@@ -1,4 +1,4 @@
-travellog
-=========
+travellogue
+===========
 
-travellog - Google Cloud Developer Challenge 2013
+Travellogue - Google Cloud Developer Challenge 2013
