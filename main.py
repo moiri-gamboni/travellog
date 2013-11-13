@@ -13,7 +13,7 @@ handlers = os.path.realpath(os.path.abspath(os.path.join\
 if handlers not in sys.path:
   sys.path.insert(0, handlers)
 
-from data_api import DataHandler
+from data_api import DataHandler, CreateCountry
 import gdrive_sync
 
 
@@ -22,5 +22,5 @@ class IndexPage(webapp2.RequestHandler):
     self.response.out.write(template.render(indexPath, None))
 
 application = webapp2.WSGIApplication([
-  ('/', IndexPage), ('/data', DataHandler)
+  ('/', IndexPage), ('/data', DataHandler), ('/country', CreateCountry)
 ], debug=True)
