@@ -1,0 +1,5 @@
+API_KEY = "hello"
+API_SECRET = "world"
+ACCESS_TOKEN = "access"
+REFRESH_TOKEN = "refresh"
+CLIENT_ID = "client_id"
