@@ -3,6 +3,8 @@
 }
 *
 	box-sizing:border-box
+.move-up
+	top: 100px
 #container
 	position:absolute
 	overflow-x:hidden
@@ -22,14 +24,13 @@
 		margin-left: 50px
 		margin-top: 50px
 		padding: 150px 50px
-		&.log-left
-			right: calc(100% - 50px)
-		&.log-right
-			left: calc(100% - 50px)
-		&.log-top
-			bottom: unquote(calc(100% - 50px))
-		&.log-bottom
-			top: unquote(calc(100% - 80px))
+		&.animate
+			-webkit-transition: all 0.5s ease
+			-moz-transition: all 0.5s ease
+			-o-transition: all 0.5s ease
+			transition: all 0.5s ease
+		&.launch
+			left:-200%	
 		.log-title
 			font-family: 'Roboto', sans-serif
 			text-transform: uppercase

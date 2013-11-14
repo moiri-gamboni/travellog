@@ -9,6 +9,9 @@
 * {
   box-sizing: border-box;
 }
+.move-up {
+  top: 100px;
+}
 #container {
   position: absolute;
   overflow-x: hidden;
@@ -30,17 +33,14 @@
   margin-top: 50px;
   padding: 150px 50px;
 }
-#container .log-details.log-left {
-  right: calc(100% - 50px);
+#container .log-details.animate {
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
-#container .log-details.log-right {
-  left: calc(100% - 50px);
-}
-#container .log-details.log-top {
-  bottom: calc(100% - 50px);
-}
-#container .log-details.log-bottom {
-  top: calc(100% - 80px);
+#container .log-details.launch {
+  left: -200%;
 }
 #container .log-details .log-title {
   font-family: 'Roboto', sans-serif;
