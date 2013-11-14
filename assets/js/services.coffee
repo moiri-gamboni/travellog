@@ -2,53 +2,74 @@
 
 srv = angular.module('myApp.services', [])
 
-srv.service('Map', ['$scope', '$rootScope', 'Country', ($scope, $rootScope, Country) ->
-  service =
-    map: []
-    current: null
+srv.factory('Map', ['$scope', '$rootScope', 'Country' ,($scope, $rootScope, Country) ->
+  map =
+    countries: []
+    current: 0
+    availableCountries: []
 
-  $scope.$on('country.update', (event) ->
-    if
-  return service
+    initMap: () ->
+      $http.get(
+        window.location.protocol + "//" + window.location.host + "/countries/"
+      ).success((data, status, headers, config) ->
+        if data.result?
+          console.log(data.result)
+          @availableCountries = shuffle(data.result)
+          for i in [0..5]
+            if @availableCountries.length isnt 0
+              country = new Country(@availableCountries.pop())
+            else break
+            for j in [0..5]
+              if country.hasLogs()
+                country.getLog()
+              else break
+            @countries.push(country)
+          @current = 1
+      ).error((data, status, headers, config) ->
+        console.log(data)
+      )
+  return map
 ])
 
-srv.factory('Country', ['$rootScope', '$http', ($rootScope, $http) ->
-  service =
-    name: null
-    id: null
+srv.factory('Country',['$http', 'id', ($http, id) ->
+  country =
+    name: ""
+    id: id
     savedLogs: []
     availableLogs: []
+    hasLogs: => @availableLogs.length!=0
 
-    getCountry: (id) ->
+    getCountry: () ->
+      country = null
       $http.get(
-        window.location.protocol + "//" + window.location.host + "/countries/:id",
+        window.location.protocol + "//" + window.location.host + "/country/",
         {params:{id:id}}
       ).success((data, status, headers, config) ->
         if data.result?
           console.log(data.result)
           @name = data.result.name
-          @id = data.result.id
-          @availableLogs = data.result.logs
-          $rootScope.$broadcast('country.init')
+          @availableLogs = shuffle(data.result.logs)
+          for j in [0..2]
+            if @hasLogs()
+              @getLog()
+            else break
       ).error((data, status, headers, config) ->
         console.log(data)
       )
 
     getLog: () ->
-      id = availableLogs[availableLogs.length -1]
+      id =  @availableLogs[@availableLogs.length -1]
       $http.get(
-        window.location.protocol + "//" + window.location.host + "/countries/:id",
+        window.location.protocol + "//" + window.location.host + "/logs/",
         {params:{id:id}}
       ).success((data, status, headers, config) ->
         if data.result?
           console.log(data.result)
           @savedLogs.push(data.result.log)
           @availableLogs.pop()
-          $rootScope.$broadcast('country.add')
-          if @availableLogs.length == 0
-            $rootScope.$broadcast('country.end')
       ).error((data, status, headers, config) ->
         console.log(data)
       )
-  return service
+  return country
 ])
+
