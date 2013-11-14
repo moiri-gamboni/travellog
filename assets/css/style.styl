@@ -1,9 +1,12 @@
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
-
+*
+	box-sizing:border-box
 #container
 	position:absolute
+	overflow-x:hidden
+	overflow-y:hidden
 	height:100%
 	width:100%
 	top:0
@@ -12,21 +15,21 @@
 	background-position:center
 	background-repeat:no-repeat
 	background-size:cover
-	.log-1
-		left: 50%
-		margin-left: -150px
-		top: 50%
-		margin-top: -100px
-	.log-2
-		left:50%
-		margin-left:-150px
-		top:0
-		margin-top:-300px
-
 	.log-details
-		width: 300px
+		width: calc(100% - 100px)
+		height: calc(100% - 130px)
 		position: absolute
-
+		margin-left: 50px
+		margin-top: 50px
+		padding: 150px 50px
+		&.log-left
+			right: calc(100% - 50px)
+		&.log-right
+			left: calc(100% - 50px)
+		&.log-top
+			bottom: unquote(calc(100% - 50px))
+		&.log-bottom
+			top: unquote(calc(100% - 80px))
 		.log-title
 			font-family: 'Roboto', sans-serif
 			text-transform: uppercase
