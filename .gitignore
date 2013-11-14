@@ -2,7 +2,7 @@ handlers/api_keys.py
 secrets.json
 *.pyc
 *.swp
-./uritemplate
-./apiclient
-./httplib2
-./oauth2client
+apiclient
+httplib2
+oauth2client
+uritemplate
