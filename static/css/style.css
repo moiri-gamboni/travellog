@@ -6,3 +6,85 @@
 .x-ng-cloak {
   display: none !important;
 }
+#container {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+#container .log-1 {
+  left: 50%;
+  margin-left: -150px;
+  top: 50%;
+  margin-top: -100px;
+}
+#container .log-2 {
+  left: 50%;
+  margin-left: -150px;
+  top: 0;
+  margin-top: -300px;
+}
+#container .log-details {
+  width: 300px;
+  position: absolute;
+}
+#container .log-details .log-title {
+  font-family: 'Roboto', sans-serif;
+  text-transform: uppercase;
+  font-size: 2em;
+  color: #fff;
+}
+#container .log-details .log-author {
+  font-family: 'Roboto', sans-serif;
+  text-transform: uppercase;
+  font-size: 1.2em;
+  color: #f06;
+  font-weight: 100;
+}
+#container .log-details .log-content {
+  font-family: 'Fenix', serif;
+  color: #fff;
+  height: 200px;
+  overflow: scroll;
+  line-height: 1.3em;
+}
+#container #blackshade {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  background-color: #000;
+  opacity: 0.6;
+}
+#container .sidenav {
+  background: rgba(225,225,225,0.3);
+  position: absolute;
+}
+#container .sidenav-top {
+  width: 100%;
+  height: 50px;
+  top: 0;
+  border-bottom: solid 1px #fff;
+}
+#container .sidenav-bottom {
+  width: 100%;
+  height: 80px;
+  bottom: 0;
+  border-top: solid 1px #fff;
+}
+#container .sidenav-left {
+  width: 50px;
+  height: 100%;
+  left: 0;
+  border-right: solid 1px #fff;
+}
+#container .sidenav-right {
+  height: 100%;
+  width: 50px;
+  right: 0;
+  border-left: solid 1px #fff;
+}
