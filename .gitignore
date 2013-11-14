@@ -1,0 +1,8 @@
+handlers/api_keys.py
+secrets.json
+*.pyc
+*.swp
+apiclient
+httplib2
+oauth2client
+uritemplate
