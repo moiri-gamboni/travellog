@@ -68,7 +68,7 @@
   color: #fff;
   overflow: scroll;
   line-height: 1.3em;
-  height: calc(100% - 100px);
+  height: calc(100% - 50px);
 }
 #container .log-details .log-content .photo {
   height: 100%;
