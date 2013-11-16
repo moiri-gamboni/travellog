@@ -6,11 +6,19 @@
 .x-ng-cloak {
   display: none !important;
 }
-* {
+*,
+*:after,
+*::before {
   box-sizing: border-box;
 }
 .move-up {
   top: 100px;
+}
+.fade {
+  opacity: 1;
+  transition: opacity 0.25s ease-in-out;
+  -moz-transition: opacity 0.25s ease-in-out;
+  -webkit-transition: opacity 0.25s ease-in-out;
 }
 #container {
   position: absolute;
@@ -31,7 +39,7 @@
   position: absolute;
   margin-left: 50px;
   margin-top: 50px;
-  padding: 150px 50px;
+  padding: 40px 50px;
 }
 #container .log-details.animate {
   -webkit-transition: all 0.5s ease;
@@ -58,9 +66,37 @@
 #container .log-details .log-content {
   font-family: 'Fenix', serif;
   color: #fff;
-  height: 200px;
   overflow: scroll;
   line-height: 1.3em;
+  height: calc(100% - 100px);
+}
+#container .log-details .log-content .photo {
+  height: 100%;
+  width: 50%;
+  float: left;
+}
+#container .log-details .log-content .photo-position {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+#container .log-details .log-content .photo-position.photo-1 {
+  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
+}
+#container .log-details .log-content .photo-position.photo-2 {
+  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
+}
+#container .log-details .log-content .photo-position.photo-3 {
+  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
+}
+#container .log-details .log-content .photo-position.photo-4 {
+  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
+}
+#container .log-details .log-content .photo-position.photo-5 {
+  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
+}
+#container .log-details .log-content .photo-position.photo-6 {
+  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
 }
 #container #blackshade {
   height: 100%;
@@ -70,7 +106,7 @@
   opacity: 0.6;
 }
 #container .sidenav {
-  background: rgba(225,225,225,0.3);
+  background: rgba(225,225,225,0.6);
   position: absolute;
 }
 #container .sidenav-top {
@@ -96,4 +132,50 @@
   width: 50px;
   right: 0;
   border-left: solid 1px #fff;
+}
+#footer {
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  width: 400px;
+  margin-left: -200px;
+  height: 80px;
+  padding: 30px 55px;
+}
+#footer img {
+  height: 30px;
+  float: left;
+  margin-right: 10px;
+}
+#footer form {
+  float: right;
+  margin-top: -15px;
+}
+#footer form input {
+  outline: none;
+  border: none;
+  background: transparent;
+  border-bottom: solid 1px #fff;
+  color: #fff;
+  font-family: 'Fenix', serif;
+  font-size: 1.5em;
+  width: 120px;
+}
+#footer form img {
+  float: none;
+  height: 40px;
+  position: relative;
+  top: 10px;
+  transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+@media (min-height:480px) {
+  .log-details {
+    padding: 80px 50px;
+  }
+  .log-content {
+    margin-top: 60px;
+    height: calc(100% - 140px);
+  }
 }

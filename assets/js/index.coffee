@@ -26,7 +26,9 @@ move = (direction) ->
 			$(".log-details").removeClass("animate").toggleClass("main launch")
 		, 500)
 	, 100)
+	
 
+	
 
 
 $(".sidenav-top").click () ->
@@ -41,6 +43,11 @@ $(".sidenav-right").click () ->
 
 $(".sidenav-left").click () ->
 	move("left")
+
+
+
+
+
 
 
 	
