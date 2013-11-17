@@ -66,37 +66,14 @@
 #container .log-details .log-content {
   font-family: 'Fenix', serif;
   color: #fff;
-  overflow: scroll;
   line-height: 1.3em;
   height: calc(100% - 50px);
 }
-#container .log-details .log-content .photo {
-  height: 100%;
-  width: 50%;
-  float: left;
-}
-#container .log-details .log-content .photo-position {
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
-#container .log-details .log-content .photo-position.photo-1 {
-  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
-}
-#container .log-details .log-content .photo-position.photo-2 {
-  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
-}
-#container .log-details .log-content .photo-position.photo-3 {
-  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
-}
-#container .log-details .log-content .photo-position.photo-4 {
-  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
-}
-#container .log-details .log-content .photo-position.photo-5 {
-  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
-}
-#container .log-details .log-content .photo-position.photo-6 {
-  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
+#container .log-details #log-wrapper {
+  height: calc(100% - 100px);
+  margin-top: 100px;
+  overflow: scroll;
+  padding-right: 30px;
 }
 #container #blackshade {
   height: 100%;
@@ -105,9 +82,38 @@
   background-color: #000;
   opacity: 0.6;
 }
+#container #nav {
+  width: calc(100% - 100px);
+  padding-left: 50px;
+  margin-left: 50px;
+  margin-top: 100px;
+  position: absolute;
+}
+#container #nav img {
+  height: 30px;
+  margin-right: 10px;
+}
+#container #country {
+  font-family: 'Roboto', sans-serif;
+  text-transform: uppercase;
+  font-size: 2em;
+  color: #fff;
+  position: absolute;
+  width: calc(100% - 100px);
+  padding-right: 50px;
+  margin-top: 100px;
+  text-align: right;
+}
 #container .sidenav {
   background: rgba(225,225,225,0.6);
   position: absolute;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+#container .sidenav:hover {
+  background: rgba(225,225,225,0.8);
 }
 #container .sidenav-top {
   width: 100%;
@@ -117,7 +123,7 @@
 }
 #container .sidenav-bottom {
   width: 100%;
-  height: 80px;
+  height: 50px;
   bottom: 0;
   border-top: solid 1px #fff;
 }
@@ -133,49 +139,12 @@
   right: 0;
   border-left: solid 1px #fff;
 }
-#footer {
-  position: absolute;
-  bottom: 0px;
-  left: 50%;
-  width: 400px;
-  margin-left: -200px;
-  height: 80px;
-  padding: 30px 55px;
-}
-#footer img {
-  height: 30px;
-  float: left;
-  margin-right: 10px;
-}
-#footer form {
-  float: right;
-  margin-top: -15px;
-}
-#footer form input {
-  outline: none;
-  border: none;
-  background: transparent;
-  border-bottom: solid 1px #fff;
-  color: #fff;
-  font-family: 'Fenix', serif;
-  font-size: 1.5em;
-  width: 120px;
-}
-#footer form img {
-  float: none;
-  height: 40px;
-  position: relative;
-  top: 10px;
-  transform: rotate(-45deg);
-  -ms-transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
-}
 @media (min-height:480px) {
-  .log-details {
-    padding: 80px 50px;
+  #container .log-details {
+    padding: 30px 50px;
   }
-  .log-content {
-    margin-top: 60px;
+  #container .log-details .log-content {
+    margin-top: 20px;
     height: calc(100% - 140px);
   }
 }
