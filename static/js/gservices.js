@@ -14,12 +14,15 @@ function checkAuth() {
 }
 
 function handleAuthResult(authResult) {
-  var authorizeButton = document.getElementById('authorize-button');
+  var authorizeMessage = $("#auth");
+  var successMessage = $("#loggedIn");
   if (authResult && !authResult.error) {
-    authorizeButton.style.visibility = 'hidden';
-    makeApiCall();
+    authorizeMessage.css({visibility:'hidden'});
+    successMessage.css({visibility:'visible'});
+    getUserInfo();
   } else {
-    authorizeButton.style.visibility = '';
+    authorizeMessage.css({visibility:'visible'});
+    successMessage.css({visibility:'hidden'});
     authorizeButton.onclick = handleAuthClick;
   }
 }
@@ -31,7 +34,7 @@ function handleAuthClick(event) {
 }
 
 // Load the API and make an API call.  Display the results on the screen.
-function makeApiCall() {
+function getUserInfo() {
   // Step 4: Load the Google+ API
   gapi.client.load('plus', 'v1', function() {
     // Step 5: Assemble the API request
@@ -40,13 +43,8 @@ function makeApiCall() {
     });
     // Step 6: Execute the API request
     request.execute(function(resp) {
-      var heading = document.createElement('h4');
-      var image = document.createElement('img');
-      image.src = resp.image.url;
-      heading.appendChild(image);
-      heading.appendChild(document.createTextNode(resp.displayName));
-
-      document.getElementById('content').appendChild(heading);
+      console.log(resp);
+      $("#name").html(resp.displayName);
     });
   });
 }
