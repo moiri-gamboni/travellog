@@ -1,27 +1,40 @@
 from google.appengine.ext import ndb
 
 class Country(ndb.Model):
-  name = ndb.StringProperty(required=True)
-  articles = ndb.StringProperty(repeated=True)
+  pass
 
 def query_country(name):
-  return Country.query(Country.name == name).get()
+  return Country.query(Country.key == ndb.Key(Country, name)).get()
+
+def get_all_countries():
+  return map(lambda x: x.id(), Country.query().fetch(200, keys_only=True))
+
+def get_country_by_key(key):
+  country_key = ndb.Key(Country, key)
+  return map(lambda x: x.id(), Log.query(ancestor=country_key).fetch(200, keys_only=True))
+
 
 def create_country(name):
-  country = Country(name=name)
-  country.puts()
-  return country
-
-def create_country(name):
-  new_country = Country(name=name)
+  new_country = Country(id=name)
   new_country.put()
   return new_country
 
 class Log(ndb.Model):
   profileId = ndb.StringProperty()
   profileName = ndb.StringProperty()
-  gdriveId = ndb.StringProperty(required=True)
+  body = ndb.StringProperty()
+
+def get_log_by_key(country, key):
+  log = ndb.Key(Country, country, Log, key).get()
+  response = {
+    "body": log.body
+  }
+  if log.profileId:
+    response['profileId'] = log.profileId
+  else:
+    response['profileName'] = log.profileName
+  return response
 
 def create_log(gdriveId, parent):
-  log = Log(parent=parent, gdriveId=gdriveId)
+  log = Log(parent=parent, id=gdriveId)
   return log
