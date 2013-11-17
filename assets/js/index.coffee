@@ -42,15 +42,13 @@ $(".sidenav-left").click () ->
 	move("left")
 
 
-changeCountry = (newCountry) ->
-	$("#country").addClass(".fadeout"
-	document.getElementById("#country").innerHTML= (newCountry);
+window.changeCountry = (newCountry) ->
+	$("#country").addClass("fadeout")
 	setTimeout(() ->
-		$(".log-details").toggleClass("fadeout fadein")
-		, 500)
+		$("#country").removeClass("fadeout").html(newCountry);
+	, 500)
 
-$(".sidenav-top").click () ->
-	changeCountry("Japan")
+
 
 
 	

@@ -11,6 +11,23 @@
 *::before {
   box-sizing: border-box;
 }
+*::-webkit-scrollbar {
+  width: 3px;
+}
+*::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+*::-webkit-scrollbar-track-piece {
+  background-color: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  height: 15px;
+  background-color: #fff;
+  border-radius: 15px;
+}
+*::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
 .move-up {
   top: 100px;
 }
@@ -22,9 +39,6 @@
 }
 .fadeout {
   opacity: 0;
-}
-.fadein {
-  opacity: 1;
 }
 #container {
   position: absolute;
@@ -81,7 +95,8 @@
 #container .log-details #log-wrapper {
   height: calc(100% - 100px);
   margin-top: 100px;
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: none;
   padding-right: 30px;
 }
 #container #blackshade {
@@ -94,8 +109,7 @@
 #container #nav {
   width: calc(100% - 100px);
   padding-left: 90px;
-  margin-left: 50px;
-  margin-top: 100px;
+  margin-top: 70px;
   position: absolute;
 }
 #container #nav img {
@@ -105,12 +119,12 @@
 #container #country {
   font-family: 'Roboto', sans-serif;
   text-transform: uppercase;
-  font-size: 2.4em;
+  font-size: 2.2em;
   color: #999;
   position: absolute;
-  width: calc(100% - 100px);
-  padding-right: 20px;
-  margin-top: 130px;
+  width: 300px;
+  right: 75px;
+  margin-top: 60px;
   text-align: right;
   -webkit-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
