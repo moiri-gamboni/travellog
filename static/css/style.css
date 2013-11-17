@@ -20,6 +20,12 @@
   -moz-transition: opacity 0.25s ease-in-out;
   -webkit-transition: opacity 0.25s ease-in-out;
 }
+.fadeout {
+  opacity: 0;
+}
+.fadein {
+  opacity: 1;
+}
 #container {
   position: absolute;
   overflow-x: hidden;
@@ -39,7 +45,6 @@
   position: absolute;
   margin-left: 50px;
   margin-top: 50px;
-  padding: 40px 50px;
 }
 #container .log-details.animate {
   -webkit-transition: all 0.5s ease;
@@ -53,7 +58,7 @@
 #container .log-details .log-title {
   font-family: 'Roboto', sans-serif;
   text-transform: uppercase;
-  font-size: 2em;
+  font-size: 1.8em;
   color: #fff;
 }
 #container .log-details .log-author {
@@ -68,6 +73,10 @@
   color: #fff;
   line-height: 1.3em;
   height: calc(100% - 50px);
+}
+#container .log-details .log-content img {
+  width: 100%;
+  height: auto;
 }
 #container .log-details #log-wrapper {
   height: calc(100% - 100px);
@@ -84,7 +93,7 @@
 }
 #container #nav {
   width: calc(100% - 100px);
-  padding-left: 50px;
+  padding-left: 90px;
   margin-left: 50px;
   margin-top: 100px;
   position: absolute;
@@ -96,16 +105,21 @@
 #container #country {
   font-family: 'Roboto', sans-serif;
   text-transform: uppercase;
-  font-size: 2em;
-  color: #fff;
+  font-size: 2.4em;
+  color: #999;
   position: absolute;
   width: calc(100% - 100px);
-  padding-right: 50px;
-  margin-top: 100px;
+  padding-right: 20px;
+  margin-top: 130px;
   text-align: right;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 #container .sidenav {
-  background: rgba(225,225,225,0.6);
+  background: rgba(225,225,225,0.8);
+  opacity: 0.8;
   position: absolute;
   -webkit-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
@@ -113,7 +127,7 @@
   transition: all 0.2s ease-in-out;
 }
 #container .sidenav:hover {
-  background: rgba(225,225,225,0.8);
+  opacity: 1;
 }
 #container .sidenav-top {
   width: 100%;
@@ -139,9 +153,46 @@
   right: 0;
   border-left: solid 1px #fff;
 }
+#container .arrow {
+  width: 0;
+  height: 0;
+  position: absolute;
+  opacity: 0.8;
+}
+#container .arrow.arrow-up-down {
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  right: 50%;
+  margin-right: -10px;
+}
+#container .arrow.arrow-left-right {
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+  top: 50%;
+  margin-top: -10px;
+}
+#container .arrow.arrow-up {
+  border-bottom: 20px solid #fff;
+  margin-top: 15px;
+}
+#container .arrow.arrow-down {
+  border-top: 20px solid #fff;
+  bottom: 0;
+  margin-bottom: 15px;
+}
+#container .arrow.arrow-right {
+  border-left: 20px solid #fff;
+  right: 0;
+  margin-right: 15px;
+}
+#container .arrow.arrow-left {
+  border-right: 20px solid #fff;
+  left: 0;
+  margin-left: 15px;
+}
 @media (min-height:480px) {
   #container .log-details {
-    padding: 30px 50px;
+    padding: 30px 50px 30px 90px;
   }
   #container .log-details .log-content {
     margin-top: 20px;
