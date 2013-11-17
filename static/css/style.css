@@ -6,8 +6,24 @@
 .x-ng-cloak {
   display: none !important;
 }
+*,
+*:after,
+*::before {
+  box-sizing: border-box;
+}
+.move-up {
+  top: 100px;
+}
+.fade {
+  opacity: 1;
+  transition: opacity 0.25s ease-in-out;
+  -moz-transition: opacity 0.25s ease-in-out;
+  -webkit-transition: opacity 0.25s ease-in-out;
+}
 #container {
   position: absolute;
+  overflow-x: hidden;
+  overflow-y: hidden;
   height: 100%;
   width: 100%;
   top: 0;
@@ -17,21 +33,22 @@
   background-repeat: no-repeat;
   background-size: cover;
 }
-#container .log-1 {
-  left: 50%;
-  margin-left: -150px;
-  top: 50%;
-  margin-top: -100px;
-}
-#container .log-2 {
-  left: 50%;
-  margin-left: -150px;
-  top: 0;
-  margin-top: -300px;
-}
 #container .log-details {
-  width: 300px;
+  width: calc(100% - 100px);
+  height: calc(100% - 130px);
   position: absolute;
+  margin-left: 50px;
+  margin-top: 50px;
+  padding: 40px 50px;
+}
+#container .log-details.animate {
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+#container .log-details.launch {
+  left: -200%;
 }
 #container .log-details .log-title {
   font-family: 'Roboto', sans-serif;
@@ -49,9 +66,14 @@
 #container .log-details .log-content {
   font-family: 'Fenix', serif;
   color: #fff;
-  height: 200px;
-  overflow: scroll;
   line-height: 1.3em;
+  height: calc(100% - 50px);
+}
+#container .log-details #log-wrapper {
+  height: calc(100% - 100px);
+  margin-top: 100px;
+  overflow: scroll;
+  padding-right: 30px;
 }
 #container #blackshade {
   height: 100%;
@@ -60,9 +82,38 @@
   background-color: #000;
   opacity: 0.6;
 }
-#container .sidenav {
-  background: rgba(225,225,225,0.3);
+#container #nav {
+  width: calc(100% - 100px);
+  padding-left: 50px;
+  margin-left: 50px;
+  margin-top: 100px;
   position: absolute;
+}
+#container #nav img {
+  height: 30px;
+  margin-right: 10px;
+}
+#container #country {
+  font-family: 'Roboto', sans-serif;
+  text-transform: uppercase;
+  font-size: 2em;
+  color: #fff;
+  position: absolute;
+  width: calc(100% - 100px);
+  padding-right: 50px;
+  margin-top: 100px;
+  text-align: right;
+}
+#container .sidenav {
+  background: rgba(225,225,225,0.6);
+  position: absolute;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+#container .sidenav:hover {
+  background: rgba(225,225,225,0.8);
 }
 #container .sidenav-top {
   width: 100%;
@@ -72,7 +123,7 @@
 }
 #container .sidenav-bottom {
   width: 100%;
-  height: 80px;
+  height: 50px;
   bottom: 0;
   border-top: solid 1px #fff;
 }
@@ -87,4 +138,13 @@
   width: 50px;
   right: 0;
   border-left: solid 1px #fff;
+}
+@media (min-height:480px) {
+  #container .log-details {
+    padding: 30px 50px;
+  }
+  #container .log-details .log-content {
+    margin-top: 20px;
+    height: calc(100% - 140px);
+  }
 }
