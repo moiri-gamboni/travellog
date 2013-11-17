@@ -13,7 +13,6 @@ def get_country_by_key(key):
   country_key = ndb.Key(Country, key)
   return map(lambda x: x.id(), Log.query(ancestor=country_key).fetch(200, keys_only=True))
 
-
 def create_country(name):
   new_country = Country(id=name)
   new_country.put()
@@ -22,11 +21,15 @@ def create_country(name):
 class Log(ndb.Model):
   profileId = ndb.StringProperty()
   profileName = ndb.StringProperty()
-  body = ndb.StringProperty()
+  body = ndb.TextProperty()
+  title = ndb.TextProperty()
 
 def get_log_by_key(country, key):
   log = ndb.Key(Country, country, Log, key).get()
   response = {
+    "id": key,
+    "country": country,
+    "title": log.title,
     "body": log.body
   }
   if log.profileId:

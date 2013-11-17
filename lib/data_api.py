@@ -3,6 +3,7 @@ import json
 import models
 
 from google.appengine.ext import ndb
+import gdrive
 
 class DataHandler(webapp2.RequestHandler):
   def get(self):
@@ -30,6 +31,7 @@ class LogHandler(webapp2.RequestHandler):
         self.response.write({"status": 404, "error":\
           "log with id %s and country %s not found" %\
           (self.request.get("id"), self.request.get("country"))})
+        return
 
   def post(self):
     self.parseJson()
@@ -53,8 +55,14 @@ class LogHandler(webapp2.RequestHandler):
       self.response.write({"status": 400, "error":\
           "You must have either a profileId or profileName parameter"})
       return
+    #try:
+    gdrive.process_log(log)
+    #except:
+      #self.response.write({"status": 400, "error":\
+          #"Could not process drive document with id %s" %\
+          #self.params["gdriveId"]})
+      #return
     log.put()
-    print log
     self.response.write({"status": 200})
 
   def parseJson(self):
@@ -70,6 +78,20 @@ class CountriesHandler(webapp2.RequestHandler):
       except:
         self.response.write({"status": 404, "error":\
           "country with id %s not found" % self.request.get("id")})
+        return
     # if there is no param for id, return all countries
     else:
       self.response.write({"status": 200, "countries": models.get_all_countries()})
+
+class DriveHandler(webapp2.RequestHandler):
+  def get(self):
+    # preferably, get the ids of the articles for a specific country
+    if "id" in self.request.arguments():
+      try:
+        document = drive.get_file()
+      except:
+        self.response.write({"status": 404, "error":\
+          "drive document with id %s not found" % self.request.get("id")})
+    # if there is no param for id, return all drive documents
+    else:
+      self.response.write({"status": 200, "gdrive": gdrive.all_files()})
