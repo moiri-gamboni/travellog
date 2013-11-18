@@ -67,44 +67,11 @@ function retrieveAllFiles(callback) {
         });
         retrievePageOfFiles(request, result);
       } else {
+        console.log(result);
         callback(result);
       }
     });
   };
   var initialRequest = gapi.client.drive.files.list();
   retrievePageOfFiles(initialRequest, []);
-}
-
-function addToTravellog(fileId) {
-  var body = {
-    "value": "travellog.io@gmail.com",
-    "type": "user",
-    "role": "owner"
-  };
-  var request = gapi.client.drive.permissions.insert({
-    "fileId": fileId,
-    "resource": body
-  });
-  request.execute(function(resp) {
-    // debug code
-    console.log(resp);
-  });
-  
-}
-
-function makePublic(fileId) {
-  var body = {
-    "value": "",
-    "type": "anyone",
-    "role": "reader"
-  };
-  var request = gapi.client.drive.permissions.insert({
-    "fileId": fileId,
-    "resource": body
-  });
-  request.execute(function(resp) {
-    // debug code
-    console.log(resp);
-  });
-  
 }
