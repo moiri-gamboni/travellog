@@ -29,7 +29,40 @@
 	opacity:0
 .fadein
 	opacity:1
+#launch-screen
+	height:100%
+	width:100%
+	top:0
+	left:0
+	position:absolute	
+	background: url('http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg')
+	background-size:cover
+	background-position:center
+	font-family: "Roboto", sans-serif
+
+	hr
+		height: 15px
+		width: 170px
+		background: black
+		border: transparent
+		top: 50%
+		left: 50%
+		position: absolute
+		margin-left: -85px
+		&.top-bar
+			margin-top: -150px
+	h1
+		font-size: 4em
+		position: absolute
+		top: 50%
+		margin-top: -108px
+		left: 50%
+		margin-left: -134px
+		font-weight: 500;
+	p
+		font-size: 2em
 #container
+	font-family: "Roboto", sans-serif
 	position:absolute
 	overflow-x:hidden
 	overflow-y:hidden
@@ -41,14 +74,27 @@
 	background-position:center
 	background-repeat:no-repeat
 	background-size:cover
+	transition: opacity .25s ease-in-out
+	-moz-transition: opacity .25s ease-in-out
+	-webkit-transition: opacity .25s ease-in-out
+	&.hide
+		opacity:0
+		pointer-events:none
 	#loading
 		position:absolute
 		height:100%
 		width:100%
 		top:0
 		left:0
-		p
-			text-align:center
+		visibility:hidden
+		span
+			position: absolute
+			color: white
+			font-size: 2em
+			top: 50%
+			margin-top: 57px
+			left: 50%
+			margin-left: -57px
 		img
 			top:50%
 			position:absolute
@@ -75,7 +121,6 @@
 			z-index: 1
 			opacity:0.9
 		h2
-			font-family: 'Roboto', sans-serif
 			text-transform: uppercase
 			font-size: 2.2em
 			position: absolute
@@ -96,10 +141,8 @@
 			pointer-events:none
 			z-index:1	
 			h1
-				font-family: 'Roboto', sans-serif
 				text-align:center
 			p
-				font-family: 'Fenix', serif
 				line-height:1.5em
 				overflow-y:scroll
 	.log-details
@@ -108,6 +151,7 @@
 		position: absolute
 		margin-left: 50px
 		margin-top: 50px
+		padding: 30px 50px 30px 90px
 		&.animate
 			-webkit-transition: all 0.5s ease
 			-moz-transition: all 0.5s ease
@@ -116,24 +160,19 @@
 		&.launch
 			left:-200%	
 		.log-title
-			font-family: 'Roboto', sans-serif
 			text-transform: uppercase
 			font-size: 1.8em
 			color: white
 		.log-author
-			font-family: 'Roboto', sans-serif
-			text-transform:uppercase
-			font-size:1.2em
-			color:#FF0066
-			font-weight:100
+			padding: 10px 0px
 		.log-content
-			font-family: 'Fenix', serif
 			color: white
 			line-height: 1.3em
+			font-size:1.1em
 			height: calc(100% - 50px)
 			img
-				width: 100%;
-				height: auto;
+				width: 100%
+				height: auto
 		#log-wrapper
 			height: calc(100% - 100px)
 			margin-top: 100px
@@ -145,7 +184,7 @@
 		width:100%
 		position:absolute
 		background-color:black
-		opacity: 0.6
+		opacity:0.6
 	#nav
 		width: calc(100% - 100px)
 		padding-left:90px
@@ -155,12 +194,11 @@
 			height:30px
 			margin-right:10px
 	#country
-		font-family: 'Roboto', sans-serif
 		text-transform: uppercase
-		font-size: 2.2em
+		font-size: 2em
 		color: #999
 		position: absolute
-		width: 300px
+		width: 250px
 		right: 75px
 		margin-top: 60px
 		text-align: right
@@ -178,6 +216,7 @@
 		transition:all 0.2s ease-in-out
 		&:hover
 			opacity: 1
+			cursor:pointer
 	.sidenav-top
 		width:100%
 		height:50px
@@ -232,7 +271,14 @@
 @media (min-height:480px)
 	#container 
 		.log-details
-			padding: 30px 50px 30px 90px;
 			.log-content
 				margin-top: 20px
 				height: calc(100% - 140px)
+@media (min-width:760px)
+	#container
+		.log-details
+			.log-content
+				img
+					padding: 0px 100px
+
+
