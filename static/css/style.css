@@ -22,7 +22,7 @@
 }
 *::-webkit-scrollbar-thumb {
   height: 15px;
-  background-color: #fff;
+  background-color: #999;
   border-radius: 15px;
 }
 *::-webkit-scrollbar-corner {
@@ -40,6 +40,9 @@
 .fadeout {
   opacity: 0;
 }
+.fadein {
+  opacity: 1;
+}
 #container {
   position: absolute;
   overflow-x: hidden;
@@ -52,6 +55,78 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+#container #loading {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+#container #loading p {
+  text-align: center;
+}
+#container #loading img {
+  top: 50%;
+  position: absolute;
+  margin-left: -16px;
+  left: 50%;
+}
+#container #overlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+  color: #fff;
+  transition: 0.5s ease-in-out;
+  -moz-transition: 0.5s ease-in-out;
+  -webkit-transition: 0.5s ease-in-out;
+  z-index: 1;
+}
+#container #overlay.fadein {
+  opacity: 1;
+  pointer-events: auto;
+}
+#container #overlay #blackblur {
+  height: 100%;
+  width: 100%;
+  background: #000;
+  z-index: 1;
+  opacity: 0.9;
+}
+#container #overlay h2 {
+  font-family: 'Roboto', sans-serif;
+  text-transform: uppercase;
+  font-size: 2.2em;
+  position: absolute;
+  top: 0;
+  right: 50px;
+}
+#container #overlay #overlay-content {
+  position: absolute;
+  top: 0;
+  width: calc(100% - 100px);
+  height: calc(100% - 130px);
+  margin-left: 50px;
+  margin-top: 50px;
+  padding-top: 100px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+#container #overlay #overlay-content.fadein {
+  opacity: 1;
+  pointer-events: auto;
+}
+#container #overlay #overlay-content h1 {
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+}
+#container #overlay #overlay-content p {
+  font-family: 'Fenix', serif;
+  line-height: 1.5em;
+  overflow-y: scroll;
 }
 #container .log-details {
   width: calc(100% - 100px);

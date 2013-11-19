@@ -48,6 +48,13 @@ window.changeCountry = (newCountry) ->
 		$("#country").removeClass("fadeout").html(newCountry);
 	, 500)
 
+$("#question").click () ->
+	console.log("working")
+	$("#overlay, #overlay-content").addClass("fadein")
+
+$("#overlay").click () ->
+	$("#overlay, #overlay-content").removeClass("fadein")
+
 
 
 

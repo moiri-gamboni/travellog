@@ -13,7 +13,7 @@
 	background-color: transparent
 *::-webkit-scrollbar-thumb 
 	height: 15px
-	background-color: #fff
+	background-color: #999
 	border-radius: 15px
 *::-webkit-scrollbar-corner
 	background-color: transparent
@@ -27,6 +27,8 @@
 	-webkit-transition: opacity .25s ease-in-out;
 .fadeout
 	opacity:0
+.fadein
+	opacity:1
 #container
 	position:absolute
 	overflow-x:hidden
@@ -39,6 +41,67 @@
 	background-position:center
 	background-repeat:no-repeat
 	background-size:cover
+	#loading
+		position:absolute
+		height:100%
+		width:100%
+		top:0
+		left:0
+		p
+			text-align:center
+		img
+			top:50%
+			position:absolute
+			margin-left:-16px
+			left:50%
+	#overlay
+		position:absolute
+		height:100%
+		width:100%
+		opacity:0
+		&.fadein
+			opacity: 1
+			pointer-events:auto
+		pointer-events:none
+		color: white
+		transition:.5s ease-in-out
+		-moz-transition: .5s ease-in-out
+		-webkit-transition: .5s ease-in-out
+		z-index:1
+		#blackblur
+			height:100%
+			width:100%
+			background:black
+			z-index: 1
+			opacity:0.9
+		h2
+			font-family: 'Roboto', sans-serif
+			text-transform: uppercase
+			font-size: 2.2em
+			position: absolute
+			top: 0
+			right: 50px
+		#overlay-content
+			position: absolute
+			top: 0
+			width: calc(100% - 100px)
+			height: calc(100% - 130px)
+			margin-left: 50px
+			margin-top: 50px
+			padding-top: 100px
+			opacity:0
+			&.fadein
+				opacity: 1
+				pointer-events:auto
+			pointer-events:none
+			z-index:1	
+			h1
+				font-family: 'Roboto', sans-serif
+				text-align:center
+			p
+				font-family: 'Fenix', serif
+				line-height:1.5em
+				overflow-y:scroll
 	.log-details
 		width: calc(100% - 100px)
 		height: calc(100% - 130px)

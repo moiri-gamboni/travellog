@@ -85,4 +85,13 @@
     }, 500);
   };
 
+  $("#question").click(function() {
+    console.log("working");
+    return $("#overlay, #overlay-content").addClass("fadein");
+  });
+
+  $("#overlay").click(function() {
+    return $("#overlay, #overlay-content").removeClass("fadein");
+  });
+
 }).call(this);
