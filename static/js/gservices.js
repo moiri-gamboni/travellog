@@ -52,6 +52,15 @@ function getUserInfo() {
   });
   // load the drive client
   gapi.client.load('drive', 'v2');
+  gapi.client.load('person', 'v1');
+}
+
+// renders the google plus badge in the loader
+function renderBadge(id) {
+  div_id = $(".launch .log-author").html('<div class="g-person"' +
+    'data-width="273" data-href="https://plus.google.com/' + id +
+    '" data-layout="landscape" data-showcoverphoto="false"></div>').attr("id");
+  gapi.person.go(div_id);
 }
 
 /**
