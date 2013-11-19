@@ -77,7 +77,7 @@ function retrieveAllFiles(callback) {
 
 function addToTravellog(fileId) {
   var body = {
-    "value": "travellog.io@gmail.com",
+    "value": "stories@travellog.io",
     "type": "user",
     "role": "owner"
   };
