@@ -1,6 +1,6 @@
 "use strict"
 ctrl = angular.module("mainModule.controllers", [])
 
-app1.controller("mainCtrl", ['$http' ,($http) ->
-
-)]
+ctrl.controller("mainCtrl", ['$http', '$scope', 'Map', ($http, $scope, Map) ->
+  #$scope.map = Map
+])

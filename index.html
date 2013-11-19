@@ -1,12 +1,14 @@
 <!DOCTYPE HTML>
-<html>
+<html ng-app="mainModule">
 	<head>
 		<link rel="stylesheet" type="text/css" href="/static/css/style.css">
 		<link href='http://fonts.googleapis.com/css?family=Fenix' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,500' rel='stylesheet' type='text/css'>
 		<meta name="viewport" content="width=device-width">
+    <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
 	</head>
 	<body>
+<<<<<<< HEAD
 		<div id="launch-screen">
 			<div id="logo">
 				<hr class="top-bar">
@@ -17,6 +19,9 @@
 			<h3> Start Here </h3>
 		</div>
 		<div id="container" class="hide">
+=======
+		<div id="container" ng-controller="mainCtrl">
+>>>>>>> master
 			<div id="overlay">
 				<div id="blackblur" ></div>
 				<h2 id="escape">X</h2>
@@ -33,6 +38,7 @@
 					<div class="log-title">
 						Edges Edges Edge sEdges
 					</div>
+<<<<<<< HEAD
 					<div class="log-author">
 						<div class="g-person" data-width="273" data-href="//plus.google.com/117392087527144681197" data-layout="landscape" data-showcoverphoto="false" data-rel="author"></div>
 						<script type="text/javascript">
@@ -42,9 +48,19 @@
 					    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
 					  })();
 					</script>
+=======
+					<div id="plus-badge" class="log-author">
+						Mariko Kuroda
+>>>>>>> master
 					</div>
 					<div class="log-content">
-						<p class="c0"><span>Here we go</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>This is pretty cool I think</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>Here&rsquo;s an image:</span></p><p class="c0"><img height="376" src="https://lh5.googleusercontent.com/iHkNlgtXhp-bvLu2WOUV5o5ILLtoFLe8oHq9ZzSRyU1GDWACPt56arkmSQchiZ-iGEuHkWdp0_Yq1M6HSW-r41VjfXZaucpMEZhfFIwEtLhZKEedkek" width="264"></p><p class="c0 c1"><span></span></p><p class="c0"><span>Yeah...</span></p><p class="c1 c0"><span></span></p>
+            <button id="authorize-button" style="visibility: hidden">Authorize</button>
+            <div id="loggedIn" style="visibility: hidden">
+              You are logged in as: <span id="name"></span>
+              <div id="plus-badge">
+              </div>
+            </div>
+						<p class="c0"><span>{{current}}</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>This is pretty cool I think</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>Here&rsquo;s an image:</span></p><p class="c0"><img height="376" src="https://lh5.googleusercontent.com/iHkNlgtXhp-bvLu2WOUV5o5ILLtoFLe8oHq9ZzSRyU1GDWACPt56arkmSQchiZ-iGEuHkWdp0_Yq1M6HSW-r41VjfXZaucpMEZhfFIwEtLhZKEedkek" width="264"></p><p class="c0 c1"><span></span></p><p class="c0"><span>Yeah...</span></p><p class="c1 c0"><span></span></p>
 					</div>
 				</div>
 			</div>
@@ -57,6 +73,7 @@
 					<div class="log-title">
 						Edges Edges Edge sEdges
 					</div>
+<<<<<<< HEAD
 					<div class="log-author">
 						<div class="g-person" data-width="273" data-href="//plus.google.com/117392087527144681197" data-layout="landscape" data-showcoverphoto="false" data-rel="author"></div>
 						<script type="text/javascript">
@@ -66,6 +83,10 @@
 					    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
 					  })();
 					</script>
+=======
+					<div id="plus-badge-2" class="log-author">
+						Mariko Kuroda
+>>>>>>> master
 					</div>
 					<div class="log-content">
 						Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem IpsumLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum
@@ -84,7 +105,6 @@
 			<div class="sidenav sidenav-bottom">
 				<div class="arrow arrow-up-down arrow-down"></div>
 			</div>
-	
 			<div id="nav">
 				<img id="question" src="/static/img/questionIcon.png"/>
 				<img src="/static/img/addIcon.png"/>
@@ -95,8 +115,14 @@
 			</div>
 
 		</div>
-		
+
+  <script type="text/javascript" src='static/lib/angular/angular.js'></script>
+  <script type="text/javascript" src='static/js/app.js'></script>
+  <script type="text/javascript" src='static/js/services.js'></script>
+  <script type="text/javascript" src='static/js/controllers.js'></script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 	<script type="text/javascript" src="/static/js/index.js"></script>
+	<script type="text/javascript" src="/static/js/gservices.js"></script>
+  <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
 	</body>
 </html>
