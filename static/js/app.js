@@ -3,6 +3,10 @@
   "use strict";
   var module;
 
-  module = angular.module("mainModule", ["mainModule.services", "mainModule.controllers", "mainModule.directives"]);
+  module = angular.module("mainModule", ["mainModule.services", "mainModule.controllers"]);
+
+  module.run(function() {
+    return console.log("run");
+  });
 
 }).call(this);

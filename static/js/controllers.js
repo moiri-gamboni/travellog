@@ -5,10 +5,6 @@
 
   ctrl = angular.module("mainModule.controllers", []);
 
-  app1.controller("mainCtrl", [
-    '$http', function($http) {
-      return console.log();
-    }
-  ]);
+  ctrl.controller("mainCtrl", ['$http', '$scope', 'Map', function($http, $scope, Map) {}]);
 
 }).call(this);

@@ -1,12 +1,12 @@
 <!DOCTYPE HTML>
-<html>
+<html ng-app="mainModule">
 	<head>
 		<link rel="stylesheet" type="text/css" href="/static/css/style.css">
 		<link href='http://fonts.googleapis.com/css?family=Fenix' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,500' rel='stylesheet' type='text/css'>
 	</head>
 	<body>
-		<div id="container">
+		<div id="container" ng-controller="mainCtrl">
 			<div id="blackshade"></div>
 			<div class="log-details main">
 				<div id="log-wrapper">
@@ -17,7 +17,7 @@
 						Mariko Kuroda
 					</div>
 					<div class="log-content">
-						<p class="c0"><span>Here we go</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>This is pretty cool I think</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>Here&rsquo;s an image:</span></p><p class="c0"><img height="376" src="https://lh5.googleusercontent.com/iHkNlgtXhp-bvLu2WOUV5o5ILLtoFLe8oHq9ZzSRyU1GDWACPt56arkmSQchiZ-iGEuHkWdp0_Yq1M6HSW-r41VjfXZaucpMEZhfFIwEtLhZKEedkek" width="264"></p><p class="c0 c1"><span></span></p><p class="c0"><span>Yeah...</span></p><p class="c1 c0"><span></span></p>
+						<p class="c0"><span>{{current}}</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>This is pretty cool I think</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>Here&rsquo;s an image:</span></p><p class="c0"><img height="376" src="https://lh5.googleusercontent.com/iHkNlgtXhp-bvLu2WOUV5o5ILLtoFLe8oHq9ZzSRyU1GDWACPt56arkmSQchiZ-iGEuHkWdp0_Yq1M6HSW-r41VjfXZaucpMEZhfFIwEtLhZKEedkek" width="264"></p><p class="c0 c1"><span></span></p><p class="c0"><span>Yeah...</span></p><p class="c1 c0"><span></span></p>
 					</div>
 				</div>
 			</div>
@@ -46,10 +46,10 @@
 			<div class="sidenav sidenav-bottom">
 				<div class="arrow arrow-up-down arrow-down"></div>
 			</div>
-			
-			
-			
-			
+
+
+
+
 			<div id="nav">
 				<img src="/static/img/questionIcon.png"/>
 				<img src="/static/img/addIcon.png"/>
@@ -59,7 +59,11 @@
 				United States of America
 			</div>
 		</div>
-		
+
+  <script type="text/javascript" src='static/lib/angular/angular.js'></script>
+  <script type="text/javascript" src='static/js/app.js'></script>
+  <script type="text/javascript" src='static/js/services.js'></script>
+  <script type="text/javascript" src='static/js/controllers.js'></script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 	<script type="text/javascript" src="/static/js/jquery.transit.min.js"></script>
 	<script type="text/javascript" src="/static/js/index.js"></script>
