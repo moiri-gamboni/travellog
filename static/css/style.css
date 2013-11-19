@@ -43,6 +43,38 @@
 .fadein {
   opacity: 1;
 }
+#launch-screen {
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
+  background-size: cover;
+  background-position: center;
+}
+#launch-screen hr {
+  height: 15px;
+  width: 170px;
+  background: #000;
+  border: transparent;
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  margin-left: -85px;
+}
+#launch-screen hr.top-bar {
+  margin-top: -150px;
+}
+#launch-screen p {
+  font-family: "Roboto", sans-serif;
+  font-size: 4em;
+  position: absolute;
+  top: 50%;
+  margin-top: -108px;
+  left: 50%;
+  margin-left: -134px;
+}
 #container {
   position: absolute;
   overflow-x: hidden;
@@ -55,6 +87,13 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  transition: opacity 0.25s ease-in-out;
+  -moz-transition: opacity 0.25s ease-in-out;
+  -webkit-transition: opacity 0.25s ease-in-out;
+}
+#container.hide {
+  opacity: 0;
+  pointer-events: none;
 }
 #container #loading {
   position: absolute;
@@ -62,9 +101,17 @@
   width: 100%;
   top: 0;
   left: 0;
+  visibility: hidden;
 }
-#container #loading p {
-  text-align: center;
+#container #loading span {
+  position: absolute;
+  color: #fff;
+  font-size: 2em;
+  font-family: "Roboto", sans-serif;
+  top: 50%;
+  margin-top: 57px;
+  left: 50%;
+  margin-left: -57px;
 }
 #container #loading img {
   top: 50%;
@@ -194,10 +241,10 @@
 #container #country {
   font-family: 'Roboto', sans-serif;
   text-transform: uppercase;
-  font-size: 2.2em;
+  font-size: 2em;
   color: #999;
   position: absolute;
-  width: 300px;
+  width: 250px;
   right: 75px;
   margin-top: 60px;
   text-align: right;
@@ -217,6 +264,7 @@
 }
 #container .sidenav:hover {
   opacity: 1;
+  cursor: pointer;
 }
 #container .sidenav-top {
   width: 100%;

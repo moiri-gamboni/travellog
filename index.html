@@ -7,9 +7,14 @@
 		<meta name="viewport" content="width=device-width">
 	</head>
 	<body>
-		<div id="container">
+		<div id="launch-screen">
+			<hr class="top-bar">
+			 <p>Travellog</p>
+			<hr>
+		</div>
+		<div id="container" class="hide">
 			<div id="overlay">
-				<div id="blackblur"></div>
+				<div id="blackblur" ></div>
 				<h2 id="escape">X</h2>
 				<div id="overlay-content">
 					<h1> Learn about Travellogue </h1>
@@ -18,7 +23,7 @@
 					</p>
 				</div>
 			</div>
-			<div id="blackshade"></div>
+			<div id="blackshade" ></div>
 			<div class="log-details main">
 				<div id="log-wrapper">
 					<div class="log-title">
@@ -35,7 +40,7 @@
 			<div class="log-details launch">
 				<div id="loading">
 					<img src="/static/img/ajax-loader.gif"/>
-					<p>Loading</p>
+					<span>Loading...</span>
 				</div>
 				<div id="log-wrapper">
 					<div class="log-title">
@@ -74,7 +79,6 @@
 		</div>
 		
 	<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
-	<script type="text/javascript" src="/static/js/jquery.transit.min.js"></script>
 	<script type="text/javascript" src="/static/js/index.js"></script>
 	</body>
 </html>

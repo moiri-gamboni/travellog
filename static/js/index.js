@@ -94,4 +94,9 @@
     return $("#overlay, #overlay-content").removeClass("fadein");
   });
 
+  $("#launch-screen p").click(function() {
+    $("#launch-screen").addClass("hide");
+    return $("#container").removeClass("hide");
+  });
+
 }).call(this);

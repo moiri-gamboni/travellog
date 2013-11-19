@@ -29,6 +29,34 @@
 	opacity:0
 .fadein
 	opacity:1
+#launch-screen
+	height:100%
+	width:100%
+	top:0
+	left:0
+	position:absolute	
+	background: url('http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg')
+	background-size:cover
+	background-position:center
+	hr
+		height: 15px
+		width: 170px
+		background: black
+		border: transparent
+		top: 50%
+		left: 50%
+		position: absolute
+		margin-left: -85px
+		&.top-bar
+			margin-top: -150px
+	p
+		font-family: "Roboto", sans-serif
+		font-size: 4em
+		position: absolute
+		top: 50%
+		margin-top: -108px
+		left: 50%
+		margin-left: -134px
 #container
 	position:absolute
 	overflow-x:hidden
@@ -41,14 +69,28 @@
 	background-position:center
 	background-repeat:no-repeat
 	background-size:cover
+	transition: opacity .25s ease-in-out
+	-moz-transition: opacity .25s ease-in-out
+	-webkit-transition: opacity .25s ease-in-out
+	&.hide
+		opacity:0
+		pointer-events:none
 	#loading
 		position:absolute
 		height:100%
 		width:100%
 		top:0
 		left:0
-		p
-			text-align:center
+		visibility:hidden
+		span
+			position: absolute
+			color: white
+			font-size: 2em
+			font-family: "Roboto", sans-serif
+			top: 50%
+			margin-top: 57px
+			left: 50%
+			margin-left: -57px
 		img
 			top:50%
 			position:absolute
@@ -132,8 +174,8 @@
 			line-height: 1.3em
 			height: calc(100% - 50px)
 			img
-				width: 100%;
-				height: auto;
+				width: 100%
+				height: auto
 		#log-wrapper
 			height: calc(100% - 100px)
 			margin-top: 100px
@@ -145,7 +187,7 @@
 		width:100%
 		position:absolute
 		background-color:black
-		opacity: 0.6
+		opacity:0.6
 	#nav
 		width: calc(100% - 100px)
 		padding-left:90px
@@ -157,10 +199,10 @@
 	#country
 		font-family: 'Roboto', sans-serif
 		text-transform: uppercase
-		font-size: 2.2em
+		font-size: 2em
 		color: #999
 		position: absolute
-		width: 300px
+		width: 250px
 		right: 75px
 		margin-top: 60px
 		text-align: right
@@ -178,6 +220,7 @@
 		transition:all 0.2s ease-in-out
 		&:hover
 			opacity: 1
+			cursor:pointer
 	.sidenav-top
 		width:100%
 		height:50px
