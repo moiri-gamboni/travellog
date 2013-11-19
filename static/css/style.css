@@ -63,6 +63,9 @@
   top: 0;
   left: 0;
 }
+#container #loading p {
+  text-align: center;
+}
 #container #loading img {
   top: 50%;
   position: absolute;
