@@ -55,7 +55,9 @@ $("#question").click () ->
 $("#overlay").click () ->
 	$("#overlay, #overlay-content").removeClass("fadein")
 
-
+$("#launch-screen p").click () ->
+		$("#launch-screen").addClass("hide")
+		$("#container").removeClass("hide")
 
 
 	

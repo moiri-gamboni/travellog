@@ -43,7 +43,44 @@
 .fadein {
   opacity: 1;
 }
+#launch-screen {
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+  background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
+  background-size: cover;
+  background-position: center;
+  font-family: "Roboto", sans-serif;
+}
+#launch-screen hr {
+  height: 15px;
+  width: 170px;
+  background: #000;
+  border: transparent;
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  margin-left: -85px;
+}
+#launch-screen hr.top-bar {
+  margin-top: -150px;
+}
+#launch-screen h1 {
+  font-size: 4em;
+  position: absolute;
+  top: 50%;
+  margin-top: -108px;
+  left: 50%;
+  margin-left: -134px;
+  font-weight: 500;
+}
+#launch-screen p {
+  font-size: 2em;
+}
 #container {
+  font-family: "Roboto", sans-serif;
   position: absolute;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -55,6 +92,13 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  transition: opacity 0.25s ease-in-out;
+  -moz-transition: opacity 0.25s ease-in-out;
+  -webkit-transition: opacity 0.25s ease-in-out;
+}
+#container.hide {
+  opacity: 0;
+  pointer-events: none;
 }
 #container #loading {
   position: absolute;
@@ -62,9 +106,16 @@
   width: 100%;
   top: 0;
   left: 0;
+  visibility: hidden;
 }
-#container #loading p {
-  text-align: center;
+#container #loading span {
+  position: absolute;
+  color: #fff;
+  font-size: 2em;
+  top: 50%;
+  margin-top: 57px;
+  left: 50%;
+  margin-left: -57px;
 }
 #container #loading img {
   top: 50%;
@@ -96,7 +147,6 @@
   opacity: 0.9;
 }
 #container #overlay h2 {
-  font-family: 'Roboto', sans-serif;
   text-transform: uppercase;
   font-size: 2.2em;
   position: absolute;
@@ -120,11 +170,9 @@
   pointer-events: auto;
 }
 #container #overlay #overlay-content h1 {
-  font-family: 'Roboto', sans-serif;
   text-align: center;
 }
 #container #overlay #overlay-content p {
-  font-family: 'Fenix', serif;
   line-height: 1.5em;
   overflow-y: scroll;
 }
@@ -134,6 +182,7 @@
   position: absolute;
   margin-left: 50px;
   margin-top: 50px;
+  padding: 30px 50px 30px 90px;
 }
 #container .log-details.animate {
   -webkit-transition: all 0.5s ease;
@@ -145,22 +194,17 @@
   left: -200%;
 }
 #container .log-details .log-title {
-  font-family: 'Roboto', sans-serif;
   text-transform: uppercase;
   font-size: 1.8em;
   color: #fff;
 }
 #container .log-details .log-author {
-  font-family: 'Roboto', sans-serif;
-  text-transform: uppercase;
-  font-size: 1.2em;
-  color: #f06;
-  font-weight: 100;
+  padding: 10px 0px;
 }
 #container .log-details .log-content {
-  font-family: 'Fenix', serif;
   color: #fff;
   line-height: 1.3em;
+  font-size: 1.1em;
   height: calc(100% - 50px);
 }
 #container .log-details .log-content img {
@@ -192,12 +236,11 @@
   margin-right: 10px;
 }
 #container #country {
-  font-family: 'Roboto', sans-serif;
   text-transform: uppercase;
-  font-size: 2.2em;
+  font-size: 2em;
   color: #999;
   position: absolute;
-  width: 300px;
+  width: 250px;
   right: 75px;
   margin-top: 60px;
   text-align: right;
@@ -217,6 +260,7 @@
 }
 #container .sidenav:hover {
   opacity: 1;
+  cursor: pointer;
 }
 #container .sidenav-top {
   width: 100%;
@@ -280,11 +324,13 @@
   margin-left: 15px;
 }
 @media (min-height:480px) {
-  #container .log-details {
-    padding: 30px 50px 30px 90px;
-  }
   #container .log-details .log-content {
     margin-top: 20px;
     height: calc(100% - 140px);
+  }
+}
+@media (min-width:760px) {
+  #container .log-details .log-content img {
+    padding: 0px 100px;
   }
 }
