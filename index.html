@@ -17,6 +17,12 @@
 						Mariko Kuroda
 					</div>
 					<div class="log-content">
+            <div id="#auth">
+              <button id="authorize-button" style="visibility: hidden">Authorize</button>
+            </div>
+            <div id="loggedIn" style="visibility: hidden">
+              You are logged in as: <span id="name"></span>
+            </div>
 						<p class="c0"><span>{{current}}</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>This is pretty cool I think</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>Here&rsquo;s an image:</span></p><p class="c0"><img height="376" src="https://lh5.googleusercontent.com/iHkNlgtXhp-bvLu2WOUV5o5ILLtoFLe8oHq9ZzSRyU1GDWACPt56arkmSQchiZ-iGEuHkWdp0_Yq1M6HSW-r41VjfXZaucpMEZhfFIwEtLhZKEedkek" width="264"></p><p class="c0 c1"><span></span></p><p class="c0"><span>Yeah...</span></p><p class="c1 c0"><span></span></p>
 					</div>
 				</div>
@@ -65,7 +71,8 @@
   <script type="text/javascript" src='static/js/services.js'></script>
   <script type="text/javascript" src='static/js/controllers.js'></script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
-	<script type="text/javascript" src="/static/js/jquery.transit.min.js"></script>
 	<script type="text/javascript" src="/static/js/index.js"></script>
+	<script type="text/javascript" src="/static/js/gservices.js"></script>
+  <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
 	</body>
 </html>
