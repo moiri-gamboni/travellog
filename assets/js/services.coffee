@@ -2,74 +2,95 @@
 
 srv = angular.module('myApp.services', [])
 
-srv.factory('Map', ['$scope', '$rootScope', 'Country' ,($scope, $rootScope, Country) ->
-  map =
-    countries: []
-    current: 0
+srv.factory('Map', ['$scope', '$rootScope', 'Country', ($scope, $rootScope, Country) ->
+
+  #from: http://stackoverflow.com/a/6274398
+  shuffle = (array) ->
+    temp
+    index
+    counter = array.length
+
+    # While there are elements in the array
+    while (counter--)
+      # Pick a random index
+      index = (Math.random() * counter) | 0
+
+      # And swap the last element with it
+      temp = array[counter]
+      array[counter] = array[index]
+      array[index] = temp
+
+      return array
+
+
+  service =
     availableCountries: []
+    loadedCountries: []
+    current: []
+    map: []
 
-    initMap: () ->
-      $http.get(
-        window.location.protocol + "//" + window.location.host + "/countries/"
-      ).success((data, status, headers, config) ->
-        if data.result?
-          console.log(data.result)
-          @availableCountries = shuffle(data.result)
-          for i in [0..5]
-            if @availableCountries.length isnt 0
-              country = new Country(@availableCountries.pop())
-            else break
-            for j in [0..5]
-              if country.hasLogs()
-                country.getLog()
-              else break
-            @countries.push(country)
-          @current = 1
-      ).error((data, status, headers, config) ->
-        console.log(data)
-      )
-  return map
+
+  Country.getCountries().success((data, status, headers, config) ->
+    service.availableCountries = shuffle(data.result)
+    current = [100, 1000]
+    $rootScope.$on('country-init', (event, countryIndex) ->
+      for i in [-1..1]
+        map[100+countryIndex][1000+i] = loadedCountries[countryIndex].getLog()
+    )
+    for i in [0..2]
+      Country.getCountry(data.result[data.result.length - 1]).success((data, status, headers, config) ->
+        loadedCountries.push(new Country.loadCountry(data.result, service.availableCountries.pop(), i))
+  )
+
+  return service
 ])
 
-srv.factory('Country',['$http', 'id', ($http, id) ->
-  country =
-    name: ""
-    id: id
-    savedLogs: []
-    availableLogs: []
-    hasLogs: => @availableLogs.length!=0
-
-    getCountry: () ->
-      country = null
-      $http.get(
-        window.location.protocol + "//" + window.location.host + "/country/",
-        {params:{id:id}}
-      ).success((data, status, headers, config) ->
-        if data.result?
-          console.log(data.result)
-          @name = data.result.name
-          @availableLogs = shuffle(data.result.logs)
-          for j in [0..2]
-            if @hasLogs()
-              @getLog()
-            else break
-      ).error((data, status, headers, config) ->
-        console.log(data)
+srv.factory('Country', ['$http', '$rootScope', ($http, $rootScope) ->
+  factory =
+    getCountries: () ->
+      return $http.get(
+        window.location.protocol + "//" + window.location.host + "/countries",
+        {params:{id:countryName}}
       )
 
-    getLog: () ->
-      id =  @availableLogs[@availableLogs.length -1]
-      $http.get(
-        window.location.protocol + "//" + window.location.host + "/logs/",
-        {params:{id:id}}
-      ).success((data, status, headers, config) ->
-        if data.result?
-          console.log(data.result)
-          @savedLogs.push(data.result.log)
-          @availableLogs.pop()
-      ).error((data, status, headers, config) ->
-        console.log(data)
+    getCountry: (countryName) ->
+      return $http.get(
+        window.location.protocol + "//" + window.location.host + "/countries/:id",
+        {params:{id:countryName}}
       )
-  return country
+
+    loadCountry: (fileIds, countryName, countryIndex) ->
+      @fileIds = fileIds
+      @countryName = countryName
+      @loadedLogs = null
+      @countryIndex = countryIndex
+      @logInit = fileIds.length < 3 ? fileIds.length : 3
+
+      @loadLog = () ->
+        $http.get(
+          window.location.protocol + "//" + window.location.host + "/logs/:id:country",
+          {params:
+            id:fileIds[fileIds.length - 1]
+            country: countryName}
+        ).success((data, status, headers, config) ->
+          loadedLogs.push(data.result)
+          fileIds.pop()
+          logInit--
+          if logInit is 0
+            $rootScope.$broadcast('country-init', countryIndex)
+        )
+
+      @getLog = () ->
+        if loadedLogs.length isnt 0
+          return loadedLogs.pop()
+        else if fileIds.length isnt 0
+          loadLog()
+          return 1
+        else return 0
+
+      for i in [1..3]
+        if fileIds.length isnt 0
+          loadLog()
+
+  return factory
 ])
-
