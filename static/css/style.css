@@ -56,6 +56,19 @@
   background-repeat: no-repeat;
   background-size: cover;
 }
+#container #loading {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+#container #loading img {
+  top: 50%;
+  position: absolute;
+  margin-left: -16px;
+  left: 50%;
+}
 #container #overlay {
   position: absolute;
   height: 100%;
@@ -63,9 +76,9 @@
   opacity: 0;
   pointer-events: none;
   color: #fff;
-  transition: 0.25s ease-in-out;
-  -moz-transition: 0.25s ease-in-out;
-  -webkit-transition: 0.25s ease-in-out;
+  transition: 0.5s ease-in-out;
+  -moz-transition: 0.5s ease-in-out;
+  -webkit-transition: 0.5s ease-in-out;
   z-index: 1;
 }
 #container #overlay.fadein {
