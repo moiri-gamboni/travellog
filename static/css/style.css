@@ -52,6 +52,7 @@
   background: url("http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg");
   background-size: cover;
   background-position: center;
+  font-family: "Roboto", sans-serif;
 }
 #launch-screen hr {
   height: 15px;
@@ -66,8 +67,7 @@
 #launch-screen hr.top-bar {
   margin-top: -150px;
 }
-#launch-screen p {
-  font-family: "Roboto", sans-serif;
+#launch-screen h1 {
   font-size: 4em;
   position: absolute;
   top: 50%;
@@ -75,7 +75,11 @@
   left: 50%;
   margin-left: -134px;
 }
+#launch-screen p {
+  font-size: 2em;
+}
 #container {
+  font-family: "Roboto", sans-serif;
   position: absolute;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -107,7 +111,6 @@
   position: absolute;
   color: #fff;
   font-size: 2em;
-  font-family: "Roboto", sans-serif;
   top: 50%;
   margin-top: 57px;
   left: 50%;
@@ -143,7 +146,6 @@
   opacity: 0.9;
 }
 #container #overlay h2 {
-  font-family: 'Roboto', sans-serif;
   text-transform: uppercase;
   font-size: 2.2em;
   position: absolute;
@@ -167,11 +169,9 @@
   pointer-events: auto;
 }
 #container #overlay #overlay-content h1 {
-  font-family: 'Roboto', sans-serif;
   text-align: center;
 }
 #container #overlay #overlay-content p {
-  font-family: 'Fenix', serif;
   line-height: 1.5em;
   overflow-y: scroll;
 }
@@ -181,6 +181,7 @@
   position: absolute;
   margin-left: 50px;
   margin-top: 50px;
+  padding: 30px 50px 30px 90px;
 }
 #container .log-details.animate {
   -webkit-transition: all 0.5s ease;
@@ -192,22 +193,17 @@
   left: -200%;
 }
 #container .log-details .log-title {
-  font-family: 'Roboto', sans-serif;
   text-transform: uppercase;
   font-size: 1.8em;
   color: #fff;
 }
 #container .log-details .log-author {
-  font-family: 'Roboto', sans-serif;
-  text-transform: uppercase;
-  font-size: 1.2em;
-  color: #f06;
-  font-weight: 100;
+  padding: 10px 0px;
 }
 #container .log-details .log-content {
-  font-family: 'Fenix', serif;
   color: #fff;
   line-height: 1.3em;
+  font-size: 1.1em;
   height: calc(100% - 50px);
 }
 #container .log-details .log-content img {
@@ -239,7 +235,6 @@
   margin-right: 10px;
 }
 #container #country {
-  font-family: 'Roboto', sans-serif;
   text-transform: uppercase;
   font-size: 2em;
   color: #999;
@@ -328,11 +323,13 @@
   margin-left: 15px;
 }
 @media (min-height:480px) {
-  #container .log-details {
-    padding: 30px 50px 30px 90px;
-  }
   #container .log-details .log-content {
     margin-top: 20px;
     height: calc(100% - 140px);
+  }
+}
+@media (min-width:760px) {
+  #container .log-details .log-content img {
+    padding: 0px 100px;
   }
 }
