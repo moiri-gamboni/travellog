@@ -28,6 +28,23 @@
 *::-webkit-scrollbar-corner {
   background-color: transparent;
 }
+#minimap {
+  height: 20%;
+  width: calc(100% - 100px);
+  position: absolute;
+  z-index: 1;
+  top: 50px;
+  left: 50px;
+}
+#minimap #map-canvas {
+  height: 100%;
+}
+#add-map-canvas {
+  height: 30%;
+  width: 100%;
+  bottom: 0;
+  position: absolute;
+}
 .move-up {
   top: 100px;
 }
@@ -153,12 +170,12 @@
   height: 100%;
   width: 100%;
   opacity: 0;
+  z-index: 11;
   pointer-events: none;
   color: #fff;
   transition: 0.5s ease-in-out;
   -moz-transition: 0.5s ease-in-out;
   -webkit-transition: 0.5s ease-in-out;
-  z-index: 1;
 }
 #container #overlay.fadein {
   opacity: 1;
@@ -203,10 +220,11 @@
 }
 #container .log-details {
   width: calc(100% - 100px);
-  height: calc(100% - 130px);
+  height: calc(80% - 130px);
+  top: calc(20% + 50px);
+  z-index: 10;
   position: absolute;
   margin-left: 50px;
-  margin-top: 50px;
   padding: 30px 50px 30px 90px;
 }
 #container .log-details.animate {
@@ -237,8 +255,7 @@
   height: auto;
 }
 #container .log-details #log-wrapper {
-  height: calc(100% - 100px);
-  margin-top: 100px;
+  height: calc(100%);
   overflow-y: scroll;
   overflow-x: none;
   padding-right: 30px;
@@ -251,10 +268,11 @@
   opacity: 0.6;
 }
 #container #nav {
-  width: calc(100% - 100px);
-  padding-left: 90px;
-  margin-top: 70px;
+  padding-right: 70px;
+  padding-bottom: 60px;
   position: absolute;
+  bottom: 0;
+  right: 0;
 }
 #container #nav img {
   height: 30px;
@@ -276,6 +294,7 @@
 }
 #container .sidenav {
   background: rgba(225,225,225,0.8);
+  z-index: 2;
   opacity: 0.8;
   position: absolute;
   -webkit-transition: all 0.2s ease-in-out;

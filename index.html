@@ -4,8 +4,11 @@
 		<link rel="stylesheet" type="text/css" href="/static/css/style.css">
 		<link href='http://fonts.googleapis.com/css?family=Fenix' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,500' rel='stylesheet' type='text/css'>
-		<meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
     <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEaBU9ut05NvkD4_k72xRDGuVYr_ucPZc&sensor=false">
+    </script>
 	</head>
 	<body>
 		<div id="launch-screen">
@@ -19,14 +22,14 @@
 			<h3 id="start-here"> Start Here </h3>
 		</div>
 		<div id="container" class="hide" ng-controller="mainCtrl">
+      <div id="minimap">
+        <div id="map-canvas"></div>
+      </div>
 			<div id="overlay">
 				<div id="blackblur" ></div>
 				<h2 id="escape">X</h2>
 				<div id="overlay-content">
-					<h1> Learn about Travellogue </h1>
-					<p>
-					Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem IpsumLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard du
-					</p>
+          <div id="add-map-canvas"></div>
 				</div>
 			</div>
 			<div id="blackshade" ></div>
@@ -79,14 +82,9 @@
 				<div class="arrow arrow-up-down arrow-down"></div>
 			</div>
 			<div id="nav">
+				<img id="add" src="/static/img/addIcon.png"/>
 				<img id="question" src="/static/img/questionIcon.png"/>
-				<img src="/static/img/addIcon.png"/>
-				<img src="/static/img/worldIcon.png"/>
 			</div>
-			<div id="country">
-				United States of America
-			</div>
-
 		</div>
 
   <script type="text/javascript" src='static/lib/angular/angular.js'></script>
@@ -96,6 +94,7 @@
 	<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 	<script type="text/javascript" src="/static/js/index.js"></script>
 	<script type="text/javascript" src="/static/js/gservices.js"></script>
+	<script type="text/javascript" src="/static/js/gmaps.js"></script>
   <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
 	</body>
 </html>
