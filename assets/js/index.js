@@ -94,6 +94,6 @@ $("#overlay").click(function() {
 });
 
 $("#launch-screen h1, h3").click(function() {
-  $("#launch-screen h1").addClass("hide");
+  $("#launch-screen").addClass("hide");
   return $("#container").removeClass("hide");
 });
