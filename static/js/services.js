@@ -5,9 +5,103 @@
 
   srv = angular.module("mainModule.services", []);
 
-  srv.factory('test', [
-    function() {
-      return true;
+  srv.factory('Map', [
+    '$http', '$rootScope', function($http, $rootScope) {
+      var factory;
+      return factory = {
+        data: {
+          logs: {},
+          latLogs: [],
+          lngLogs: [],
+          current: null
+        },
+        getLogs: function(success, error) {
+          var get;
+          get = $http.get(window.location.protocol + "//" + window.location.host + "/logs");
+          get.success(callback);
+          if (error != null) {
+            return get.error(error);
+          }
+        },
+        getLog: function(logId, error) {
+          var get;
+          get = $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
+            params: {
+              id: logId
+            }
+          });
+          get.success(function(data, status, headers, config) {
+            return factory.data.logs[data.log.id].body = factory.data.log.body;
+          });
+          if (error != null) {
+            return get.error(error);
+          }
+        },
+        getClosestLogs: function() {
+          var direction, _i, _len, _ref, _results;
+          _ref = ['N', 'E', 'S', 'W'];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            direction = _ref[_i];
+            _results.push(getLog(getClosestLocation(factory.data.current, direction)));
+          }
+          return _results;
+        },
+        getClosestLocation: function(from, towards) {
+          var change, tempKey, tempLog;
+          tempKey = from;
+          tempLog = null;
+          change = towards === 'N' || towards === 'E' ? +1 : -1;
+          if (towards === 'N' || towards === 'S') {
+            while (!inRange(from, tempLog, towards)) {
+              tempKey[1] += change;
+              tempLog = latLogs[tempKey[1]];
+              tempKey = factory.data.logs[tempLog.id].key;
+            }
+          } else {
+            while (!inRange(from, tempLog, towards)) {
+              tempKey[0] += change;
+              tempLog = lngLogs[tempKey[0]];
+              tempKey = factory.data.logs[tempLog.id].key;
+            }
+          }
+          return tempKey;
+        },
+        initMap: function() {
+          var getLogsCallback;
+          getLogsCallback = function(mapData) {
+            return function(data, status, headers, config) {
+              var current, i, keys, log, _i, _j, _len, _len1, _ref, _ref1;
+              mapData.latLogs = data.logs.sort(function(a, b) {
+                return b.lat - a.lat;
+              });
+              _ref = mapData.latLogs;
+              for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+                log = _ref[i];
+                mapData.logs[log.id] = {
+                  id: log.id,
+                  body: null,
+                  lat: log.lat,
+                  lng: log.lng,
+                  key: [null, i]
+                };
+              }
+              mapData.lngLogs = data.logs.sort(function(a, b) {
+                return b.lng - a.lng;
+              });
+              _ref1 = mapData.lngLogs;
+              for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
+                log = _ref1[i];
+                mapData.logs[log.id].key = [i, mapData.logs[log.id].key[1]];
+              }
+              keys = Object.keys(mapData.logs);
+              current = mapData.logs[keys[(Math.random() * keys.length) >> 0]].key;
+              return getLog(mapData.latLogs[current]);
+            };
+          };
+          return getLogs(getLogsCallback(factory.data));
+        }
+      };
     }
   ]);
 
@@ -81,7 +175,7 @@
     }
   ]);
 
-  srv.factory('Map', [
+  srv.factory('oldMap', [
     '$rootScope', 'Country', function($rootScope, Country) {
       var service, shuffle;
       shuffle = function(array) {

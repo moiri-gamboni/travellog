@@ -2,9 +2,81 @@
 
 srv = angular.module("mainModule.services", [])
 
-srv.factory('test', [ () ->
-  return true
+srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
+  factory =
+    data:
+      logs: {}
+      latLogs: []
+      lngLogs: []
+      current: null
+
+    getLogs: (success, error) ->
+      get = $http.get(
+        window.location.protocol + "//" + window.location.host + "/logs"
+      )
+      get.success(callback)
+      if error?
+        get.error(error)
+
+    getLog: (logId, error) ->
+      get = $http.get(
+        window.location.protocol + "//" + window.location.host + "/logs",
+        {params:{id:logId}}
+      )
+      get.success((data, status, headers, config)->
+        factory.data.logs[data.log.id].body = factory.data.log.body
+      )
+      if error?
+        get.error(error)
+
+    getClosestLogs: () ->
+      for direction in ['N','E','S','W']
+        getLog(getClosestLocation(factory.data.current, direction))
+
+    getClosestLocation: (from, towards) ->
+      tempKey = from
+      tempLog = null
+      change = if towards is 'N' or towards is 'E' then +1 else -1
+      if towards is 'N' or towards is 'S'
+        while(not inRange(from, tempLog, towards))
+          tempKey[1] += change
+          tempLog = latLogs[tempKey[1]]
+          tempKey = factory.data.logs[tempLog.id].key
+      else
+        while(not inRange(from, tempLog, towards))
+          tempKey[0] += change
+          tempLog = lngLogs[tempKey[0]]
+          tempKey = factory.data.logs[tempLog.id].key
+      return tempKey
+
+    initMap: () ->
+      getLogsCallback = (mapData) ->
+        return (data, status, headers, config) ->
+          mapData.latLogs = data.logs.sort((a, b) ->
+            return b.lat-a.lat
+          )
+          for log, i in mapData.latLogs
+            mapData.logs[log.id] =
+              id: log.id
+              body: null
+              lat: log.lat
+              lng: log.lng
+              key: [null, i]
+          mapData.lngLogs = data.logs.sort((a, b) ->
+            return b.lng-a.lng
+          )
+          for log, i in mapData.lngLogs
+            mapData.logs[log.id].key = [i, mapData.logs[log.id].key[1]]
+
+          keys = Object.keys(mapData.logs)
+          current = mapData.logs[keys[(Math.random()*keys.length)>>0]].key
+
+          getLog(mapData.latLogs[current])
+
+      getLogs(getLogsCallback(factory.data))
+
 ])
+
 
 srv.factory('Country', ['$http', '$rootScope', ($http, $rootScope) ->
   factory =
@@ -85,7 +157,7 @@ srv.factory('Country', ['$http', '$rootScope', ($http, $rootScope) ->
   return factory
 ])
 
-srv.factory('Map', ['$rootScope', 'Country', ($rootScope, Country) ->
+srv.factory('oldMap', ['$rootScope', 'Country', ($rootScope, Country) ->
 
   #from: http://stackoverflow.com/a/6274398
   shuffle = (array) ->
