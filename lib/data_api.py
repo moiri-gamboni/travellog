@@ -5,23 +5,15 @@ import models
 from google.appengine.ext import ndb
 import gdrive
 
-class DataHandler(webapp2.RequestHandler):
-  def get(self):
-    self.response.headers['Content-Type'] = "application/json"
-    self.response.out.write(json.dumps({"status": 200}))
-
 class LogHandler(webapp2.RequestHandler):
-  post_params = ["gdriveId", "country"]
-  get_params = ["id"]
+  post_params = ["gdriveId", "lat", "lng"]
 
   def get(self):
-    # param check
-    for param in self.get_params:
-      if param not in self.request.arguments():
-        self.response.headers['Content-Type'] = "application/json"
-        self.response.write(json.dumps({"status": 400, "error":\
-            "You must have a %s parameter" % param}))
-        return
+    # return all logs if id is not in the argument
+    if "in" not in self.request.arguments():
+      self.response.headers['Content-Type'] = "application/json"
+      self.response.write(json.dumps({"status": 200, "logs":\
+        models.get_all_logs()}))
     else:
       try:
         # try fetch the requested id by key
@@ -43,13 +35,8 @@ class LogHandler(webapp2.RequestHandler):
         self.response.write(json.dumps({"status": 400, "error":\
             "You must have a %s parameter" % param}))
         return
-    # find the country
-    country_name = self.params["country"]
-    existing_country = models.query_country(country_name)
-    if not existing_country:
-      existing_country = models.create_country(country_name)
     # construct the child
-    log = models.create_log(self.params["gdriveId"], existing_country.key)
+    log = models.create_log(self.params["gdriveId"], self.params["lat"], self.params["lng"])
     # grab either a profileId or profileName depending on what was passed in 
     if "profileId" in self.params.keys():
       log.profileId = self.params["profileId"]
@@ -75,24 +62,6 @@ class LogHandler(webapp2.RequestHandler):
 
   def parseJson(self):
     self.params = json.loads(self.request.body)
-
-class CountriesHandler(webapp2.RequestHandler):
-  def get(self):
-    # preferably, get the ids of the articles for a specific country
-    if "id" in self.request.arguments():
-      try:
-        self.response.headers['Content-Type'] = "application/json"
-        self.response.write(json.dumps({"status": 200,\
-          "logs": models.get_country_by_key(self.request.get("id"))}))
-      except:
-        self.response.headers['Content-Type'] = "application/json"
-        self.response.write(json.dumps({"status": 404, "error":\
-          "country with id %s not found" % self.request.get("id")}))
-        return
-    # if there is no param for id, return all countries
-    else:
-      self.response.headers['Content-Type'] = "application/json"
-      self.response.write(json.dumps({"status": 200, "countries": models.get_all_countries()}))
 
 class DriveHandler(webapp2.RequestHandler):
   def get(self):
