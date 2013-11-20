@@ -1,3 +1,5 @@
+idMarkerMap = {};
+
 function initialize() {
   var mapOptions = {
     center: new google.maps.LatLng(20, 0),
@@ -50,23 +52,30 @@ icons = {
 
 currentMiniMarker = null;
 // click handler for a minimap item
-function switchMiniMarker() {
+function changeLocation(markerId) {
+  newMarker = idMarkerMap[markerId];
   // deselct the old one if it exists
   if (currentMiniMarker) {
     currentMiniMarker.setAnimation(null);
-    currentMiniMarker.setIcon(icons["visited"]);
+    currentMiniMarker.setIcon(icons.visited);
   }
-  currentMiniMarker = this;
-currentMiniMarker.setIcon(icons["current"]);
-// start the bouncing
+  currentMiniMarker = newMarker;
+  // set the current color
+  currentMiniMarker.setIcon(icons.current);
+  // start the bouncing
   if (currentMiniMarker.getAnimation() !== null) {
     currentMiniMarker.setAnimation(null);
   } else {
     currentMiniMarker.setAnimation(google.maps.Animation.BOUNCE);
   }
+  // push the new url
+  history.pushState(null, null, "/log/" + currentMiniMarker.title);
 }
 
-idMarkerMap = {};
+function switchMiniMarker() {
+  changeLocation(this.title);
+}
+
 
 function placeMarkerMiniMap(log_object) {
   console.log(log_object);
@@ -75,7 +84,7 @@ function placeMarkerMiniMap(log_object) {
       animation: google.maps.Animation.DROP,
     map: miniMap,
     title: log_object.id,
-    icon: icons["unvisited"]
+    icon: icons.unvisited
   });
   idMarkerMap[log_object.id] = marker;
   google.maps.event.addListener(marker, 'click', switchMiniMarker);
