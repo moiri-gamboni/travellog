@@ -3,18 +3,18 @@ move = (direction) ->
 	windowWidth = $(window).width();
 	if direction == "top"
 		prepare = {"left":"0", "top":-windowHeight}
-		launchIn = {"top": windowHeight*0.2 + 50}
+		launchIn = {"top":0}
 		mainOut = {"top": windowHeight}
 	else if direction == "down"
 		prepare = {"left":"0", "top":2*windowHeight}
-		launchIn = {"top": windowHeight*0.2 + 50}
+		launchIn = {"top":0}
 		mainOut = {"top": -windowHeight}
 	else if direction == "left"
-		prepare = {"left":-windowWidth, "top": windowHeight*0.2 + 50}
+		prepare = {"left":-windowWidth, "top": 0}
 		launchIn = {"left": 0}
 		mainOut = {"left": windowWidth}
 	else
-		prepare = {"left":2*windowWidth, "top": windowHeight*0.2 + 50}
+		prepare = {"left":2*windowWidth, "top": 0}
 		launchIn = {"left": 0}
 		mainOut = {"left": -windowWidth}
 	$(".launch").css(prepare)
@@ -57,3 +57,6 @@ $("#escape").click () ->
 $("#launch-screen h1").click () ->
 		$("#launch-screen").addClass("hide")
 		$("#container").removeClass("hide")
+
+
+	

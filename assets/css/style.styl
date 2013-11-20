@@ -18,6 +18,22 @@
 *::-webkit-scrollbar-corner
 	background-color: transparent
 
+// for google maps
+#minimap
+  height: 20%
+  width: calc(100% - 100px)
+  position: absolute
+  z-index: 1
+  top: 50px
+  left: 50px
+  #map-canvas
+    height: 100%
+#add-map-canvas
+  height: 30%
+  width: 100%
+  bottom: 0
+  position: absolute
+
 .move-up
 	top: 100px
 .fade
@@ -127,6 +143,7 @@
 		height:100%
 		width:100%
 		opacity:0
+		z-index : 11
 		&.fadein
 			opacity: 1
 			pointer-events:auto
@@ -135,7 +152,6 @@
 		transition:.5s ease-in-out
 		-moz-transition: .5s ease-in-out
 		-webkit-transition: .5s ease-in-out
-		z-index:1
 		#blackblur
 			height:100%
 			width:100%
@@ -169,10 +185,11 @@
 				overflow-y:scroll
 	.log-details
 		width: calc(100% - 100px)
-		height: calc(100% - 130px)
+		height: calc(80% - 130px)
+		top: calc(20% + 50px)
+		z-index: 10
 		position: absolute
 		margin-left: 50px
-		margin-top: 50px
 		padding: 30px 50px 30px 90px
 		&.animate
 			-webkit-transition: all 0.5s ease
@@ -196,8 +213,7 @@
 				width: 100%
 				height: auto
 		#log-wrapper
-			height: calc(100% - 100px)
-			margin-top: 100px
+			height: calc(100%)
 			overflow-y: scroll
 			overflow-x: none
 			padding-right: 30px
@@ -208,10 +224,11 @@
 		background-color:black
 		opacity:0.6
 	#nav
-		width: calc(100% - 100px)
-		padding-left:90px
-		margin-top:70px
+		padding-right: 70px
+		padding-bottom: 60px
 		position:absolute
+		bottom: 0
+		right: 0
 		img
 			height:30px
 			margin-right:10px
@@ -230,6 +247,7 @@
 		transition:all 0.2s ease-in-out;
 	.sidenav
 		background:rgba(225,225,225,0.8)
+		z-index: 2
 		opacity: 0.8
 		position:absolute
 		-webkit-transition:all 0.2s ease-in-out

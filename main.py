@@ -22,5 +22,5 @@ class IndexPage(webapp2.RequestHandler):
 
 application = webapp2.WSGIApplication([
   ('/', IndexPage), ('/data', DataHandler), ('/logs', LogHandler),
-  ('/countries', CountriesHandler), ("/drive", DriveHandler)
+  ('/countries', CountriesHandler), ("/drive", DriveHandler), (r'/log/.+', IndexPage)
 ], debug=True)
