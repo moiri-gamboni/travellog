@@ -18,36 +18,69 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
       if error?
         get.error(error)
 
+    move: (direction) ->
+      change = if direction in ['N', 'E'] then +1 else -1
+      if direction in ['N', 'S']
+        newCurrent = factory.data.logs[factory.data.latLogs[factory.data.current[1]+change].id].key
+      else
+        newCurrent = factory.data.logs[factory.data.lngLogs[factory.data.current[0]+change].id].key
+      getClosestLogs(newCurrent)
+      changeCurrent = (newCurrent)-> factory.data.current = newCurrent
+      $timeout(changeCurrent(newCurrent), 100)
+
+
     getLog: (logId, error) ->
-      get = $http.get(
-        window.location.protocol + "//" + window.location.host + "/logs",
-        {params:{id:logId}}
-      )
-      get.success((data, status, headers, config)->
-        factory.data.logs[data.log.id].body = factory.data.log.body
-      )
-      if error?
-        get.error(error)
+      if not factory.data.logs[data.log.id].body?
+        get = $http.get(
+          window.location.protocol + "//" + window.location.host + "/logs",
+          {params:{id:logId}}
+        )
+        get.success((data, status, headers, config)->
+          factory.data.logs[data.log.id].body = factory.data.log.body
+        )
+        if error?
+          get.error(error)
 
-    getClosestLogs: () ->
+    getClosestLogs: (around) ->
       for direction in ['N','E','S','W']
-        getLog(getClosestLocation(factory.data.current, direction))
+        factory.getLog(getClosestLocation(around, direction))
 
-    getClosestLocation: (from, towards) ->
+    getClosestLocation: (from, direction) ->
       tempKey = from
       tempLog = null
-      change = if towards is 'N' or towards is 'E' then +1 else -1
-      if towards is 'N' or towards is 'S'
-        while(not inRange(from, tempLog, towards))
+      change = if direction in ['N', 'E'] then +1 else -1
+      if direction in ['N', 'S']
+        while(not factory.inRange(from, tempLog, direction))
           tempKey[1] += change
-          tempLog = latLogs[tempKey[1]]
+          tempLog = factory.data.latLogs[tempKey[1]]
           tempKey = factory.data.logs[tempLog.id].key
       else
-        while(not inRange(from, tempLog, towards))
+        while(not factory.inRange(from, tempLog, direction))
           tempKey[0] += change
-          tempLog = lngLogs[tempKey[0]]
+          tempLog = factory.data.lngLogs[tempKey[0]]
           tempKey = factory.data.logs[tempLog.id].key
       return tempKey
+
+    inRange: (from, to, direction) ->
+      from = factory.data.lngLogs[from[0]]
+      to = factory.data.lngLogs[to[0]]
+      gradient = (to.lat-from.lat)/(to.lng-from.lng)
+      if direction in ['N', 'S']
+        if gradient <= -0.5 or gradient >= 0.5
+          if direction is 'N'
+            return to.lat >= from.lat
+          else
+            return to.lat <= from.lat
+        else
+          return false
+      else
+        if gradient >= -0.5 and gradient <= 0.5
+          if direction is 'E'
+            return to.lng >= from.lng
+          else
+            return to.lng <= from.lng
+        else
+          return false
 
     initMap: () ->
       getLogsCallback = (mapData) ->
@@ -71,7 +104,8 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
           keys = Object.keys(mapData.logs)
           current = mapData.logs[keys[(Math.random()*keys.length)>>0]].key
 
-          getLog(mapData.latLogs[current])
+          getLog(mapData.lngLogs[current[0]])
+          getClosestLogs(current)
 
       getLogs(getLogsCallback(factory.data))
 

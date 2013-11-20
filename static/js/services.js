@@ -23,49 +23,92 @@
             return get.error(error);
           }
         },
+        move: function(direction) {
+          var change, changeCurrent, newCurrent;
+          change = direction === 'N' || direction === 'E' ? +1 : -1;
+          if (direction === 'N' || direction === 'S') {
+            newCurrent = factory.data.logs[factory.data.latLogs[factory.data.current[1] + change].id].key;
+          } else {
+            newCurrent = factory.data.logs[factory.data.lngLogs[factory.data.current[0] + change].id].key;
+          }
+          getClosestLogs(newCurrent);
+          changeCurrent = function(newCurrent) {
+            return factory.data.current = newCurrent;
+          };
+          return $timeout(changeCurrent(newCurrent), 100);
+        },
         getLog: function(logId, error) {
           var get;
-          get = $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
-            params: {
-              id: logId
+          if (factory.data.logs[data.log.id].body == null) {
+            get = $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
+              params: {
+                id: logId
+              }
+            });
+            get.success(function(data, status, headers, config) {
+              return factory.data.logs[data.log.id].body = factory.data.log.body;
+            });
+            if (error != null) {
+              return get.error(error);
             }
-          });
-          get.success(function(data, status, headers, config) {
-            return factory.data.logs[data.log.id].body = factory.data.log.body;
-          });
-          if (error != null) {
-            return get.error(error);
           }
         },
-        getClosestLogs: function() {
+        getClosestLogs: function(around) {
           var direction, _i, _len, _ref, _results;
           _ref = ['N', 'E', 'S', 'W'];
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             direction = _ref[_i];
-            _results.push(getLog(getClosestLocation(factory.data.current, direction)));
+            _results.push(factory.getLog(getClosestLocation(around, direction)));
           }
           return _results;
         },
-        getClosestLocation: function(from, towards) {
+        getClosestLocation: function(from, direction) {
           var change, tempKey, tempLog;
           tempKey = from;
           tempLog = null;
-          change = towards === 'N' || towards === 'E' ? +1 : -1;
-          if (towards === 'N' || towards === 'S') {
-            while (!inRange(from, tempLog, towards)) {
+          change = direction === 'N' || direction === 'E' ? +1 : -1;
+          if (direction === 'N' || direction === 'S') {
+            while (!factory.inRange(from, tempLog, direction)) {
               tempKey[1] += change;
-              tempLog = latLogs[tempKey[1]];
+              tempLog = factory.data.latLogs[tempKey[1]];
               tempKey = factory.data.logs[tempLog.id].key;
             }
           } else {
-            while (!inRange(from, tempLog, towards)) {
+            while (!factory.inRange(from, tempLog, direction)) {
               tempKey[0] += change;
-              tempLog = lngLogs[tempKey[0]];
+              tempLog = factory.data.lngLogs[tempKey[0]];
               tempKey = factory.data.logs[tempLog.id].key;
             }
           }
           return tempKey;
+        },
+        inRange: function(from, to, direction) {
+          var gradient;
+          from = factory.data.lngLogs[from[0]];
+          to = factory.data.lngLogs[to[0]];
+          gradient = (to.lat - from.lat) / (to.lng - from.lng);
+          if (direction === 'N' || direction === 'S') {
+            if (gradient <= -0.5 || gradient >= 0.5) {
+              if (direction === 'N') {
+                return to.lat >= from.lat;
+              } else {
+                return to.lat <= from.lat;
+              }
+            } else {
+              return false;
+            }
+          } else {
+            if (gradient >= -0.5 && gradient <= 0.5) {
+              if (direction === 'E') {
+                return to.lng >= from.lng;
+              } else {
+                return to.lng <= from.lng;
+              }
+            } else {
+              return false;
+            }
+          }
         },
         initMap: function() {
           var getLogsCallback;
@@ -96,7 +139,8 @@
               }
               keys = Object.keys(mapData.logs);
               current = mapData.logs[keys[(Math.random() * keys.length) >> 0]].key;
-              return getLog(mapData.latLogs[current]);
+              getLog(mapData.lngLogs[current[0]]);
+              return getClosestLogs(current);
             };
           };
           return getLogs(getLogsCallback(factory.data));
