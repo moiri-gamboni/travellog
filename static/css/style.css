@@ -84,13 +84,13 @@
   width: 170px;
   background: #000;
   border: transparent;
-  top: 50%;
+  top: 48%;
   left: 50%;
   position: absolute;
   margin-left: -85px;
 }
 #launch-screen hr.top-bar {
-  margin-top: -150px;
+  margin-top: -125px;
 }
 #launch-screen h1 {
   font-size: 4em;
@@ -98,8 +98,9 @@
   top: 50%;
   margin-top: -108px;
   left: 50%;
-  margin-left: -134px;
-  font-weight: 500;
+  margin-left: -170px;
+  font-weight: 100;
+  text-transform: uppercase;
 }
 #launch-screen p {
   font-size: 2em;
