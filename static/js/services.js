@@ -16,11 +16,9 @@
       var factory;
       factory = {
         getCountries: function() {
-          console.log("getCountries call");
           return $http.get(window.location.protocol + "//" + window.location.host + "/countries");
         },
         getCountry: function(countryName) {
-          console.log("getCountry call");
           return $http.get(window.location.protocol + "//" + window.location.host + "/countries", {
             params: {
               id: countryName
@@ -28,46 +26,50 @@
           });
         },
         loadCountry: function(fileIds, countryName, countryIndex) {
-          var i, _i, _results;
+          var i, _i;
+          this.countryIndex = countryIndex;
+          $rootScope.$broadcast('country-init');
           this.fileIds = fileIds;
           this.countryName = countryName;
-          this.loadedLogs = null;
-          this.countryIndex = countryIndex;
+          this.loadedLogs = [];
           this.logInit = fileIds.length < 3 ? fileIds.length : 3;
+          console.log("fileIds.length for " + this.countryName + " : " + this.fileIds.length);
+          console.log("logInit for " + this.countryName + " : " + this.logInit);
           this.loadLog = function() {
-            return $http.get(window.location.protocol + "//" + window.location.host + "/logs/:id:country", {
+            console.log("loadLog for " + this.countryName);
+            return $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
               params: {
-                id: fileIds[fileIds.length - 1],
-                country: countryName
-              }
-            }).success(function(data, status, headers, config) {
-              loadedLogs.push(data.result);
-              fileIds.pop();
-              logInit--;
-              if (logInit === 0) {
-                return $rootScope.$broadcast('country-init', countryIndex);
+                id: this.fileIds[this.fileIds.length - 1],
+                country: this.countryName
               }
             });
           };
           this.getLog = function() {
-            if (loadedLogs.length !== 0) {
-              return loadedLogs.pop();
-            } else if (fileIds.length !== 0) {
-              loadLog();
+            var _this = this;
+            console.log("getLog");
+            if (this.loadedLogs.length !== 0) {
+              return this.loadedLogs.pop();
+            } else if (this.fileIds.length !== 0) {
+              this.loadLog().success(function(data, status, headers, config) {
+                console.log("logInit for " + _this.countryName + " : " + _this.logInit);
+                _this.loadedLogs.push(data.result);
+                _this.fileIds.pop();
+                _this.logInit--;
+                if (_this.logInit === 0) {
+                  console.log("DONE");
+                  console.log(_this.countryIndex);
+                  return $rootScope.$broadcast('country-finished-init', _this.countryIndex);
+                }
+              });
               return 1;
             } else {
               return 0;
             }
           };
-          _results = [];
           for (i = _i = 1; _i <= 3; i = ++_i) {
-            if (fileIds.length !== 0) {
-              _results.push(loadLog());
-            } else {
-              _results.push(void 0);
-            }
+            this.getLog();
           }
-          return _results;
+          return this;
         }
       };
       return factory;
@@ -94,28 +96,43 @@
         availableCountries: [],
         loadedCountries: [],
         current: [],
-        map: []
+        map: [],
+        countryIndex: 0
       };
       Country.getCountries().success(function(data, status, headers, config) {
-        var current, i, _i, _results;
-        console.log("getCountries success");
-        console.log(data);
+        var callback, countries, current, i, _i, _results,
+          _this = this;
         service.availableCountries = shuffle(data.countries);
-        current = [100, 1000];
-        $rootScope.$on('country-init', function(event, countryIndex) {
+        current = [100, 100];
+        $rootScope.$on('country-init', function(event) {
+          return service.countryIndex++;
+        });
+        $rootScope.$on('country-finished-init', function(event, countryIndex) {
           var i, _i, _results;
           _results = [];
           for (i = _i = -1; _i <= 1; i = ++_i) {
-            _results.push(map[100 + countryIndex][1000 + i] = service.loadedCountries[countryIndex].getLog());
+            console.log(100 + countryIndex);
+            if (service.map[100 + countryIndex] == null) {
+              service.map[100 + countryIndex] = [];
+            }
+            service.map[100 + countryIndex][100 + i] = service.loadedCountries[countryIndex].getLog();
+            _results.push(console.log(service.map));
           }
           return _results;
         });
         _results = [];
-        for (i = _i = 0; _i <= 2; i = ++_i) {
-          _results.push(Country.getCountry(data.countries[data.countries.length - 1]).success(function(data, status, headers, config) {
-            console.log("getCountry success");
-            console.log(data);
-            return service.loadedCountries.push(new Country.loadCountry(data.logs, service.availableCountries.pop(), i));
+        for (i = _i = 1; _i <= 3; i = ++_i) {
+          countries = data.countries;
+          callback = function(i) {
+            var _this = this;
+            return function(data, status, headers, config) {
+              var country;
+              country = countries[countries.length - i];
+              return service.loadedCountries.push(Country.loadCountry(data.logs, country, service.countryIndex));
+            };
+          };
+          _results.push(Country.getCountry(data.countries[data.countries.length - i]).success(callback(i)).error(function(data, status, headers, config) {
+            return console.log(data);
           }));
         }
         return _results;

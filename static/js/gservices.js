@@ -5,7 +5,6 @@ var scopes = "https://www.googleapis.com/auth/plus.me"+
   " https://www.googleapis.com/auth/userinfo.profile";
 function handleClientLoad() {
   // Step 2: Reference the API key
-  console.log("This is working");
   gapi.client.setApiKey(apiKey);
   window.setTimeout(checkAuth,1);
 }
@@ -15,16 +14,13 @@ function checkAuth() {
 }
 
 function handleAuthResult(authResult) {
-  console.log(1)
   var successMessage = $("#loggedIn");
   var authorizeButton = $("#authorize-button");
   if (authResult && !authResult.error) {
-    console.log(2)
     authorizeButton.css({visibility:'hidden'});
     successMessage.css({visibility:'visible'});
     getUserInfo();
   } else {
-    console.log(3)
     successMessage.css({visibility:'hidden'});
     authorizeButton.css({visibility:'visible'}).on("click", handleAuthClick);
   }
@@ -47,6 +43,17 @@ function getUserInfo() {
     // Step 6: Execute the API request
     request.execute(function(resp) {
       console.log(resp);
+      // if the person has no google plus id
+      if (resp.code == 404) {
+        gapi.client.load('oauth2', 'v2', function() {
+          var request = gapi.client.oauth2.userinfo.get();
+          request.execute(function(resp) {
+            console.log(resp);
+            $("#name").html(resp.name);
+          });
+        });
+      }
+      // else retrieve their information from the g+ info
       $("#name").html(resp.displayName);
     });
   });

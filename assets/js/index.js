@@ -11,7 +11,7 @@ move = function(direction) {
       "top": -windowHeight
     };
     launchIn = {
-      "top": 0
+      "top": windowHeight * 0.2 + 50
     };
     mainOut = {
       "top": windowHeight
@@ -22,7 +22,7 @@ move = function(direction) {
       "top": 2 * windowHeight
     };
     launchIn = {
-      "top": 0
+      "top": windowHeight * 0.2 + 50
     };
     mainOut = {
       "top": -windowHeight
@@ -30,7 +30,7 @@ move = function(direction) {
   } else if (direction === "left") {
     prepare = {
       "left": -windowWidth,
-      "top": 0
+      "top": windowHeight * 0.2 + 50
     };
     launchIn = {
       "left": 0
@@ -41,7 +41,7 @@ move = function(direction) {
   } else {
     prepare = {
       "left": 2 * windowWidth,
-      "top": 0
+      "top": windowHeight * 0.2 + 50
     };
     launchIn = {
       "left": 0
@@ -84,12 +84,12 @@ window.changeCountry = function(newCountry) {
   }, 500);
 };
 
-$("#question").click(function() {
-  console.log("working");
+$("#add").click(function() {
+  startAddMap();
   return $("#overlay, #overlay-content").addClass("fadein");
 });
 
-$("#overlay").click(function() {
+$("#escape").click(function() {
   return $("#overlay, #overlay-content").removeClass("fadein");
 });
 

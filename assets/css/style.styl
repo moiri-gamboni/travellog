@@ -18,6 +18,22 @@
 *::-webkit-scrollbar-corner
 	background-color: transparent
 
+// for google maps
+#minimap
+  height: 25%
+  width: calc(100% - 100px)
+  position: absolute
+  z-index: 1
+  top: 50px
+  left: 50px
+  #map-canvas
+    height: 100%
+#add-map-canvas
+  height: 40%
+  width: 100%
+  bottom: -10%
+  position: absolute
+
 .move-up
 	top: 100px
 .fade
@@ -127,6 +143,7 @@
 		height:100%
 		width:100%
 		opacity:0
+		z-index : 11
 		&.fadein
 			opacity: 1
 			pointer-events:auto
@@ -135,7 +152,6 @@
 		transition:.5s ease-in-out
 		-moz-transition: .5s ease-in-out
 		-webkit-transition: .5s ease-in-out
-		z-index:1
 		#blackblur
 			height:100%
 			width:100%
@@ -169,10 +185,11 @@
 				overflow-y:scroll
 	.log-details
 		width: calc(100% - 100px)
-		height: calc(100% - 130px)
+		height: calc(80% - 130px)
+		top: calc(20% + 50px)
+		z-index: 10
 		position: absolute
 		margin-left: 50px
-		margin-top: 50px
 		padding: 30px 50px 30px 90px
 		&.animate
 			-webkit-transition: all 0.5s ease
@@ -199,8 +216,7 @@
 				width: 100%
 				height: auto
 		#log-wrapper
-			height: calc(100% - 100px)
-			margin-top: 100px
+			height: calc(100%)
 			overflow-y: scroll
 			overflow-x: none
 			padding-right: 30px
@@ -211,21 +227,22 @@
 		background-color:black
 		opacity:0.6
 	#nav
-		width: calc(100% - 100px)
-		padding-left:90px
-		margin-top:70px
+		padding-right: 70px
+		padding-bottom: 60px
 		position:absolute
+		bottom: 0
+		right: 0
 		img
 			height:30px
 			margin-right:10px
 	#country
 		text-transform: uppercase
-		font-size: 2em
+		font-size: 1.5em
 		color: #999
 		position: absolute
 		width: 250px
 		right: 75px
-		margin-top: 60px
+		margin-top: 110px
 		text-align: right
 		-webkit-transition:all 0.2s ease-in-out;
 		-moz-transition:all 0.2s ease-in-out;
@@ -233,6 +250,7 @@
 		transition:all 0.2s ease-in-out;
 	.sidenav
 		background:rgba(225,225,225,0.8)
+		z-index: 2
 		opacity: 0.8
 		position:absolute
 		-webkit-transition:all 0.2s ease-in-out
@@ -242,57 +260,42 @@
 		&:hover
 			opacity: 1
 			cursor:pointer
-		.sidenav-top
-			width:100%
-			height:50px
-			top:0
-			border-bottom:solid 1px white
-		.sidenav-bottom
-			width:100%
-			height:50px
-			bottom:0
-			border-top:solid 1px white
-		.sidenav-left
-			width:50px
-			height:100%
-			left:0
-			border-right:solid 1px white
-		.sidenav-right
-			height:100%
-			width:50px
-			right:0
-			border-left:solid 1px white
+	.sidenav-top
+		width:100%
+		height:30px
+		top:0
+		border-bottom:solid 1px white
+	.sidenav-bottom
+		width:100%
+		height:30px
+		bottom:0
+		border-top:solid 1px white
+	.sidenav-left
+		width:30px
+		height:100%
+		left:0
+		border-right:solid 1px white
+	.sidenav-right
+		height:100%
+		width:30px
+		right:0
+		border-left:solid 1px white
 	.arrow
-		width: 0
-		height: 0
-		position: absolute
-		opacity: 0.8
-		&.arrow-up-down
-			border-left: 20px solid transparent
-			border-right: 20px solid transparent
-			right:50%
-			margin-right:-1px
-		&.arrow-left-right
-			border-top: 20px solid transparent
-			border-bottom: 20px solid transparent
-			top:50%
-			margin-top:-10px
 		&.arrow-up		
 			border-bottom: 20px solid #fff
-			margin-top: 15px
+			margin-top: 0px
 		&.arrow-down
 			border-top: 20px solid #fff
 			bottom:0
-			margin-bottom: 15px
+			margin-bottom: 0px
 		&.arrow-right
 			border-left: 20px solid #fff
 			right:0
-			margin-right: 15px
+			margin-right: 0px
 		&.arrow-left 
 			border-right:20px solid #fff
 			left:0
-			margin-left: 15px
-	
+			margin-left: 0px
 
 @media (min-width:320px)
 	#launch-screen
@@ -309,45 +312,7 @@
 			padding: 30px
 			.log-title
 				font-size: 1.7em
-		#country
-			font-size: 1.5em
-			margin-top: 110px
-		.sidenav-top
-			width:100%
-			height:30px
-			top:0
-			border-bottom:solid 1px white
-		.sidenav-bottom
-			width:100%
-			height:30px
-			bottom:0
-			border-top:solid 1px white
-		.sidenav-left
-			width:30px
-			height:100%
-			left:0
-			border-right:solid 1px white
-		.sidenav-right
-			height:100%
-			width:30px
-			right:0
-			border-left:solid 1px white
-		.arrow
-			&.arrow-up		
-				border-bottom: 20px solid #fff
-				margin-top: 0px
-			&.arrow-down
-				border-top: 20px solid #fff
-				bottom:0
-				margin-bottom: 0px
-			&.arrow-right
-				border-left: 20px solid #fff
-				right:0
-				margin-right: 0px
-			&.arrow-left 
-				border-right:20px solid #fff
-				left:0
-				margin-left: 0px
+		
 
 @media (min-height:480px)
 	#container 
@@ -355,7 +320,23 @@
 			padding: 30px 50px 30px 90px
 			.log-content
 				margin-top: 20px
-				height: calc(100% - 140px)
+		.sidenav-top
+			height:50px
+		.sidenav-bottom
+			height:50px
+		.sidenav-left
+			width:50px
+		.sidenav-right
+			width:50px
+		.arrow
+			&.arrow-up		
+				margin-top: 15px
+			&.arrow-down
+				margin-bottom: 15px
+			&.arrow-right
+				margin-right: 15px
+			&.arrow-left 
+				margin-left: 15px
 
 @media (min-width:760px)
 	#container
@@ -368,4 +349,7 @@
 				width:600px
 				margin-left:auto
 				margin-right:auto
+		#country
+			font-size: 2em
+			margin-top: 60px
 
