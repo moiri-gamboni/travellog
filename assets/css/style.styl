@@ -35,7 +35,7 @@
 	top:0
 	left:0
 	position:absolute	
-	background: url('http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg')
+	background: url('/static/img/stump.jpg')
 	background-size:cover
 	background-position:center
 	font-family: "Roboto", sans-serif
@@ -92,13 +92,13 @@
 	width:100%
 	top:0
 	left:0
-	background: url('http://data1.whicdn.com/images/29440241/1277651095-OD4KRDG_original.jpg')
+	background: url('/static/img/stump.jpg')
 	background-position:center
 	background-repeat:no-repeat
 	background-size:cover
-	transition: opacity .25s ease-in-out
-	-moz-transition: opacity .25s ease-in-out
-	-webkit-transition: opacity .25s ease-in-out
+	transition: opacity .5s ease-in-out
+	-moz-transition: opacity .5s ease-in-out
+	-webkit-transition: opacity .5s ease-in-out
 	&.hide
 		opacity:0
 		pointer-events:none
@@ -187,10 +187,13 @@
 			color: white
 		.log-author
 			padding: 10px 0px
+			color:#ed4d4a
+			font-size:1.5em
+			text-transform:uppercase
 		.log-content
 			color: white
 			line-height: 1.3em
-			font-size:1.1em
+			font-size:1em
 			height: calc(100% - 50px)
 			img
 				width: 100%
@@ -239,26 +242,26 @@
 		&:hover
 			opacity: 1
 			cursor:pointer
-	.sidenav-top
-		width:100%
-		height:50px
-		top:0
-		border-bottom:solid 1px white
-	.sidenav-bottom
-		width:100%
-		height:50px
-		bottom:0
-		border-top:solid 1px white
-	.sidenav-left
-		width:50px
-		height:100%
-		left:0
-		border-right:solid 1px white
-	.sidenav-right
-		height:100%
-		width:50px
-		right:0
-		border-left:solid 1px white
+		.sidenav-top
+			width:100%
+			height:50px
+			top:0
+			border-bottom:solid 1px white
+		.sidenav-bottom
+			width:100%
+			height:50px
+			bottom:0
+			border-top:solid 1px white
+		.sidenav-left
+			width:50px
+			height:100%
+			left:0
+			border-right:solid 1px white
+		.sidenav-right
+			height:100%
+			width:50px
+			right:0
+			border-left:solid 1px white
 	.arrow
 		width: 0
 		height: 0
@@ -268,7 +271,7 @@
 			border-left: 20px solid transparent
 			border-right: 20px solid transparent
 			right:50%
-			margin-right:-10px
+			margin-right:-1px
 		&.arrow-left-right
 			border-top: 20px solid transparent
 			border-bottom: 20px solid transparent
@@ -289,6 +292,7 @@
 			border-right:20px solid #fff
 			left:0
 			margin-left: 15px
+	
 
 @media (min-width:320px)
 	#launch-screen
@@ -308,20 +312,60 @@
 		#country
 			font-size: 1.5em
 			margin-top: 110px
+		.sidenav-top
+			width:100%
+			height:30px
+			top:0
+			border-bottom:solid 1px white
+		.sidenav-bottom
+			width:100%
+			height:30px
+			bottom:0
+			border-top:solid 1px white
+		.sidenav-left
+			width:30px
+			height:100%
+			left:0
+			border-right:solid 1px white
+		.sidenav-right
+			height:100%
+			width:30px
+			right:0
+			border-left:solid 1px white
+		.arrow
+			&.arrow-up		
+				border-bottom: 20px solid #fff
+				margin-top: 0px
+			&.arrow-down
+				border-top: 20px solid #fff
+				bottom:0
+				margin-bottom: 0px
+			&.arrow-right
+				border-left: 20px solid #fff
+				right:0
+				margin-right: 0px
+			&.arrow-left 
+				border-right:20px solid #fff
+				left:0
+				margin-left: 0px
+
 @media (min-height:480px)
 	#container 
 		.log-details
+			padding: 30px 50px 30px 90px
 			.log-content
 				margin-top: 20px
 				height: calc(100% - 140px)
-	#country
-			font-size: 2em
-			margin-top: 60px
+
 @media (min-width:760px)
 	#container
 		.log-details
 			.log-content
 				img
 					padding: 0px 100px
-
+		#overlay-content
+			p
+				width:600px
+				margin-left:auto
+				margin-right:auto
 
