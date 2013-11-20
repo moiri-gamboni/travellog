@@ -5,7 +5,6 @@ var scopes = "https://www.googleapis.com/auth/plus.me"+
   " https://www.googleapis.com/auth/userinfo.profile";
 function handleClientLoad() {
   // Step 2: Reference the API key
-  console.log("This is working");
   gapi.client.setApiKey(apiKey);
   window.setTimeout(checkAuth,1);
 }
