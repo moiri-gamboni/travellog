@@ -1,10 +1,11 @@
 move = (direction) ->
-	windowHeight = $(window).height();
-	windowWidth = $(window).width();
+	windowHeight = $(".main").height();
+	windowWidth = $(".main").width();
+	topDistance = parseInt($(".main").css("top"), 10)
 	if direction == "top"
 		prepare = {"left":"0", "top":-windowHeight}
-		launchIn = {"top": windowHeight*0.2 + 50}
-		mainOut = {"top": windowHeight}
+		launchIn = {"y": windowHeight + topDistance + 1}
+		mainOut = {"y": windowHeight + topDistance + 1}
 	else if direction == "down"
 		prepare = {"left":"0", "top":2*windowHeight}
 		launchIn = {"top": windowHeight*0.2 + 50}
@@ -17,14 +18,14 @@ move = (direction) ->
 		prepare = {"left":2*windowWidth, "top": windowHeight*0.2 + 50}
 		launchIn = {"left": 0}
 		mainOut = {"left": -windowWidth}
-	$(".launch").css(prepare)
+	$(".launch").attr({"style": ""}).css(prepare)
 	setTimeout(() ->
 		$(".log-details").addClass("animate")
-		$(".launch").css(launchIn)
-		$(".main").css(mainOut)
+		$(".launch").transition(launchIn,800)
+		$(".main").transition(mainOut,800)
 		setTimeout(() ->
-			$(".log-details").removeClass("animate").toggleClass("main launch")
-		, 500)
+			$(".log-details").removeClass("animate").toggleClass("main launch").attr({"style": ""})
+		, 1000)
 	, 100)
 	
 

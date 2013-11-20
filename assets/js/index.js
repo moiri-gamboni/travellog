@@ -2,19 +2,20 @@
 var move;
 
 move = function(direction) {
-  var launchIn, mainOut, prepare, windowHeight, windowWidth;
-  windowHeight = $(window).height();
-  windowWidth = $(window).width();
+  var launchIn, mainOut, prepare, topDistance, windowHeight, windowWidth;
+  windowHeight = $(".main").height();
+  windowWidth = $(".main").width();
+  topDistance = parseInt($(".main").css("top"), 10);
   if (direction === "top") {
     prepare = {
       "left": "0",
       "top": -windowHeight
     };
     launchIn = {
-      "top": windowHeight * 0.2 + 50
+      "y": windowHeight + topDistance + 1
     };
     mainOut = {
-      "top": windowHeight
+      "y": windowHeight + topDistance + 1
     };
   } else if (direction === "down") {
     prepare = {
@@ -50,14 +51,18 @@ move = function(direction) {
       "left": -windowWidth
     };
   }
-  $(".launch").css(prepare);
+  $(".launch").attr({
+    "style": ""
+  }).css(prepare);
   return setTimeout(function() {
     $(".log-details").addClass("animate");
-    $(".launch").css(launchIn);
-    $(".main").css(mainOut);
+    $(".launch").transition(launchIn, 800);
+    $(".main").transition(mainOut, 800);
     return setTimeout(function() {
-      return $(".log-details").removeClass("animate").toggleClass("main launch");
-    }, 500);
+      return $(".log-details").removeClass("animate").toggleClass("main launch").attr({
+        "style": ""
+      });
+    }, 1000);
   }, 100);
 };
 
