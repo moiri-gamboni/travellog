@@ -5,6 +5,7 @@
 
   ctrl = angular.module("mainModule.controllers", []);
 
+<<<<<<< HEAD
   ctrl.controller("mainCtrl", ['$http', '$scope', 'Map', function($http, $scope, Map) {}]);
 
   ctrl.controller("myfiles", [
@@ -50,6 +51,16 @@
         }
       ];
       return console.log($scope.myfilesa);
+=======
+  ctrl.controller("mainCtrl", [
+    '$http', '$rootScope', '$scope', 'Map', function($http, $scope, $rootScope, Map) {
+      var map;
+      map = Map;
+      map.initMap();
+      return $rootScope.$on('handle-client-load', function(event, apiKey) {
+        return console.log(apiKey);
+      });
+>>>>>>> d35088287adc02a19db9d62f73bd034dabdf5b20
     }
   ]);
 

@@ -37,7 +37,7 @@ class LogHandler(webapp2.RequestHandler):
         return
     # construct the child
     log = models.create_log(self.params["gdriveId"], self.params["lat"], self.params["lng"])
-    # grab either a profileId or profileName depending on what was passed in 
+    # grab either a profileId or profileName depending on what was passed in
     if "profileId" in self.params.keys():
       log.profileId = self.params["profileId"]
     elif "profileName" in self.params.keys():
