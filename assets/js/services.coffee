@@ -24,45 +24,62 @@ srv.factory('Country', ['$http', '$rootScope', ($http, $rootScope) ->
       )
 
     loadCountry: (fileIds, countryName, countryIndex) ->
-      @countryIndex = countryIndex
+      @data =
+        countryIndex: countryIndex
+        fileIds: fileIds
+        countryName: countryName
+        loadedLogs: []
+        logInit: if fileIds.length < 3 then fileIds.length else 3
+      console.log("countryIndex for "+@data.countryName+" : "+@data.countryIndex)
+      #console.log("fileIds for "+@data.countryName+" : "+@data.fileIds)
+      #console.log("fileIds.length for "+@data.countryName+" : "+@data.fileIds.length)
+      #console.log("logInit for "+@data.countryName+" : "+@data.logInit)
+      #console.log(@data)
       $rootScope.$broadcast('country-init')
-      @fileIds = fileIds
-      @countryName = countryName
-      @loadedLogs = []
-      @logInit = if fileIds.length < 3 then fileIds.length else 3
-      #console.log("countryIndex for "+@countryName+" : "+@countryIndex)
-      console.log("fileIds.length for "+@countryName+" : "+@fileIds.length)
-      console.log("logInit for "+@countryName+" : "+@logInit)
 
-      @loadLog = () ->
-        console.log("loadLog for "+@countryName)
+      @loadLog = (fileId) ->
+        #console.log("loadLog for "+@data.countryName)
+        #console.log("fileId for loadLog of "+@data.countryName+" : "+fileId)
+        callback = (countryData) =>
+          return (data, status, headers, config) =>
+            #console.log("loadLog callback")
+            #console.log(data)
+            #console.log(status)
+            #console.log(headers)
+            #console.log(config)
+            #console.log("logInit for "+countryData.countryName+" : "+countryData.logInit)
+            countryData.loadedLogs.push(data.log)
+            countryData.fileIds.pop()
+            countryData.logInit--
+            if countryData.logInit is 0
+              console.log("logInit DONE for "+countryData.countryName)
+              console.log(countryData.loadedLogs)
+              $rootScope.$broadcast('country-finished-init', countryData.countryIndex)
+
         return $http.get(
           window.location.protocol + "//" + window.location.host + "/logs",
           {params:
-            id:@fileIds[@fileIds.length - 1]
-            country: @countryName}
-        )
+            id:fileId}
+        ).success(callback(@data))
 
       @getLog = () ->
         console.log("getLog")
-        if @loadedLogs.length isnt 0
-          return @loadedLogs.pop()
-        else if @fileIds.length isnt 0
-          @loadLog().success((data, status, headers, config) =>
-            console.log("logInit for "+@countryName+" : "+@logInit)
-            @loadedLogs.push(data.result)
-            @fileIds.pop()
-            @logInit--
-            if @logInit is 0
-              console.log("DONE")
-              console.log(@countryIndex)
-              $rootScope.$broadcast('country-finished-init', @countryIndex)
-          )
+        console.log(@data.loadedLogs.length)
+        if @data.loadedLogs.length isnt 0
+          log = @data.loadedLogs.pop()
+          #console.log(log)
+          return log
+        else if @data.fileIds.length isnt 0
+          #@loadLog()
           return 1
         else return 0
 
-      for i in [1..3]
-        @getLog()
+      #console.log(@data.logInit)
+      for i in [1..@data.logInit]
+        fileId = @data.fileIds[@data.fileIds.length - i]
+        #console.log(@data.fileIds.length - i)
+        #console.log(fileId)
+        @loadLog(fileId)
       return @
 
   return factory
@@ -103,17 +120,21 @@ srv.factory('Map', ['$rootScope', 'Country', ($rootScope, Country) ->
       service.countryIndex++
     )
     $rootScope.$on('country-finished-init', (event, countryIndex) ->
+      console.log(countryIndex)
       for i in [-1..1]
-        console.log(100+countryIndex)
+        #console.log(100+countryIndex)
+        log = service.loadedCountries[countryIndex].getLog()
+        console.log(log)
         if not service.map[100+countryIndex]?
           service.map[100+countryIndex] = []
-        service.map[100+countryIndex][100+i] = service.loadedCountries[countryIndex].getLog()
-        console.log(service.map)
+        service.map[100+countryIndex][100+i] = log
+        #console.log(service.map)
     )
     for i in [1..3]
       countries = data.countries
       callback = (i) ->
         return (data, status, headers, config) =>
+          #console.log(data)
           country = countries[countries.length - i]
           service.loadedCountries.push(Country.loadCountry(data.logs, country, service.countryIndex))
       Country.getCountry(data.countries[data.countries.length - i]).success(callback(i)
