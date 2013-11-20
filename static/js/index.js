@@ -85,8 +85,8 @@
     }, 500);
   };
 
-  $("#question, #add, #map").click(function() {
-    console.log("working");
+  $("#add").click(function() {
+    startAddMap();
     return $("#overlay, #overlay-content").addClass("fadein");
   });
 
