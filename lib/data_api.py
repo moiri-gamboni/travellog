@@ -10,7 +10,7 @@ class LogHandler(webapp2.RequestHandler):
 
   def get(self):
     # return all logs if id is not in the argument
-    if "in" not in self.request.arguments():
+    if "id" not in self.request.arguments():
       self.response.headers['Content-Type'] = "application/json"
       self.response.write(json.dumps({"status": 200, "logs":\
         models.get_all_logs()}))

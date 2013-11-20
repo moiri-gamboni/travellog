@@ -5,11 +5,51 @@
 
   ctrl = angular.module("mainModule.controllers", []);
 
-  ctrl.controller("mainCtrl", [
-    '$http', '$rootScope', '$scope', 'Map', function($http, $scope, $rootScope, Map) {
-      return $rootScope.$on('handle-client-load', function(event, apiKey) {
-        return console.log(apiKey);
-      });
+  ctrl.controller("mainCtrl", ['$http', '$scope', 'Map', function($http, $scope, Map) {}]);
+
+  ctrl.controller("myfiles", [
+    '$http', '$scope', function($http, $scope) {
+      console.log("yo");
+      $scope.myfilesa = [
+        {
+          "name": "yes"
+        }, {
+          "name": "no"
+        }, {
+          "name": "maybe"
+        }, {
+          "name": "first"
+        }, {
+          "name": "middle"
+        }, {
+          "name": "last"
+        }, {
+          "name": "yes"
+        }, {
+          "name": "no"
+        }, {
+          "name": "maybe"
+        }, {
+          "name": "first"
+        }, {
+          "name": "middle"
+        }, {
+          "name": "last"
+        }, {
+          "name": "yes"
+        }, {
+          "name": "no"
+        }, {
+          "name": "maybe"
+        }, {
+          "name": "first"
+        }, {
+          "name": "middle"
+        }, {
+          "name": "last"
+        }
+      ];
+      return console.log($scope.myfilesa);
     }
   ]);
 

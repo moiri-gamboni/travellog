@@ -74,9 +74,9 @@ function changeLocation(markerId) {
 }
 
 // bind the state changes to change locations
-$(window).on("onpopstate", function() {
-  
-});
+window.onpopstate = function() {
+  changeLocation(history.state);
+};
 
 function switchMiniMarker() {
   changeLocation(this.title);
