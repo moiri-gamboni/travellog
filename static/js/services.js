@@ -8,28 +8,24 @@
   srv.factory('Map', [
     '$http', '$rootScope', function($http, $rootScope) {
       var factory;
-      return factory = {
+      factory = {
         data: {
           logs: {},
           latLogs: [],
           lngLogs: [],
           current: null
         },
-        getLogs: function(success, error) {
+        getLogs: function(success) {
           var get;
-          get = $http.get(window.location.protocol + "//" + window.location.host + "/logs");
-          get.success(callback);
-          if (error != null) {
-            return get.error(error);
-          }
+          return get = $http.get(window.location.protocol + "//" + window.location.host + "/logs").success(success);
         },
         move: function(direction) {
           var change, changeCurrent, newCurrent;
           change = direction === 'N' || direction === 'E' ? +1 : -1;
           if (direction === 'N' || direction === 'S') {
-            newCurrent = factory.data.logs[factory.data.latLogs[factory.data.current[1] + change].id].key;
+            newCurrent = factory.data.logs[factory.data.latLogs[(factory.data.current[1] + change) % factory.data.latLogs.length].id].key;
           } else {
-            newCurrent = factory.data.logs[factory.data.lngLogs[factory.data.current[0] + change].id].key;
+            newCurrent = factory.data.logs[factory.data.lngLogs[(factory.data.current[0] + change) % factory.data.latLogs.length].id].key;
           }
           getClosestLogs(newCurrent);
           changeCurrent = function(newCurrent) {
@@ -37,20 +33,20 @@
           };
           return $timeout(changeCurrent(newCurrent), 100);
         },
-        getLog: function(logId, error) {
+        getLog: function(logId) {
           var get;
-          if (factory.data.logs[data.log.id].body == null) {
-            get = $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
+          console.log(logId);
+          console.log(factory.data.logs);
+          if (factory.data.logs[logId].body == null) {
+            return get = $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
               params: {
                 id: logId
               }
+            }).success(function(data, status, headers, config) {
+              console.log(data);
+              console.log(factory.data.logs[data.log.id]);
+              return factory.data.logs[data.log.id].body = data.log.body;
             });
-            get.success(function(data, status, headers, config) {
-              return factory.data.logs[data.log.id].body = factory.data.log.body;
-            });
-            if (error != null) {
-              return get.error(error);
-            }
           }
         },
         getClosestLogs: function(around) {
@@ -59,34 +55,64 @@
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             direction = _ref[_i];
-            _results.push(factory.getLog(getClosestLocation(around, direction)));
+            _results.push(factory.getLog(factory.getClosestLocation(around, direction)));
           }
           return _results;
         },
         getClosestLocation: function(from, direction) {
-          var change, tempKey, tempLog;
+          var changeFirst, changeSecond, last, tempKey, tempLog;
           tempKey = from;
           tempLog = null;
-          change = direction === 'N' || direction === 'E' ? +1 : -1;
+          changeFirst = direction === 'N' || direction === 'E' ? +1 : -1;
           if (direction === 'N' || direction === 'S') {
-            while (!factory.inRange(from, tempLog, direction)) {
-              tempKey[1] += change;
-              tempLog = factory.data.latLogs[tempKey[1]];
-              tempKey = factory.data.logs[tempLog.id].key;
+            tempKey[1] = (tempKey[1] + changeFirst) % factory.data.latLogs.length;
+            tempLog = factory.data.latLogs[tempKey[1]];
+            while (tempKey !== from) {
+              changeSecond = tempLog.lng > from.lng ? -1 : +1;
+              while (!factory.inRange(from, tempLog, direction)) {
+                tempKey[0] = (tempKey[0] + changeSecond) % factory.data.lngLogs.length;
+                tempLog = factory.data.lngLogs[tempKey[0]];
+                tempKey = factory.data.logs[tempLog.id].key;
+              }
+              last = tempKey;
+              while (factory.inRange(from, tempLog, direction) || tempKey !== from) {
+                last = tempKey;
+                tempKey[1] = (tempKey[1] - changeFirst) % factory.data.latLogs.length;
+                tempLog = factory.data.latLogs[tempKey[1]];
+                tempKey = factory.data.logs[tempLog.id].key;
+              }
             }
           } else {
-            while (!factory.inRange(from, tempLog, direction)) {
-              tempKey[0] += change;
-              tempLog = factory.data.lngLogs[tempKey[0]];
-              tempKey = factory.data.logs[tempLog.id].key;
+            tempKey[0] = (tempKey[0] + changeFirst) % factory.data.lngLogs.length;
+            tempLog = factory.data.lngLogs[tempKey[0]];
+            while (tempKey !== from) {
+              changeSecond = tempLog.lat > from.lat ? -1 : +1;
+              while (!factory.inRange(from, tempLog, direction)) {
+                tempKey[1] = (tempKey[1] + changeSecond) % factory.data.latLogs.length;
+                tempLog = factory.data.latLogs[tempKey[1]];
+                tempKey = factory.data.logs[tempLog.id].key;
+              }
+              last = tempKey;
+              while (factory.inRange(from, tempLog, direction) || tempKey !== from) {
+                last = tempKey;
+                tempKey[0] = (tempKey[0] - changeFirst) % factory.data.lngLogs.length;
+                tempLog = factory.data.lngLogs[tempKey[0]];
+                tempKey = factory.data.logs[tempLog.id].key;
+              }
             }
           }
-          return tempKey;
+          return last;
         },
         inRange: function(from, to, direction) {
           var gradient;
+          console.log("from");
+          console.log(from);
+          console.log("to");
+          console.log(to);
           from = factory.data.lngLogs[from[0]];
           to = factory.data.lngLogs[to[0]];
+          console.log(from);
+          console.log(to);
           gradient = (to.lat - from.lat) / (to.lng - from.lng);
           if (direction === 'N' || direction === 'S') {
             if (gradient <= -0.5 || gradient >= 0.5) {
@@ -114,7 +140,7 @@
           var getLogsCallback;
           getLogsCallback = function(mapData) {
             return function(data, status, headers, config) {
-              var current, i, keys, log, _i, _j, _len, _len1, _ref, _ref1;
+              var current, i, id, keys, log, _i, _j, _len, _len1, _ref, _ref1;
               mapData.latLogs = data.logs.sort(function(a, b) {
                 return b.lat - a.lat;
               });
@@ -139,13 +165,15 @@
               }
               keys = Object.keys(mapData.logs);
               current = mapData.logs[keys[(Math.random() * keys.length) >> 0]].key;
-              getLog(mapData.lngLogs[current[0]]);
-              return getClosestLogs(current);
+              id = mapData.lngLogs[current[0]].id;
+              factory.getLog(id);
+              return factory.getClosestLogs(current);
             };
           };
-          return getLogs(getLogsCallback(factory.data));
+          return factory.getLogs(getLogsCallback(factory.data));
         }
       };
+      return factory;
     }
   ]);
 

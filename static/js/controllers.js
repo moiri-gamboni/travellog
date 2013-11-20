@@ -7,6 +7,9 @@
 
   ctrl.controller("mainCtrl", [
     '$http', '$rootScope', '$scope', 'Map', function($http, $scope, $rootScope, Map) {
+      var map;
+      map = Map;
+      map.initMap();
       return $rootScope.$on('handle-client-load', function(event, apiKey) {
         return console.log(apiKey);
       });
