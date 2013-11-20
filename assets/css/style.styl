@@ -19,13 +19,20 @@
 	background-color: transparent
 
 // for google maps
+#loading
+	position: absolute
+	z-index: 20
+	height:100px
+	bottom: 50px
+	left: 50%
+	margin-left: -50px
 #minimap
-  height: 25%
-  width: calc(100% - 100px)
+  height: 20%
+  width: calc(100% - 60px)
   position: absolute
   z-index: 1
-  top: 50px
-  left: 50px
+  top: 30px
+  left: 30px
   #map-canvas
     height: 100%
 #add-map-canvas
@@ -51,18 +58,10 @@
 	top:0
 	left:0
 	position:absolute	
-	background: url('/static/img/stump.jpg')
+	background: url('/static/img/boat.jpg')
 	background-size:cover
 	background-position:center
 	font-family: "Roboto", sans-serif
-	#whiteshade
-		position: absolute
-		width: 100%
-		height: 100%
-		top: 0
-		left: 0
-		background: white
-		opacity: 0.4
 	hr
 		height: 15px
 		width: 170px
@@ -90,6 +89,7 @@
 		margin-left: -270px
 		font-weight:300
 		text-align:center
+		color:#666
 	h3
 		position: absolute
 		font-size: 2em
@@ -99,6 +99,7 @@
 		margin-left: -90px
 		font-weight: 500
 		text-transform: uppercase
+		visibility:hidden
 #container
 	font-family: "Roboto", sans-serif
 	position:absolute
@@ -108,7 +109,7 @@
 	width:100%
 	top:0
 	left:0
-	background: url('/static/img/stump.jpg')
+	background: url('/static/img/boat.jpg')
 	background-position:center
 	background-repeat:no-repeat
 	background-size:cover
@@ -281,21 +282,36 @@
 		right:0
 		border-left:solid 1px white
 	.arrow
+		width: 0
+		height: 0
+		position: absolute
+		opacity: 0.8
+		&.arrow-up-down
+			border-left: 15px solid transparent
+			border-right: 15px solid transparent
+			right:50%
+			margin-right:-10px
+		&.arrow-left-right
+			border-top: 15px solid transparent
+			border-bottom: 15px solid transparent
+			top:50%
+			margin-top:-10px
 		&.arrow-up		
-			border-bottom: 20px solid #fff
-			margin-top: 0px
+			border-bottom: 15px solid #fff
+			margin-top: 5px
 		&.arrow-down
-			border-top: 20px solid #fff
+			border-top: 15px solid #fff
 			bottom:0
-			margin-bottom: 0px
+			margin-bottom: 5px
 		&.arrow-right
-			border-left: 20px solid #fff
+			border-left: 15px solid #fff
 			right:0
-			margin-right: 0px
+			margin-right: 5px
 		&.arrow-left 
-			border-right:20px solid #fff
+			border-right:15px solid #fff
 			left:0
-			margin-left: 0px
+			margin-left: 5px
+
 
 @media (min-width:320px)
 	#launch-screen
@@ -312,14 +328,34 @@
 			padding: 30px
 			.log-title
 				font-size: 1.7em
-		
-
 @media (min-height:480px)
 	#container 
 		.log-details
-			padding: 30px 50px 30px 90px
+			padding: 30px 30px 30px 50px
 			.log-content
 				margin-top: 20px
+		
+
+@media (min-width:760px)
+	#minimap
+		width: calc(100% - 100px)
+		top: 50px
+		left: 50px
+	#container
+		.log-details
+			.log-content
+				img
+					padding: 0px 100px
+			.log-title
+				font-size:2.2em
+		#overlay-content
+			p
+				width:600px
+				margin-left:auto
+				margin-right:auto
+		#country
+			font-size: 2em
+			margin-top: 60px
 		.sidenav-top
 			height:50px
 		.sidenav-bottom
@@ -329,27 +365,29 @@
 		.sidenav-right
 			width:50px
 		.arrow
+			&.arrow-up-down
+				border-left: 20px solid transparent
+				border-right: 20px solid transparent
+				right:50%
+				margin-right:-10px
+			&.arrow-left-right
+				border-top: 20px solid transparent
+				border-bottom: 20px solid transparent
+				top:50%
+				margin-top:-10px
 			&.arrow-up		
+				border-bottom: 20px solid #fff
+				top: 0
 				margin-top: 15px
 			&.arrow-down
+				border-top: 20px solid #fff
+				bottom:0
 				margin-bottom: 15px
 			&.arrow-right
+				border-left: 20px solid #fff
+				right:0
 				margin-right: 15px
 			&.arrow-left 
+				border-right:20px solid #fff
+				left:0
 				margin-left: 15px
-
-@media (min-width:760px)
-	#container
-		.log-details
-			.log-content
-				img
-					padding: 0px 100px
-		#overlay-content
-			p
-				width:600px
-				margin-left:auto
-				margin-right:auto
-		#country
-			font-size: 2em
-			margin-top: 60px
-

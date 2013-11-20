@@ -2,6 +2,7 @@
 <html ng-app="mainModule">
 	<head>
 		<link rel="stylesheet" type="text/css" href="/static/css/style.css">
+		<link rel="stylesheet" type="text/css" href="/static/css/loading.css">
 		<link href='http://fonts.googleapis.com/css?family=Fenix' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,500' rel='stylesheet' type='text/css'>
     <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
@@ -11,15 +12,21 @@
     </script>
 	</head>
 	<body>
+		<div id="loading">
+			<ul class="bokeh">
+					<li></li>
+					<li></li>
+					<li></li>
+					<li></li>
+				</ul>
+		</div>
 		<div id="launch-screen">
-			<div id="whiteshade"></div>
 			<div id="logo">
 				<hr class="top-bar">
 				 <h1>Travellog</h1>
 				<hr>
 			</div>
 			<p> Document and share your adventures. </p>
-			<h3> Start Here </h3>
 		</div>
 		<div id="container" class="hide" ng-controller="mainCtrl">
       <div id="minimap">
