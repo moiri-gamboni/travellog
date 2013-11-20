@@ -5,9 +5,103 @@
 
   srv = angular.module("mainModule.services", []);
 
-  srv.factory('test', [
-    function() {
-      return true;
+  srv.factory('Map', [
+    '$http', '$rootScope', function($http, $rootScope) {
+      var factory;
+      return factory = {
+        data: {
+          logs: {},
+          latLogs: [],
+          lngLogs: [],
+          current: null
+        },
+        getLogs: function(success, error) {
+          var get;
+          get = $http.get(window.location.protocol + "//" + window.location.host + "/logs");
+          get.success(callback);
+          if (error != null) {
+            return get.error(error);
+          }
+        },
+        getLog: function(logId, error) {
+          var get;
+          get = $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
+            params: {
+              id: logId
+            }
+          });
+          get.success(function(data, status, headers, config) {
+            return factory.data.logs[data.log.id].body = factory.data.log.body;
+          });
+          if (error != null) {
+            return get.error(error);
+          }
+        },
+        getClosestLogs: function() {
+          var direction, _i, _len, _ref, _results;
+          _ref = ['N', 'E', 'S', 'W'];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            direction = _ref[_i];
+            _results.push(getLog(getClosestLocation(factory.data.current, direction)));
+          }
+          return _results;
+        },
+        getClosestLocation: function(from, towards) {
+          var change, tempKey, tempLog;
+          tempKey = from;
+          tempLog = null;
+          change = towards === 'N' || towards === 'E' ? +1 : -1;
+          if (towards === 'N' || towards === 'S') {
+            while (!inRange(from, tempLog, towards)) {
+              tempKey[1] += change;
+              tempLog = latLogs[tempKey[1]];
+              tempKey = factory.data.logs[tempLog.id].key;
+            }
+          } else {
+            while (!inRange(from, tempLog, towards)) {
+              tempKey[0] += change;
+              tempLog = lngLogs[tempKey[0]];
+              tempKey = factory.data.logs[tempLog.id].key;
+            }
+          }
+          return tempKey;
+        },
+        initMap: function() {
+          var getLogsCallback;
+          getLogsCallback = function(mapData) {
+            return function(data, status, headers, config) {
+              var current, i, keys, log, _i, _j, _len, _len1, _ref, _ref1;
+              mapData.latLogs = data.logs.sort(function(a, b) {
+                return b.lat - a.lat;
+              });
+              _ref = mapData.latLogs;
+              for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+                log = _ref[i];
+                mapData.logs[log.id] = {
+                  id: log.id,
+                  body: null,
+                  lat: log.lat,
+                  lng: log.lng,
+                  key: [null, i]
+                };
+              }
+              mapData.lngLogs = data.logs.sort(function(a, b) {
+                return b.lng - a.lng;
+              });
+              _ref1 = mapData.lngLogs;
+              for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
+                log = _ref1[i];
+                mapData.logs[log.id].key = [i, mapData.logs[log.id].key[1]];
+              }
+              keys = Object.keys(mapData.logs);
+              current = mapData.logs[keys[(Math.random() * keys.length) >> 0]].key;
+              return getLog(mapData.latLogs[current]);
+            };
+          };
+          return getLogs(getLogsCallback(factory.data));
+        }
+      };
     }
   ]);
 
@@ -26,48 +120,53 @@
           });
         },
         loadCountry: function(fileIds, countryName, countryIndex) {
-          var i, _i;
-          this.countryIndex = countryIndex;
+          var fileId, i, _i, _ref;
+          this.data = {
+            countryIndex: countryIndex,
+            fileIds: fileIds,
+            countryName: countryName,
+            loadedLogs: [],
+            logInit: fileIds.length < 3 ? fileIds.length : 3
+          };
+          console.log("countryIndex for " + this.data.countryName + " : " + this.data.countryIndex);
           $rootScope.$broadcast('country-init');
-          this.fileIds = fileIds;
-          this.countryName = countryName;
-          this.loadedLogs = [];
-          this.logInit = fileIds.length < 3 ? fileIds.length : 3;
-          console.log("fileIds.length for " + this.countryName + " : " + this.fileIds.length);
-          console.log("logInit for " + this.countryName + " : " + this.logInit);
-          this.loadLog = function() {
-            console.log("loadLog for " + this.countryName);
+          this.loadLog = function(fileId) {
+            var callback,
+              _this = this;
+            callback = function(countryData) {
+              return function(data, status, headers, config) {
+                countryData.loadedLogs.push(data.log);
+                countryData.fileIds.pop();
+                countryData.logInit--;
+                if (countryData.logInit === 0) {
+                  console.log("logInit DONE for " + countryData.countryName);
+                  console.log(countryData.loadedLogs);
+                  return $rootScope.$broadcast('country-finished-init', countryData.countryIndex);
+                }
+              };
+            };
             return $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
               params: {
-                id: this.fileIds[this.fileIds.length - 1],
-                country: this.countryName
+                id: fileId
               }
-            });
+            }).success(callback(this.data));
           };
           this.getLog = function() {
-            var _this = this;
+            var log;
             console.log("getLog");
-            if (this.loadedLogs.length !== 0) {
-              return this.loadedLogs.pop();
-            } else if (this.fileIds.length !== 0) {
-              this.loadLog().success(function(data, status, headers, config) {
-                console.log("logInit for " + _this.countryName + " : " + _this.logInit);
-                _this.loadedLogs.push(data.result);
-                _this.fileIds.pop();
-                _this.logInit--;
-                if (_this.logInit === 0) {
-                  console.log("DONE");
-                  console.log(_this.countryIndex);
-                  return $rootScope.$broadcast('country-finished-init', _this.countryIndex);
-                }
-              });
+            console.log(this.data.loadedLogs.length);
+            if (this.data.loadedLogs.length !== 0) {
+              log = this.data.loadedLogs.pop();
+              return log;
+            } else if (this.data.fileIds.length !== 0) {
               return 1;
             } else {
               return 0;
             }
           };
-          for (i = _i = 1; _i <= 3; i = ++_i) {
-            this.getLog();
+          for (i = _i = 1, _ref = this.data.logInit; 1 <= _ref ? _i <= _ref : _i >= _ref; i = 1 <= _ref ? ++_i : --_i) {
+            fileId = this.data.fileIds[this.data.fileIds.length - i];
+            this.loadLog(fileId);
           }
           return this;
         }
@@ -76,7 +175,7 @@
     }
   ]);
 
-  srv.factory('Map', [
+  srv.factory('oldMap', [
     '$rootScope', 'Country', function($rootScope, Country) {
       var service, shuffle;
       shuffle = function(array) {
@@ -108,15 +207,16 @@
           return service.countryIndex++;
         });
         $rootScope.$on('country-finished-init', function(event, countryIndex) {
-          var i, _i, _results;
+          var i, log, _i, _results;
+          console.log(countryIndex);
           _results = [];
           for (i = _i = -1; _i <= 1; i = ++_i) {
-            console.log(100 + countryIndex);
+            log = service.loadedCountries[countryIndex].getLog();
+            console.log(log);
             if (service.map[100 + countryIndex] == null) {
               service.map[100 + countryIndex] = [];
             }
-            service.map[100 + countryIndex][100 + i] = service.loadedCountries[countryIndex].getLog();
-            _results.push(console.log(service.map));
+            _results.push(service.map[100 + countryIndex][100 + i] = log);
           }
           return _results;
         });

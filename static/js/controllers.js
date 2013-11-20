@@ -5,6 +5,12 @@
 
   ctrl = angular.module("mainModule.controllers", []);
 
-  ctrl.controller("mainCtrl", ['$http', '$scope', 'Map', function($http, $scope, Map) {}]);
+  ctrl.controller("mainCtrl", [
+    '$http', '$rootScope', '$scope', 'Map', function($http, $scope, $rootScope, Map) {
+      return $rootScope.$on('handle-client-load', function(event, apiKey) {
+        return console.log(apiKey);
+      });
+    }
+  ]);
 
 }).call(this);
