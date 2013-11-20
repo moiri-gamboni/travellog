@@ -10,7 +10,7 @@ class LogHandler(webapp2.RequestHandler):
 
   def get(self):
     # return all logs if id is not in the argument
-    if "in" not in self.request.arguments():
+    if "id" not in self.request.arguments():
       self.response.headers['Content-Type'] = "application/json"
       self.response.write(json.dumps({"status": 200, "logs":\
         models.get_all_logs()}))
@@ -37,7 +37,7 @@ class LogHandler(webapp2.RequestHandler):
         return
     # construct the child
     log = models.create_log(self.params["gdriveId"], self.params["lat"], self.params["lng"])
-    # grab either a profileId or profileName depending on what was passed in 
+    # grab either a profileId or profileName depending on what was passed in
     if "profileId" in self.params.keys():
       log.profileId = self.params["profileId"]
     elif "profileName" in self.params.keys():
