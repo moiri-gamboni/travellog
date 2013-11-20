@@ -5,11 +5,6 @@
 
   srv = angular.module("mainModule.services", []);
 
-<<<<<<< HEAD
-  srv.factory('test', [
-    function() {
-      return true;
-=======
   srv.factory('Map', [
     '$http', '$rootScope', function($http, $rootScope) {
       var factory;
@@ -48,9 +43,8 @@
                 id: logId
               }
             }).success(function(data, status, headers, config) {
-              console.log(data);
-              console.log(factory.data.logs[data.log.id]);
-              return factory.data.logs[data.log.id].body = data.log.body;
+              console.log(factory.data.logs[data.id]);
+              return factory.data.logs[data.id].body = data.body;
             });
           }
         },
@@ -110,14 +104,8 @@
         },
         inRange: function(from, to, direction) {
           var gradient;
-          console.log("from");
-          console.log(from);
-          console.log("to");
-          console.log(to);
           from = factory.data.lngLogs[from[0]];
           to = factory.data.lngLogs[to[0]];
-          console.log(from);
-          console.log(to);
           gradient = (to.lat - from.lat) / (to.lng - from.lng);
           if (direction === 'N' || direction === 'S') {
             if (gradient <= -0.5 || gradient >= 0.5) {
@@ -179,7 +167,6 @@
         }
       };
       return factory;
->>>>>>> d35088287adc02a19db9d62f73bd034dabdf5b20
     }
   ]);
 
@@ -198,48 +185,53 @@
           });
         },
         loadCountry: function(fileIds, countryName, countryIndex) {
-          var i, _i;
-          this.countryIndex = countryIndex;
+          var fileId, i, _i, _ref;
+          this.data = {
+            countryIndex: countryIndex,
+            fileIds: fileIds,
+            countryName: countryName,
+            loadedLogs: [],
+            logInit: fileIds.length < 3 ? fileIds.length : 3
+          };
+          console.log("countryIndex for " + this.data.countryName + " : " + this.data.countryIndex);
           $rootScope.$broadcast('country-init');
-          this.fileIds = fileIds;
-          this.countryName = countryName;
-          this.loadedLogs = [];
-          this.logInit = fileIds.length < 3 ? fileIds.length : 3;
-          console.log("fileIds.length for " + this.countryName + " : " + this.fileIds.length);
-          console.log("logInit for " + this.countryName + " : " + this.logInit);
-          this.loadLog = function() {
-            console.log("loadLog for " + this.countryName);
+          this.loadLog = function(fileId) {
+            var callback,
+              _this = this;
+            callback = function(countryData) {
+              return function(data, status, headers, config) {
+                countryData.loadedLogs.push(data.log);
+                countryData.fileIds.pop();
+                countryData.logInit--;
+                if (countryData.logInit === 0) {
+                  console.log("logInit DONE for " + countryData.countryName);
+                  console.log(countryData.loadedLogs);
+                  return $rootScope.$broadcast('country-finished-init', countryData.countryIndex);
+                }
+              };
+            };
             return $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
               params: {
-                id: this.fileIds[this.fileIds.length - 1],
-                country: this.countryName
+                id: fileId
               }
-            });
+            }).success(callback(this.data));
           };
           this.getLog = function() {
-            var _this = this;
+            var log;
             console.log("getLog");
-            if (this.loadedLogs.length !== 0) {
-              return this.loadedLogs.pop();
-            } else if (this.fileIds.length !== 0) {
-              this.loadLog().success(function(data, status, headers, config) {
-                console.log("logInit for " + _this.countryName + " : " + _this.logInit);
-                _this.loadedLogs.push(data.result);
-                _this.fileIds.pop();
-                _this.logInit--;
-                if (_this.logInit === 0) {
-                  console.log("DONE");
-                  console.log(_this.countryIndex);
-                  return $rootScope.$broadcast('country-finished-init', _this.countryIndex);
-                }
-              });
+            console.log(this.data.loadedLogs.length);
+            if (this.data.loadedLogs.length !== 0) {
+              log = this.data.loadedLogs.pop();
+              return log;
+            } else if (this.data.fileIds.length !== 0) {
               return 1;
             } else {
               return 0;
             }
           };
-          for (i = _i = 1; _i <= 3; i = ++_i) {
-            this.getLog();
+          for (i = _i = 1, _ref = this.data.logInit; 1 <= _ref ? _i <= _ref : _i >= _ref; i = 1 <= _ref ? ++_i : --_i) {
+            fileId = this.data.fileIds[this.data.fileIds.length - i];
+            this.loadLog(fileId);
           }
           return this;
         }
@@ -248,7 +240,7 @@
     }
   ]);
 
-  srv.factory('Map', [
+  srv.factory('oldMap', [
     '$rootScope', 'Country', function($rootScope, Country) {
       var service, shuffle;
       shuffle = function(array) {
@@ -280,15 +272,16 @@
           return service.countryIndex++;
         });
         $rootScope.$on('country-finished-init', function(event, countryIndex) {
-          var i, _i, _results;
+          var i, log, _i, _results;
+          console.log(countryIndex);
           _results = [];
           for (i = _i = -1; _i <= 1; i = ++_i) {
-            console.log(100 + countryIndex);
+            log = service.loadedCountries[countryIndex].getLog();
+            console.log(log);
             if (service.map[100 + countryIndex] == null) {
               service.map[100 + countryIndex] = [];
             }
-            service.map[100 + countryIndex][100 + i] = service.loadedCountries[countryIndex].getLog();
-            _results.push(console.log(service.map));
+            _results.push(service.map[100 + countryIndex][100 + i] = log);
           }
           return _results;
         });

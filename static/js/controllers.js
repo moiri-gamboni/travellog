@@ -5,63 +5,32 @@
 
   ctrl = angular.module("mainModule.controllers", []);
 
-<<<<<<< HEAD
-  ctrl.controller("mainCtrl", ['$http', '$scope', 'Map', function($http, $scope, Map) {}]);
-
-  ctrl.controller("myfiles", [
-    '$http', '$scope', function($http, $scope) {
-      console.log("yo");
-      $scope.myfilesa = [
-        {
-          "name": "yes"
-        }, {
-          "name": "no"
-        }, {
-          "name": "maybe"
-        }, {
-          "name": "first"
-        }, {
-          "name": "middle"
-        }, {
-          "name": "last"
-        }, {
-          "name": "yes"
-        }, {
-          "name": "no"
-        }, {
-          "name": "maybe"
-        }, {
-          "name": "first"
-        }, {
-          "name": "middle"
-        }, {
-          "name": "last"
-        }, {
-          "name": "yes"
-        }, {
-          "name": "no"
-        }, {
-          "name": "maybe"
-        }, {
-          "name": "first"
-        }, {
-          "name": "middle"
-        }, {
-          "name": "last"
-        }
-      ];
-      return console.log($scope.myfilesa);
-=======
   ctrl.controller("mainCtrl", [
-    '$http', '$rootScope', '$scope', 'Map', function($http, $scope, $rootScope, Map) {
-      var map;
-      map = Map;
-      map.initMap();
+    '$http', '$scope', '$rootScope', 'Map', function($http, $scope, $rootScope, Map) {
+      Map.initMap();
       return $rootScope.$on('handle-client-load', function(event, apiKey) {
         return console.log(apiKey);
       });
->>>>>>> d35088287adc02a19db9d62f73bd034dabdf5b20
     }
   ]);
+
+  /*ctrl.controller("MyFilesController", ['$http', '$scope', ($http, $scope) ->
+  	if user is signed_in
+    #$scope.map = Map
+  	  console.log("yo")
+  	  #get request
+  	  $scope.myfilesa = [{"name": "yes"}, {"name": "no"}, {"name": "maybe"}, {"name": "first"}, {"name": "middle"}, {"name": "last"}, {"name": "yes"}, {"name": "no"}, {"name": "maybe"}, {"name": "first"}, {"name": "middle"}, {"name": "last"} , {"name": "yes"}, {"name": "no"}, {"name": "maybe"}, {"name": "first"}, {"name": "middle"}, {"name": "last"}]
+  	  console.log $scope.myfilesa
+  	  upload = (id) ->
+  	  	#post request
+  	else:
+  		populate sign_in page
+  ])
+  ctrl.controller("SignInController", ['$http', '$scope', ($http, $scope) ->
+  	sign_in = (user) ->
+  		# blah
+  ])
+  */
+
 
 }).call(this);

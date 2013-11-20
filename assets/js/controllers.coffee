@@ -1,15 +1,14 @@
 "use strict"
 ctrl = angular.module("mainModule.controllers", [])
 
-ctrl.controller("mainCtrl", ['$http', '$rootScope', '$scope', 'Map', ($http, $scope, $rootScope, Map) ->
-  map = Map
-  map.initMap()
+ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', 'Map', ($http, $scope, $rootScope, Map) ->
+  Map.initMap()
   $rootScope.$on('handle-client-load', (event, apiKey)->
     console.log(apiKey)
   )
 ])
-ctrl.controller("MyFilesController", ['$http', '$scope', ($http, $scope) ->
-	if user is signed in:
+###ctrl.controller("MyFilesController", ['$http', '$scope', ($http, $scope) ->
+	if user is signed_in
   #$scope.map = Map
 	  console.log("yo")
 	  #get request
@@ -18,9 +17,9 @@ ctrl.controller("MyFilesController", ['$http', '$scope', ($http, $scope) ->
 	  upload = (id) ->
 	  	#post request
 	else:
-		populate sign-in page
+		populate sign_in page
 ])
 ctrl.controller("SignInController", ['$http', '$scope', ($http, $scope) ->
 	sign_in = (user) ->
 		# blah
-])
+])###
