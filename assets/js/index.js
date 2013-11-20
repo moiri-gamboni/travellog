@@ -93,7 +93,7 @@ $("#overlay").click(function() {
   return $("#overlay, #overlay-content").removeClass("fadein");
 });
 
-$("#launch-screen p").click(function() {
-  $("#launch-screen").addClass("hide");
+$("#launch-screen h1").click(function() {
+  $("#launch-screen h1, #start-here").addClass("hide");
   return $("#container").removeClass("hide");
 });

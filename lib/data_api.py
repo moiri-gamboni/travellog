@@ -12,7 +12,7 @@ class DataHandler(webapp2.RequestHandler):
 
 class LogHandler(webapp2.RequestHandler):
   post_params = ["gdriveId", "country"]
-  get_params = ["id", "country"]
+  get_params = ["id"]
 
   def get(self):
     # param check
@@ -27,13 +27,12 @@ class LogHandler(webapp2.RequestHandler):
         # try fetch the requested id by key
         self.response.headers['Content-Type'] = "application/json"
         self.response.write(json.dumps({"status": 200, "log":\
-          models.get_log_by_key(self.request.get("country"),
-            self.request.get("id"))}))
+          models.get_log_by_key(self.request.get("id"))}))
       except:
         self.response.headers['Content-Type'] = "application/json"
         self.response.write(json.dumps({"status": 404, "error":\
-          "log with id %s and country %s not found" %\
-          (self.request.get("id"), self.request.get("country"))}))
+          "log with id %s not found" %\
+          (self.request.get("id"))}))
         return
 
   def post(self):
@@ -51,6 +50,7 @@ class LogHandler(webapp2.RequestHandler):
       existing_country = models.create_country(country_name)
     # construct the child
     log = models.create_log(self.params["gdriveId"], existing_country.key)
+    # grab either a profileId or profileName depending on what was passed in 
     if "profileId" in self.params.keys():
       log.profileId = self.params["profileId"]
     elif "profileName" in self.params.keys():
@@ -60,14 +60,15 @@ class LogHandler(webapp2.RequestHandler):
       self.response.write(json.dumps({"status": 400, "error":\
           "You must have either a profileId or profileName parameter"}))
       return
-    #try:
-    gdrive.process_log(log)
-    #except:
-      #self.response.headers['Content-Type'] = "application/json"
-      #self.response.write(json.dumps({"status": 400, "error":\
-          #"Could not process drive document with id %s" %\
-          #self.params["gdriveId"]}))
-      #return
+    try:
+      # process the log, fetching its html content
+      gdrive.process_log(log)
+    except:
+      self.response.headers['Content-Type'] = "application/json"
+      self.response.write(json.dumps({"status": 400, "error":\
+          "Could not process drive document with id %s" %\
+          self.params["gdriveId"]}))
+      return
     log.put()
     self.response.headers['Content-Type'] = "application/json"
     self.response.write(json.dumps({"status": 200}))
@@ -82,7 +83,7 @@ class CountriesHandler(webapp2.RequestHandler):
       try:
         self.response.headers['Content-Type'] = "application/json"
         self.response.write(json.dumps({"status": 200,\
-            "logs": models.get_country_by_key(self.request.get("id"))}))
+          "logs": models.get_country_by_key(self.request.get("id"))}))
       except:
         self.response.headers['Content-Type'] = "application/json"
         self.response.write(json.dumps({"status": 404, "error":\

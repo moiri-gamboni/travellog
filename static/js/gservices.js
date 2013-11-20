@@ -43,6 +43,17 @@ function getUserInfo() {
     // Step 6: Execute the API request
     request.execute(function(resp) {
       console.log(resp);
+      // if the person has no google plus id
+      if (resp.code == 404) {
+        gapi.client.load('oauth2', 'v2', function() {
+          var request = gapi.client.oauth2.userinfo.get();
+          request.execute(function(resp) {
+            console.log(resp);
+            $("#name").html(resp.name);
+          });
+        });
+      }
+      // else retrieve their information from the g+ info
       $("#name").html(resp.displayName);
     });
   });
