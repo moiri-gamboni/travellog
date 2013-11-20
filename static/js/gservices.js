@@ -52,9 +52,11 @@ function getUserInfo() {
             $("#name").html(resp.name);
           });
         });
+      } else {
+        // else retrieve their information from the g+ info
+        $("#name").html(resp.displayName);  
       }
-      // else retrieve their information from the g+ info
-      $("#name").html(resp.displayName);
+      
     });
   });
   // load the drive client

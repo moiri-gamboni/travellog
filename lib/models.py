@@ -12,9 +12,10 @@ def get_log_by_key(key):
   log = ndb.Key(Log, key).get()
   response = {
     "id": key,
-    "country": log.country.id(),
     "title": log.title,
-    "body": log.body
+    "body": log.body,
+    "lat": log.lat,
+    "lng": log.lng
   }
   if log.profileId:
     response['profileId'] = log.profileId

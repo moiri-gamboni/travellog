@@ -69,8 +69,14 @@ function changeLocation(markerId) {
     currentMiniMarker.setAnimation(google.maps.Animation.BOUNCE);
   }
   // push the new url
-  history.pushState(null, null, "/log/" + currentMiniMarker.title);
+  history.pushState(currentMiniMarker.title, null,
+    "/log/" + currentMiniMarker.title);
 }
+
+// bind the state changes to change locations
+$(window).on("onpopstate", function() {
+  
+});
 
 function switchMiniMarker() {
   changeLocation(this.title);
@@ -91,4 +97,5 @@ function placeMarkerMiniMap(log_object) {
 }
                       
 google.maps.event.addDomListener(window, 'load', initialize);
+
 
