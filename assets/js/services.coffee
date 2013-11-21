@@ -59,14 +59,18 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
 
       tempKey = from.slice()
       change = if direction in ['N', 'E'] then 1 else (-1)
+      breakLoop = false
       for wrapNumber in [0,1,2]
+        break if breakLoop
         if direction in ['N', 'S']
           i = Math.abs(mod(from[1] + change, factory.data.latLogs.length))
           while i isnt from[1]
             tempKey[1] = i
             tempLog = factory.data.latLogs[tempKey[1]]
             tempKey = factory.data.logs[tempLog.id].key
-            break if factory.inRange(from, tempKey, direction, wrapNumber)
+            if factory.inRange(from, tempKey, direction, wrapNumber)
+              breakLoop = true
+              break
             i = Math.abs(mod(i + change, factory.data.latLogs.length))
 
         else
@@ -75,7 +79,9 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
             tempKey[0] = i
             tempLog = factory.data.lngLogs[tempKey[0]]
             tempKey = factory.data.logs[tempLog.id].key
-            break if factory.inRange(from, tempKey, direction, wrapNumber)
+            if factory.inRange(from, tempKey, direction, wrapNumber)
+              breakLoop = true
+              break
             i = Math.abs(mod(i + change, factory.data.lngLogs.length))
 
       return tempKey

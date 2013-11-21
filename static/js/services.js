@@ -72,12 +72,16 @@
           return _results;
         },
         getClosestLocation: function(from, direction) {
-          var change, i, tempKey, tempLog, wrapNumber, _i, _len, _ref;
+          var breakLoop, change, i, tempKey, tempLog, wrapNumber, _i, _len, _ref;
           tempKey = from.slice();
           change = direction === 'N' || direction === 'E' ? 1 : -1.;
+          breakLoop = false;
           _ref = [0, 1, 2];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             wrapNumber = _ref[_i];
+            if (breakLoop) {
+              break;
+            }
             if (direction === 'N' || direction === 'S') {
               i = Math.abs(mod(from[1] + change, factory.data.latLogs.length));
               while (i !== from[1]) {
@@ -85,6 +89,7 @@
                 tempLog = factory.data.latLogs[tempKey[1]];
                 tempKey = factory.data.logs[tempLog.id].key;
                 if (factory.inRange(from, tempKey, direction, wrapNumber)) {
+                  breakLoop = true;
                   break;
                 }
                 i = Math.abs(mod(i + change, factory.data.latLogs.length));
@@ -96,6 +101,7 @@
                 tempLog = factory.data.lngLogs[tempKey[0]];
                 tempKey = factory.data.logs[tempLog.id].key;
                 if (factory.inRange(from, tempKey, direction, wrapNumber)) {
+                  breakLoop = true;
                   break;
                 }
                 i = Math.abs(mod(i + change, factory.data.lngLogs.length));
