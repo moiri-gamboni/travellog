@@ -285,15 +285,24 @@
   opacity: 1;
   pointer-events: auto;
 }
+#container #overlay #overlay-content .message {
+  font-size: 1.5em;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  text-align: center;
+  width: 290px;
+  margin-left: -145px;
+}
 #container #overlay #overlay-content button {
   background: transparent;
   border: transparent;
   outline: transparent;
   color: #aaa;
-  font-size: 2em;
+  font-size: 1.5em;
   padding: 0px;
   position: absolute;
-  top: 50%;
+  top: 60%;
   right: 10px;
 }
 #container #overlay #overlay-content span {
@@ -539,6 +548,9 @@
   }
   #container #overlay-content #search ul {
     height: 200px;
+  }
+  #container #overlay-content #search button {
+    font-size: 2em;
   }
   #container #country {
     font-size: 2em;
