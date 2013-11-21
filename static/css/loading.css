@@ -32,6 +32,9 @@ body:after {
     height: .2em;
     border-radius: 50%;
 }
+.boken li .hide-loading{
+        visibility:hidden
+}
 
 .bokeh li:nth-child(1) {
     left: 50%;

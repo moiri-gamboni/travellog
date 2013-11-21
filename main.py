@@ -3,8 +3,6 @@ import sys
 import inspect
 import webapp2
 
-from google.appengine.ext.webapp import template
-
 indexPath = os.path.join(os.path.dirname(__file__), 'index.html')
 
 # setting up subfolder
@@ -21,6 +19,6 @@ class IndexPage(webapp2.RequestHandler):
     self.response.out.write(template.render(indexPath, None))
 
 application = webapp2.WSGIApplication([
-  ('/', IndexPage), ('/logs', LogHandler),
-  ("/drive", DriveHandler), (r'/log/.+', IndexPage)
+  ('/logs', LogHandler),
+  ("/drive", DriveHandler)
 ], debug=True)
