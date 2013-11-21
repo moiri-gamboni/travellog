@@ -21,29 +21,29 @@
     } else if (direction === "down") {
       prepare = {
         "left": "0",
-        "top": 2 * windowHeight
+        "top": windowHeight
       };
       launchIn = {
-        "top": windowHeight * 0.2 + 50
+        "top": windowHeight - topDistance + 1
       };
       mainOut = {
-        "top": -windowHeight
+        "top": -windowHeight - topDistance
       };
     } else if (direction === "left") {
       prepare = {
         "left": -windowWidth,
-        "top": windowHeight * 0.2 + 50
+        "top": windowHeight - topDistance
       };
       launchIn = {
         "left": 0
       };
       mainOut = {
-        "left": windowWidth
+        "left": windowWidth + 50
       };
     } else {
       prepare = {
         "left": 2 * windowWidth,
-        "top": windowHeight * 0.2 + 50
+        "top": windowHeight - topDistance
       };
       launchIn = {
         "left": 0
@@ -110,7 +110,7 @@
     $(".background").toggleClass("active passive");
     passive = $(".passive");
     counter = passive.attr("data-counter");
-    newCounter = (parseInt(counter) + 2) % 5;
+    newCounter = (parseInt(counter) + 2) % 4;
     return setTimeout(function() {
       return passive.removeClass("background-" + counter).addClass("background-" + newCounter).attr("data-counter", newCounter);
     }, 2000);

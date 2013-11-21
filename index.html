@@ -38,21 +38,27 @@
                         <div id="map-canvas"></div>
                 </div>
                 <div id="overlay">
-                        <div id="blackblur" ></div>
-                        <h2 id="escape">X</h2>
-                        <div id="overlay-content" ng-controller="MyFilesController">
+                   	<div id="blackblur" ></div>
+                    <h2 id="escape">X</h2>
+                    <div id="overlay-content" ng-controller="MyFilesController">
                                 <!--         <div ng-hide="loggedIn">
 
                         </div> -->
-                        <p>Logged:{{loggedIn}}</p>
-                        <button ng-click="upload()" ng-class="{active: canSubmit()}">Submit</button>
-                        <div ng-show="loggedIn">
-                                Search: <input ng-model="query">
+                        <p><span> To add a log: </span>  <br>
+                   
+                        		Search for a file from your Google Drive. 
+                        	<br>Select a file and click submit.
+
+                        </p>
+                        
+                        <div id="search" ng-show="loggedIn">
+                               <br> <input ng-model="query" placeholder="search">
                                 <ul decorations:"none">
                                         <li ng-class="{active: isSelected(file)}" ng-repeat="file in myfilesa | filter:query | limitTo:5" ng-click="selectFile(file)">
                                                 File: {{file.title}}
                                         </li>
                                 </ul>
+                                <button ng-click="upload()" ng-class="{active: canSubmit()}">Submit</button>
                         </div>
 
                         <div id="add-map-canvas"></div>

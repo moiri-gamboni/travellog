@@ -7,15 +7,15 @@ move = (direction) ->
 		launchIn = {"y": windowHeight + topDistance + 1}
 		mainOut = {"y": windowHeight + topDistance + 1}
 	else if direction == "down"
-		prepare = {"left":"0", "top":2*windowHeight}
-		launchIn = {"top": windowHeight*0.2 + 50}
-		mainOut = {"top": -windowHeight}
+		prepare = {"left":"0", "top":windowHeight}
+		launchIn = {"top": windowHeight - topDistance + 1}
+		mainOut = {"top": -windowHeight-topDistance}
 	else if direction == "left"
-		prepare = {"left":-windowWidth, "top": windowHeight*0.2 + 50}
+		prepare = {"left":-windowWidth, "top": windowHeight - topDistance}
 		launchIn = {"left": 0}
-		mainOut = {"left": windowWidth}
+		mainOut = {"left": windowWidth + 50}
 	else
-		prepare = {"left":2*windowWidth, "top": windowHeight*0.2 + 50}
+		prepare = {"left":2*windowWidth, "top": windowHeight - topDistance}
 		launchIn = {"left": 0}
 		mainOut = {"left": -windowWidth}
 	$(".launch").attr({"style": ""}).css(prepare)

@@ -50,7 +50,7 @@
 	position: absolute
 
 .active
-  background: red
+  color:#ed4d4a
 
 .move-up
 	top: 100px
@@ -78,18 +78,16 @@
 	background-position:center
 	background-repeat:no-repeat
 	&.background-0
-		background: url('/static/img/boat.jpg')
+		background: url('/static/img/1280calmlake.jpg')
 		background-size:cover	
 	&.background-1
-		background: url('/static/img/wave.jpg')
+		background: url('/static/img/1280eveningsky.jpg')
 	&.background-2
-		background: url('/static/img/stars.jpg')
+		background: url('/static/img/1280roughwaves.jpg')
 	&.background-3
-		background: url('/static/img/mountain.jpg')
+		background: url('/static/img/1280snowymountain.jpg')
 		background-repeat:no-repeat
 		background-size:cover	
-	&.background-4
-		background: url('/static/img/cars.jpg')
 	&.passive
 		opacity:0
 
@@ -100,10 +98,24 @@
 	left:0
 	position:absolute
 	font-family: "Roboto", sans-serif
+	#logo
+		width: 400px
+		height: 120px
+		position: absolute
+		left: 50%
+		margin-left: -200px
+		top: 50%
+		margin-top: -60px
+		opacity:0.5
+		&:hover
+			opacity:1
+			transition: opacity 0.5s ease-in-out;
+			-moz-transition: opacity 0.5s ease-in-out;
+			-webkit-transition: opacity 0.5s ease-in-out;
 	hr
 		height: 15px
 		width: 170px
-		background: #000
+		background: #292929
 		border: transparent
 		top: 48%
 		left: 50%
@@ -115,11 +127,12 @@
 		font-size: 4em
 		position: absolute
 		top: 50%
-		margin-top: -108px
+		margin-top: -100px
 		left: 50%
 		margin-left: -170px
 		font-weight: 100
 		text-transform:uppercase
+		color:#292929
 	p
 		font-size: 2em
 		position: absolute
@@ -213,38 +226,38 @@
 				pointer-events:auto
 			pointer-events:none
 			z-index:1	
-			#search
-				input
-					border:none
-					background:transparent
-					font-size:1.5em
-					border-bottom:1px solid #999
-					outline:none
-			h1
-				text-align:center
+			button
+				background:transparent
+				border:transparent
+				outline:transparent
+				color:#aaa
+				font-size:2em
+				padding:0px
+				float:right
+			span
+				font-size:1.3em
 			p
-				line-height:1.5em
-				overflow-y:scroll
-			form
-				margin-left: auto
-				margin-right: auto
-				width: 300px
+				font-size:1.2em
+				color:#aaa
+			#search
+				margin-top:15px
+				color:#aaa
 				input
 					border:none
 					background:transparent
 					font-size:1.5em
-					border-bottom:1px solid #999
+					border-bottom:1px solid #aaa
 					outline:none
-					color:white
-				#button
-					margin-top:25px
-					button
-						background:transparent
-						color:white
-						font-size:1.8em
-						outline:none
-						border:none
-						font-weight:300
+					margin-top: 10px
+					padding-left: 10px
+				ul
+					padding-left: 0px
+					li
+						list-style:none
+						line-height:2em
+
+
+
 
 	.log-details
 		width: calc(100% - 100px)
@@ -291,9 +304,16 @@
 		position:absolute
 		bottom: 0
 		right: 0
+
 		img
 			height:30px
 			margin-right:10px
+			opacity:0.5
+			&:hover
+				opacity:1
+				transition: opacity .25s ease-in-out
+				-moz-transition: opacity .25s ease-in-out
+				-webkit-transition: opacity .25s ease-in-out
 	#country
 		text-transform: uppercase
 		font-size: 1.5em
@@ -385,10 +405,10 @@
 			padding: 30px
 			.log-title
 				font-size: 1.7em
-@media (min-height:480px)
+@media (min-width:480px)
 	#container 
 		.log-details
-			padding: 30px 30px 30px 50px
+			padding: 10px
 			.log-content
 				margin-top: 20px
 		
@@ -400,6 +420,7 @@
 		left: 50px
 	#container
 		.log-details
+			padding: 30px 30px 30px 50px
 			.log-content
 				img
 					padding: 0px 100px
@@ -448,3 +469,15 @@
 				border-right:20px solid #fff
 				left:0
 				margin-left: 15px
+
+@media (min-height:1000px)
+	.background
+		&.background-0
+			background: url('/static/img/2000calmlake.jpg')
+		&.background-1
+			background: url('/static/img/2000eveningsky.jpg')
+		&.background-2
+			background: url('/static/img/2000roughwaves.jpg')
+		&.background-3
+			background: url('/static/img/2000snowymountain.jpg')
+	
