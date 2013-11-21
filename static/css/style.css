@@ -65,6 +65,9 @@
   bottom: -10%;
   position: absolute;
 }
+.active {
+  background: #f00;
+}
 .move-up {
   top: 100px;
 }

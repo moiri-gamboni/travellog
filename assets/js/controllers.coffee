@@ -7,19 +7,56 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', 'Map', ($http, $sc
     console.log(apiKey)
   )
 ])
-###ctrl.controller("MyFilesController", ['$http', '$scope', ($http, $scope) ->
-	if user is signed_in
+ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $scope, $rootScope) ->
+    #if user is signed_in
   #$scope.map = Map
-	  console.log("yo")
-	  #get request
-	  $scope.myfilesa = [{"name": "yes"}, {"name": "no"}, {"name": "maybe"}, {"name": "first"}, {"name": "middle"}, {"name": "last"}, {"name": "yes"}, {"name": "no"}, {"name": "maybe"}, {"name": "first"}, {"name": "middle"}, {"name": "last"} , {"name": "yes"}, {"name": "no"}, {"name": "maybe"}, {"name": "first"}, {"name": "middle"}, {"name": "last"}]
-	  console.log $scope.myfilesa
-	  upload = (id) ->
-	  	#post request
-	else:
-		populate sign_in page
+  console.log('going false')
+  $scope.loggedIn = false
+  console.log($scope)
+  $scope.myfilesa = {"title":"empty"}
+  $scope.selectedFile = null
+  $scope.addMapSelected = false
+  console.log $scope.myfilesa
+  callback = (passedScope)=>
+    return (event, name, profileId)=>
+      passedScope.$apply(()->
+        passedScope.loggedIn = true
+      )
+      retrieveAllFiles((resp) ->
+        passedScope.$apply(() ->
+          passedScope.myfilesa = resp
+        )
+      )
+      console.log(passedScope.loggedIn)
+      if profileId
+        passedScope.hasGoogle = true
+      else
+        passedScope.hasGoogle = false
+  $rootScope.$on('loggedIn', callback($scope))
+
+  callback2 = (passedScope) =>
+    return 
+
+  $rootScope.$on('addMapSelected', () ->
+    console.log("working away to make mapSelected True")
+    $scope.$apply ()->
+      $scope.addMapSelected = true
+  ) 
+  $scope.isSelected = (file) -> 
+    return file == $scope.selectedFile
+  
+  $scope.selectFile = (file) ->
+    console.log("selecting file!")
+    $scope.selectedFile = file
+
+  $scope.canSubmit = () ->
+    console.log("checking submit" + $scope.addMapSelected + $scope.selectedFile?)
+    return $scope.addMapSelected and $scope.selectedFile?
+
+  $scope.upload = () ->
+    console.log("uploading: " + $scope.selectedFile + "at co-ords: " + addMapMarker.position)
+
 ])
 ctrl.controller("SignInController", ['$http', '$scope', ($http, $scope) ->
-	sign_in = (user) ->
-		# blah
-])###
+    #sign_in = (user) ->
+])
