@@ -55,7 +55,7 @@ $("#add").click () ->
 $("#escape").click () ->
 	$("#overlay, #overlay-content").removeClass("fadein")
 
-$("#launch-screen h1").click () ->
+$("#logo").click () ->
 		console.log("working")
 		$("#launch-screen, .background").addClass("hide")
 		$("#container").removeClass("hide")
