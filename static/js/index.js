@@ -24,10 +24,10 @@
         "top": windowHeight
       };
       launchIn = {
-        "top": windowHeight - topDistance + 1
+        "y": -(windowHeight + topDistance + 1)
       };
       mainOut = {
-        "top": -windowHeight - topDistance
+        "y": -(windowHeight + topDistance + 1)
       };
     } else if (direction === "left") {
       prepare = {

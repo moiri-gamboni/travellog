@@ -7,9 +7,9 @@ move = (direction) ->
 		launchIn = {"y": windowHeight + topDistance + 1}
 		mainOut = {"y": windowHeight + topDistance + 1}
 	else if direction == "down"
-		prepare = {"left":"0", "top":windowHeight}
-		launchIn = {"top": windowHeight - topDistance + 1}
-		mainOut = {"top": -windowHeight-topDistance}
+		prepare = {"left":"0", "top": windowHeight}
+		launchIn = {"y": -(windowHeight + topDistance + 1)}
+		mainOut = {"y": -(windowHeight + topDistance + 1)}
 	else if direction == "left"
 		prepare = {"left":-windowWidth, "top": windowHeight - topDistance}
 		launchIn = {"left": 0}
