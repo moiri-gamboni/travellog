@@ -1,62 +1,70 @@
 "use strict"
 ctrl = angular.module("mainModule.controllers", [])
 
-ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', 'Map', ($http, $scope, $rootScope, Map) ->
+ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map', ($http, $scope, $rootScope, $timeout, Map) ->
+  console.log("A")
   Map.initMap()
-  $rootScope.$on('handle-client-load', (event, apiKey)->
-    console.log(apiKey)
+  $rootScope.$on('map-init', ()->
+    console.log("init")
+
   )
+  $scope.$watch(
+    -> Map.data.current,
+    (current) ->
+      $scope.log = Map.getCurrentLog()
+  )
+  $scope.getLog = () ->
+    $scope.log = Map.getCurrentLog()
+
+  $scope.move = (direction) ->
+    Map.move(direction)
+
+  $scope.dropPins = () ->
+    dropPin = (log) ->
+      return ()->
+        placeMarkerMiniMap(log)
+
+    for log, i in Object.keys(Map.data.logs)
+      $timeout(
+        dropPin(log)
+        ,
+        200*i
+      )
+
+
 ])
-ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $scope, $rootScope) ->
-    #if user is signed_in
-  #$scope.map = Map
-  console.log('going false')
-  $scope.loggedIn = false
-  console.log($scope)
-  $scope.myfilesa = {"title":"empty"}
+ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', ($http, $scope, $rootScope, User) ->
+  $scope.myfiles = {"title":"empty"}
   $scope.selectedFile = null
   $scope.addMapSelected = false
-  console.log $scope.myfilesa
-  callback = (passedScope)=>
-    return (event, name, profileId)=>
-      passedScope.$apply(()->
-        passedScope.loggedIn = true
+
+  $rootScope.$on('loggedIn',
+    (event, resp)=>
+      User = resp
+      $scope.$apply(() ->
+        $scope.loggedIn = true
       )
       retrieveAllFiles((resp) ->
-        passedScope.$apply(() ->
-          passedScope.myfilesa = resp
+        $scope.$apply(() ->
+          $scope.myfiles = resp
         )
       )
-      console.log(passedScope.loggedIn)
-      if profileId
-        passedScope.hasGoogle = true
-      else
-        passedScope.hasGoogle = false
-  $rootScope.$on('loggedIn', callback($scope))
-
-  callback2 = (passedScope) =>
-    return 
+  )
 
   $rootScope.$on('addMapSelected', () ->
-    console.log("working away to make mapSelected True")
     $scope.$apply ()->
       $scope.addMapSelected = true
-  ) 
-  $scope.isSelected = (file) -> 
+  )
+  $scope.isSelected = (file) ->
     return file == $scope.selectedFile
-  
+
   $scope.selectFile = (file) ->
-    console.log("selecting file!")
+    console.log(User)
     $scope.selectedFile = file
 
   $scope.canSubmit = () ->
-    console.log("checking submit" + $scope.addMapSelected + $scope.selectedFile?)
     return $scope.addMapSelected and $scope.selectedFile?
 
   $scope.upload = () ->
-    console.log("uploading: " + $scope.selectedFile + "at co-ords: " + addMapMarker.position)
-
-])
-ctrl.controller("SignInController", ['$http', '$scope', ($http, $scope) ->
-    #sign_in = (user) ->
+    return
 ])

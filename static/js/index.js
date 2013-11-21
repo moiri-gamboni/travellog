@@ -60,9 +60,10 @@
       $(".launch").transition(launchIn, 800);
       $(".main").transition(mainOut, 800);
       return setTimeout(function() {
-        return $(".log-details").removeClass("animate").toggleClass("main launch").attr({
+        $(".log-details").removeClass("animate").toggleClass("main launch").attr({
           "style": ""
         });
+        return angular.element("html").scope().$broadcast("animation-done");
       }, 1000);
     }, 100);
   };

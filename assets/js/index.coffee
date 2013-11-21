@@ -25,9 +25,10 @@ move = (direction) ->
 		$(".main").transition(mainOut,800)
 		setTimeout(() ->
 			$(".log-details").removeClass("animate").toggleClass("main launch").attr({"style": ""})
+			angular.element("html").scope().$broadcast("animation-done")
 		, 1000)
 	, 100)
-	
+
 
 $(".sidenav-top").click () ->
 	move("top")

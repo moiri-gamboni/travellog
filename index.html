@@ -10,7 +10,7 @@
 	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEaBU9ut05NvkD4_k72xRDGuVYr_ucPZc&sensor=false">
 	</script>
 </head>
-<body>
+<body ng-controller="mainCtrl">
   <div id="loading">
     <ul class="bokeh">
         <li></li>
@@ -29,7 +29,7 @@
 		<p> Document and share your adventures. </p>
 		<h3 id="start-here"> Start Here </h3>
 	</div>
-	<div id="container" class="hide" ng-controller="mainCtrl">
+	<div id="container" class="hide">
 		<div id="minimap">
 			<div id="map-canvas"></div>
 		</div>
@@ -37,15 +37,12 @@
 			<div id="blackblur" ></div>
 			<h2 id="escape">X</h2>
 			<div id="overlay-content" ng-controller="MyFilesController">
-				<!-- 	<div ng-hide="loggedIn">
-
-			</div> -->
 			<p>Logged:{{loggedIn}}</p>
 			<button ng-click="upload()" ng-class="{active: canSubmit()}">Submit</button>
 			<div ng-show="loggedIn">
 				Search: <input ng-model="query">
 				<ul decorations:"none">
-					<li ng-class="{active: isSelected(file)}" ng-repeat="file in myfilesa | filter:query | limitTo:5" ng-click="selectFile(file)">
+					<li ng-class="{active: isSelected(file)}" ng-repeat="file in myfiles | filter:query | limitTo:5" ng-click="selectFile(file)">
 						File: {{file.title}}
 					</li>
 				</ul>
@@ -55,26 +52,8 @@
 		</div>
 	</div>
 	<div id="blackshade" ></div>
+	<log></log>
 	<div class="log-details main">
-		<div id="log-wrapper">
-			<div class="log-title">
-				Edges Edges Edge sEdges
-			</div>
-			<div id="plus-badge" class="log-author">
-				Mariko Kuroda
-			</div>
-			<div class="log-content">
-				<button id="authorize-button" style="visibility: hidden">Authorize</button>
-				<div id="loggedIn" style="visibility: hidden">
-					You are logged in as: <span id="name"></span>
-					<div id="plus-badge">
-					</div>
-				</div>
-				<p class="c0"><span>{{current}}</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>This is pretty cool I think</span></p><p class="c1 c0"><span></span></p><p class="c0"><span>Here&rsquo;s an image:</span></p><p class="c0"><img height="376" src="https://lh5.googleusercontent.com/iHkNlgtXhp-bvLu2WOUV5o5ILLtoFLe8oHq9ZzSRyU1GDWACPt56arkmSQchiZ-iGEuHkWdp0_Yq1M6HSW-r41VjfXZaucpMEZhfFIwEtLhZKEedkek" width="264"></p><p class="c0 c1"><span></span></p><p class="c0"><span>Yeah...</span></p><p class="c1 c0"><span></span></p>
-			</div>
-		</div>
-	</div>
-	<div class="log-details launch">
 		<div id="loading">
 			<img src="/static/img/ajax-loader.gif"/>
 			<span>Loading...</span>
@@ -91,16 +70,16 @@
 			</div>
 		</div>
 	</div>
-	<div class="sidenav sidenav-left">
+	<div class="sidenav sidenav-left" ng-click="move('W')">
 		<div class="arrow arrow-left-right arrow-left"></div>
 	</div>
-	<div class="sidenav sidenav-right">
+	<div class="sidenav sidenav-right" ng-click="move('E')">
 		<div class="arrow arrow-left-right arrow-right"></div>
 	</div>
-	<div class="sidenav sidenav-top">
+	<div class="sidenav sidenav-top" ng-click="move('N')">
 		<div class="arrow arrow-up-down arrow-up"></div>
 	</div>
-	<div class="sidenav sidenav-bottom">
+	<div class="sidenav sidenav-bottom" ng-click="move('S')">
 		<div class="arrow arrow-up-down arrow-down"></div>
 	</div>
 	<div id="nav">
@@ -114,9 +93,11 @@
   src="/static/js/jquery.transit.min.js">
   </script>
 <script type="text/javascript" src='/static/lib/angular/angular.js'></script>
+<script type="text/javascript" src='/static/lib/angular/angular-sanitize.js'></script>
 <script type="text/javascript" src='/static/js/app.js'></script>
 <script type="text/javascript" src='/static/js/helpers.js'></script>
 <script type="text/javascript" src='/static/js/services.js'></script>
+<script type="text/javascript" src='/static/js/directives.js'></script>
 <script type="text/javascript" src='/static/js/controllers.js'></script>
 <script type="text/javascript" src="/static/js/index.js"></script>
 <script type="text/javascript" src="/static/js/gservices.js"></script>

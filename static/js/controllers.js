@@ -6,49 +6,61 @@
   ctrl = angular.module("mainModule.controllers", []);
 
   ctrl.controller("mainCtrl", [
-    '$http', '$scope', '$rootScope', 'Map', function($http, $scope, $rootScope, Map) {
+    '$http', '$scope', '$rootScope', '$timeout', 'Map', function($http, $scope, $rootScope, $timeout, Map) {
+      console.log("A");
       Map.initMap();
-      return $rootScope.$on('handle-client-load', function(event, apiKey) {
-        return console.log(apiKey);
+      $rootScope.$on('map-init', function() {
+        return console.log("init");
       });
+      $scope.$watch(function() {
+        return Map.data.current;
+      }, function(current) {
+        return $scope.log = Map.getCurrentLog();
+      });
+      $scope.getLog = function() {
+        return $scope.log = Map.getCurrentLog();
+      };
+      $scope.move = function(direction) {
+        return Map.move(direction);
+      };
+      return $scope.dropPins = function() {
+        var dropPin, i, log, _i, _len, _ref, _results;
+        dropPin = function(log) {
+          return function() {
+            return placeMarkerMiniMap(log);
+          };
+        };
+        _ref = Object.keys(Map.data.logs);
+        _results = [];
+        for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+          log = _ref[i];
+          _results.push($timeout(dropPin(log), 200 * i));
+        }
+        return _results;
+      };
     }
   ]);
 
   ctrl.controller("MyFilesController", [
-    '$http', '$scope', '$rootScope', function($http, $scope, $rootScope) {
-      var callback, callback2,
-        _this = this;
-      console.log('going false');
-      $scope.loggedIn = false;
-      console.log($scope);
-      $scope.myfilesa = {
+    '$http', '$scope', '$rootScope', 'User', function($http, $scope, $rootScope, User) {
+      var _this = this;
+      $scope.myfiles = {
         "title": "empty"
       };
       $scope.selectedFile = null;
       $scope.addMapSelected = false;
-      console.log($scope.myfilesa);
-      callback = function(passedScope) {
-        return function(event, name, profileId) {
-          passedScope.$apply(function() {
-            return passedScope.loggedIn = true;
+      $rootScope.$on('loggedIn', function(event, resp) {
+        User = resp;
+        $scope.$apply(function() {
+          return $scope.loggedIn = true;
+        });
+        return retrieveAllFiles(function(resp) {
+          return $scope.$apply(function() {
+            return $scope.myfiles = resp;
           });
-          retrieveAllFiles(function(resp) {
-            return passedScope.$apply(function() {
-              return passedScope.myfilesa = resp;
-            });
-          });
-          console.log(passedScope.loggedIn);
-          if (profileId) {
-            return passedScope.hasGoogle = true;
-          } else {
-            return passedScope.hasGoogle = false;
-          }
-        };
-      };
-      $rootScope.$on('loggedIn', callback($scope));
-      callback2 = function(passedScope) {};
+        });
+      });
       $rootScope.$on('addMapSelected', function() {
-        console.log("working away to make mapSelected True");
         return $scope.$apply(function() {
           return $scope.addMapSelected = true;
         });
@@ -57,19 +69,14 @@
         return file === $scope.selectedFile;
       };
       $scope.selectFile = function(file) {
-        console.log("selecting file!");
+        console.log(User);
         return $scope.selectedFile = file;
       };
       $scope.canSubmit = function() {
-        console.log("checking submit" + $scope.addMapSelected + ($scope.selectedFile != null));
         return $scope.addMapSelected && ($scope.selectedFile != null);
       };
-      return $scope.upload = function() {
-        return console.log("uploading: " + $scope.selectedFile + "at co-ords: " + addMapMarker.position);
-      };
+      return $scope.upload = function() {};
     }
   ]);
-
-  ctrl.controller("SignInController", ['$http', '$scope', function($http, $scope) {}]);
 
 }).call(this);

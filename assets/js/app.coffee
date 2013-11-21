@@ -1,6 +1,3 @@
 "use strict"
 
-module = angular.module("mainModule", ["mainModule.services", "mainModule.controllers"])
-
-module.run () ->
-	console.log("run")
+module = angular.module("mainModule", ["ngSanitize", "mainModule.services", "mainModule.controllers", "mainModule.directives"])

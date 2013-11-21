@@ -5,6 +5,11 @@
 
   drct = angular.module("mainModule.directives", []);
 
-  drct.directive("", ["", function() {}]);
+  drct.directive("log", function() {
+    return {
+      restrict: 'E',
+      templateUrl: "/static/app/partials/log.html"
+    };
+  });
 
 }).call(this);
