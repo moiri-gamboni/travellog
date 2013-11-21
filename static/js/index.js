@@ -90,8 +90,7 @@
     }, 500);
   };
 
-  $("#add").click(function() {
-    startAddMap();
+  $("#add, #question").click(function() {
     return $("#overlay, #overlay-content").addClass("fadein");
   });
 

@@ -1,0 +1,4 @@
+cron:
+- description: checking gdrive for document updates
+  url: /drive/sync
+  schedule: every 10 minutes

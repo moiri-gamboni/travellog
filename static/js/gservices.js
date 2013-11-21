@@ -17,12 +17,9 @@ function handleAuthResult(authResult) {
   var successMessage = $("#loggedIn");
   var authorizeButton = $("#authorize-button");
   if (authResult && !authResult.error) {
-    authorizeButton.css({visibility:'hidden'});
-    successMessage.css({visibility:'visible'});
     getUserInfo();
   } else {
-    successMessage.css({visibility:'hidden'});
-    authorizeButton.css({visibility:'visible'}).on("click", handleAuthClick);
+    authorizeButton.on("click", handleAuthClick);
   }
 }
 
