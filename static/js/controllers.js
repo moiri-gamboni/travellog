@@ -14,23 +14,62 @@
     }
   ]);
 
-  /*ctrl.controller("MyFilesController", ['$http', '$scope', ($http, $scope) ->
-  	if user is signed_in
-    #$scope.map = Map
-  	  console.log("yo")
-  	  #get request
-  	  $scope.myfilesa = [{"name": "yes"}, {"name": "no"}, {"name": "maybe"}, {"name": "first"}, {"name": "middle"}, {"name": "last"}, {"name": "yes"}, {"name": "no"}, {"name": "maybe"}, {"name": "first"}, {"name": "middle"}, {"name": "last"} , {"name": "yes"}, {"name": "no"}, {"name": "maybe"}, {"name": "first"}, {"name": "middle"}, {"name": "last"}]
-  	  console.log $scope.myfilesa
-  	  upload = (id) ->
-  	  	#post request
-  	else:
-  		populate sign_in page
-  ])
-  ctrl.controller("SignInController", ['$http', '$scope', ($http, $scope) ->
-  	sign_in = (user) ->
-  		# blah
-  ])
-  */
+  ctrl.controller("MyFilesController", [
+    '$http', '$scope', '$rootScope', function($http, $scope, $rootScope) {
+      var callback, callback2,
+        _this = this;
+      console.log('going false');
+      $scope.loggedIn = false;
+      console.log($scope);
+      $scope.myfilesa = {
+        "title": "empty"
+      };
+      $scope.selectedFile = null;
+      $scope.addMapSelected = false;
+      console.log($scope.myfilesa);
+      callback = function(passedScope) {
+        return function(event, name, profileId) {
+          passedScope.$apply(function() {
+            return passedScope.loggedIn = true;
+          });
+          retrieveAllFiles(function(resp) {
+            return passedScope.$apply(function() {
+              return passedScope.myfilesa = resp;
+            });
+          });
+          console.log(passedScope.loggedIn);
+          if (profileId) {
+            return passedScope.hasGoogle = true;
+          } else {
+            return passedScope.hasGoogle = false;
+          }
+        };
+      };
+      $rootScope.$on('loggedIn', callback($scope));
+      callback2 = function(passedScope) {};
+      $rootScope.$on('addMapSelected', function() {
+        console.log("working away to make mapSelected True");
+        return $scope.$apply(function() {
+          return $scope.addMapSelected = true;
+        });
+      });
+      $scope.isSelected = function(file) {
+        return file === $scope.selectedFile;
+      };
+      $scope.selectFile = function(file) {
+        console.log("selecting file!");
+        return $scope.selectedFile = file;
+      };
+      $scope.canSubmit = function() {
+        console.log("checking submit" + $scope.addMapSelected + ($scope.selectedFile != null));
+        return $scope.addMapSelected && ($scope.selectedFile != null);
+      };
+      return $scope.upload = function() {
+        return console.log("uploading: " + $scope.selectedFile + "at co-ords: " + addMapMarker.position);
+      };
+    }
+  ]);
 
+  ctrl.controller("SignInController", ['$http', '$scope', function($http, $scope) {}]);
 
 }).call(this);
