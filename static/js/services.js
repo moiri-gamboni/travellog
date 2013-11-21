@@ -43,9 +43,8 @@
                 id: logId
               }
             }).success(function(data, status, headers, config) {
-              console.log(data);
-              console.log(factory.data.logs[data.log.id]);
-              return factory.data.logs[data.log.id].body = data.log.body;
+              console.log(factory.data.logs[data.id]);
+              return factory.data.logs[data.id].body = data.body;
             });
           }
         },
@@ -105,14 +104,8 @@
         },
         inRange: function(from, to, direction) {
           var gradient;
-          console.log("from");
-          console.log(from);
-          console.log("to");
-          console.log(to);
           from = factory.data.lngLogs[from[0]];
           to = factory.data.lngLogs[to[0]];
-          console.log(from);
-          console.log(to);
           gradient = (to.lat - from.lat) / (to.lng - from.lng);
           if (direction === 'N' || direction === 'S') {
             if (gradient <= -0.5 || gradient >= 0.5) {

@@ -15,17 +15,17 @@ class LogHandler(webapp2.RequestHandler):
       self.response.write(json.dumps({"status": 200, "logs":\
         models.get_all_logs()}))
     else:
-      try:
+      # try:
         # try fetch the requested id by key
-        self.response.headers['Content-Type'] = "application/json"
-        self.response.write(json.dumps({"status": 200, "log":\
-          models.get_log_by_key(self.request.get("id"))}))
-      except:
-        self.response.headers['Content-Type'] = "application/json"
-        self.response.write(json.dumps({"status": 404, "error":\
-          "log with id %s not found" %\
-          (self.request.get("id"))}))
-        return
+      self.response.headers['Content-Type'] = "application/json"
+      self.response.write(json.dumps({"status": 200, "log":\
+        models.get_log_by_key(self.request.get("id"))}))
+      # except:
+      #   self.response.headers['Content-Type'] = "application/json"
+      #   self.response.write(json.dumps({"status": 404, "error":\
+      #     "log with id %s not found" %\
+      #     (self.request.get("id"))}))
+      #   return
 
   def post(self):
     self.parseJson()

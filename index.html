@@ -37,8 +37,27 @@
 			<div id="overlay">
 				<div id="blackblur" ></div>
 				<h2 id="escape">X</h2>
-				<div id="overlay-content">
-          <div id="add-map-canvas"></div>
+				<div id="overlay-content" ng-controller="myfiles">
+					<div ng-hide="loggedIn">
+						<form name="signInForm" ng-controller="SignInController" method="POST" novalidate ng-submit="signIn(user)">
+							<h2>e-mail</h2>
+							<input type="text" ng-model="user.email" required>
+							<h2>password</h2>
+							<input type="password" ng-model="user.password" required>
+							<button type="submit">Sign In</button>
+							<p>or</p>
+							<a href="#/sign_up">Sign Up</a>
+						</form>
+					</div>
+					<div ng-show="loggedIn">
+						Search: <input ng-model="query">
+						<ul decorations:"none">
+							<li ng-repeat="file in myfilesa | filter:query | limitTo:5" ng-click="uploads(file.id)">
+								File: {{file.name}}
+							</li>
+						</ul>
+					</div>
+          			<div id="add-map-canvas"></div>
 				</div>
 			</div>
 			<div id="blackshade" ></div>
@@ -96,14 +115,14 @@
 			</div>
 		</div>
 
+  <script type="text/javascript" src='/static/lib/angular/angular.js'></script>
+  <script type="text/javascript" src='/static/js/app.js'></script>
+  <script type="text/javascript" src='/static/js/services.js'></script>
+  <script type="text/javascript" src='/static/js/controllers.js'></script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
-  <script type="text/javascript" src='static/lib/angular/angular.js'></script>
   <script type="text/javascript"
 		src="/static/js/jquery.transit.min.js">
 		</script>
-  <script type="text/javascript" src='static/js/app.js'></script>
-  <script type="text/javascript" src='static/js/services.js'></script>
-  <script type="text/javascript" src='static/js/controllers.js'></script>
 	<script type="text/javascript" src="/static/js/index.js"></script>
 	<script type="text/javascript" src="/static/js/gservices.js"></script>
 	<script type="text/javascript" src="/static/js/gmaps.js"></script>

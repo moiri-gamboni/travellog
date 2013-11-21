@@ -5,7 +5,6 @@ var scopes = "https://www.googleapis.com/auth/plus.me"+
   " https://www.googleapis.com/auth/userinfo.profile";
 function handleClientLoad() {
   // Step 2: Reference the API key
-  angular.element('html').scope().$broadcast('handle-client-load', apiKey);
   gapi.client.setApiKey(apiKey);
   window.setTimeout(checkAuth,1);
 }
@@ -53,9 +52,11 @@ function getUserInfo() {
             $("#name").html(resp.name);
           });
         });
+      } else {
+        // else retrieve their information from the g+ info
+        $("#name").html(resp.displayName);  
       }
-      // else retrieve their information from the g+ info
-      $("#name").html(resp.displayName);
+      
     });
   });
   // load the drive client

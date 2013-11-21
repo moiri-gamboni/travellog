@@ -34,9 +34,9 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
           window.location.protocol + "//" + window.location.host + "/logs",
           {params:{id:logId}}
         ).success((data, status, headers, config)->
-          console.log(data)
-          console.log(factory.data.logs[data.log.id])
-          factory.data.logs[data.log.id].body = data.log.body
+          #console.log(data)
+          console.log(factory.data.logs[data.id])
+          factory.data.logs[data.id].body = data.body
         )
 
     getClosestLogs: (around) ->
@@ -96,14 +96,14 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
       return last
 
     inRange: (from, to, direction) ->
-      console.log("from")
-      console.log(from)
-      console.log("to")
-      console.log(to)
+      # console.log("from")
+      # console.log(from)
+      # console.log("to")
+      # console.log(to)
       from = factory.data.lngLogs[from[0]]
       to = factory.data.lngLogs[to[0]]
-      console.log(from)
-      console.log(to)
+      # console.log(from)
+      # console.log(to)
       gradient = (to.lat-from.lat)/(to.lng-from.lng)
       if direction in ['N', 'S']
         if gradient <= -0.5 or gradient >= 0.5
