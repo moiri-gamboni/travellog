@@ -1,19 +1,59 @@
 "use strict"
 ctrl = angular.module("mainModule.controllers", [])
 
-ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', 'Map', ($http, $scope, $rootScope, Map) ->
+ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map', ($http, $scope, $rootScope, $timeout, Map) ->
   Map.initMap()
-  $rootScope.$on('handle-client-load', (event, apiKey)->
-    console.log(apiKey)
-  )
+  switchLogs = true
   $rootScope.loadingClass = ""
   $rootScope.loadingSize = ""
   $scope.loadingClass = () ->
     classString = $rootScope.loadingClass
     loadSize = $rootScope.loadingSize
     return classString + " " + loadSize
-
+ 
+  $scope.dropPins = () ->
+    dropPin = (log) ->
+      return ()->
+        placeMarkerMiniMap(log)
+ 
+    i = 0
+    for logId, log of Map.data.logs
+      $timeout(
+        dropPin(log)
+        ,
+        200*i
+      )
+      i++
+    $timeout(
+        () ->
+          console.log($scope.log.id)
+          changeLocation($scope.log.id)
+        ,
+        2800
+      )
+ 
+  $rootScope.$on('animation-done', () ->
+    console.log("firing")
+    switchLogs = not switchLogs
+  )
+ 
+  $rootScope.$on('gotFirstLog', () ->
+    $scope.log = Map.getCurrentLog()
+    $scope.dropPins()
+  )
+ 
+  $scope.getLog = () ->
+    $scope.log = Map.getCurrentLog()
+ 
+  $scope.move = (direction) ->
+    if switchLogs
+      $scope.otherLog = Map.move(direction)
+      changeLocation($scope.otherLog.id)
+    else
+      $scope.log = Map.move(direction)
+      changeLocation($scope.log.id)
 ])
+
 ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $scope, $rootScope) ->
     #if user is signed_in
   #$scope.map = Map

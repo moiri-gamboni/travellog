@@ -6,18 +6,56 @@
   ctrl = angular.module("mainModule.controllers", []);
 
   ctrl.controller("mainCtrl", [
-    '$http', '$scope', '$rootScope', 'Map', function($http, $scope, $rootScope, Map) {
+    '$http', '$scope', '$rootScope', '$timeout', 'Map', function($http, $scope, $rootScope, $timeout, Map) {
+      var switchLogs;
       Map.initMap();
-      $rootScope.$on('handle-client-load', function(event, apiKey) {
-        return console.log(apiKey);
-      });
+      switchLogs = true;
       $rootScope.loadingClass = "";
       $rootScope.loadingSize = "";
-      return $scope.loadingClass = function() {
+      $scope.loadingClass = function() {
         var classString, loadSize;
         classString = $rootScope.loadingClass;
         loadSize = $rootScope.loadingSize;
         return classString + " " + loadSize;
+      };
+      $scope.dropPins = function() {
+        var dropPin, i, log, logId, _ref;
+        dropPin = function(log) {
+          return function() {
+            return placeMarkerMiniMap(log);
+          };
+        };
+        i = 0;
+        _ref = Map.data.logs;
+        for (logId in _ref) {
+          log = _ref[logId];
+          $timeout(dropPin(log), 200 * i);
+          i++;
+        }
+        return $timeout(function() {
+          console.log($scope.log.id);
+          return changeLocation($scope.log.id);
+        }, 2800);
+      };
+      $rootScope.$on('animation-done', function() {
+        console.log("firing");
+        return switchLogs = !switchLogs;
+      });
+      $rootScope.$on('gotFirstLog', function() {
+        $scope.log = Map.getCurrentLog();
+        return $scope.dropPins();
+      });
+      $scope.getLog = function() {
+        return $scope.log = Map.getCurrentLog();
+      };
+      return $scope.move = function(direction) {
+        if (switchLogs) {
+          $scope.otherLog = Map.move(direction);
+          return changeLocation($scope.otherLog.id);
+        } else {
+          $scope.log = Map.move(direction);
+          return changeLocation($scope.log.id);
+        }
       };
     }
   ]);
