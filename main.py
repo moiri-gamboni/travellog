@@ -11,7 +11,7 @@ handlers = os.path.realpath(os.path.abspath(os.path.join\
 if handlers not in sys.path:
   sys.path.insert(0, handlers)
 
-from data_api import LogHandler, DriveHandler
+from data_api import LogHandler, DriveHandler, DriveSyncHandler
 import gdrive
 
 class IndexPage(webapp2.RequestHandler):
@@ -20,5 +20,5 @@ class IndexPage(webapp2.RequestHandler):
 
 application = webapp2.WSGIApplication([
   ('/logs', LogHandler),
-  ("/drive", DriveHandler)
+  ("/drive", DriveHandler), ("/drive/sync", DriveSyncHandler)
 ], debug=True)

@@ -32,7 +32,9 @@
 		opacity:0
 	&.hide-1 li:nth-child(1), &.hide-2 li:nth-child(2), &.hide-3 li:nth-child(3), &.hide-4 li:nth-child(4)
 		visibility: hidden
-
+	&.bigLoadCenter
+		bottom: 50%
+	
 
 #minimap
 	height: 25%
@@ -48,6 +50,9 @@
 	width: 100%
 	bottom: -50px
 	position: absolute
+	display: none
+	&.show
+		display: block
 
 .active
   color:#ed4d4a

@@ -186,7 +186,7 @@ function changeLocation(markerId) {
   // focus the map to the new marker
   miniMap.panTo(currentMiniMarker.position);
   if (miniMap.getZoom() == 1) {
-    miniMap.setZoom(3);
+    miniMap.setZoom(2);
   }
 }
 

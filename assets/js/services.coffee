@@ -10,6 +10,13 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
       lngLogs: []
       current: null
 
+    getCurrentLog: () ->
+      if factory.data.current? and factory.data.lngLogs? and factory.data.lngLogs[factory.data.current[0]]?
+        console.log(factory.data.current)
+        return factory.data.logs[factory.data.lngLogs[factory.data.current[0]].id]
+      else
+        return null
+
     getLogs: (success) ->
       get = $http.get(
         window.location.protocol + "//" + window.location.host + "/logs"
@@ -18,27 +25,30 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
     move: (direction) ->
       change = if direction in ['N', 'E'] then +1 else -1
       if direction in ['N', 'S']
-        newCurrent = factory.data.logs[factory.data.latLogs[mod(factory.data.current[1]+change,factory.data.latLogs.length)].id].key
+        newCurrentLog = factory.data.logs[factory.data.latLogs[mod(factory.data.current[1]+change,factory.data.latLogs.length)].id]
       else
-        newCurrent = factory.data.logs[factory.data.lngLogs[mod(factory.data.current[0]+change,factory.data.latLogs.length)].id].key
-      getClosestLogs(newCurrent)
-      changeCurrent = (newCurrent)-> factory.data.current = newCurrent
-      $timeout(changeCurrent(newCurrent), 100)
+        newCurrentLog = factory.data.logs[factory.data.lngLogs[mod(factory.data.current[0]+change,factory.data.latLogs.length)].id]
+      factory.getClosestLogs(newCurrentLog.key)
+      factory.data.current = newCurrentLog.key
+      return newCurrentLog
 
 
-    getLog: (logId) ->
-      #console.log(logId)
-      #console.log(factory.data.logs[logId])
+    getLog: (logId, callback) ->
       if not factory.data.logs[logId].body?
         get = $http.get(
           window.location.protocol + "//" + window.location.host + "/logs",
           {params:{id:logId}}
-        ).success((data, status, headers, config)->
-          # console.log(data)
-          # console.log(factory.data.logs)
-          # console.log(data)
-          factory.data.logs[data.log.id].body = data.log.body
         )
+        if callback?
+          get.success(callback)
+        else
+          get.success((data, status, headers, config)->
+            console.log(data)
+            factory.data.logs[data.log.id].title = data.log.title
+            factory.data.logs[data.log.id].profileId = data.log.profileId
+            factory.data.logs[data.log.id].profileId = data.log.profileName
+            factory.data.logs[data.log.id].body = data.log.body
+          )
 
     getClosestLogs: (around) ->
       for direction in ['N','E','S','W']
@@ -47,81 +57,34 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
 
     getClosestLocation: (from, direction) ->
 
-      tempKey = from
-      console.log(from)
+      tempKey = from.slice()
       change = if direction in ['N', 'E'] then 1 else (-1)
+      breakLoop = false
       for wrapNumber in [0,1,2]
+        break if breakLoop
         if direction in ['N', 'S']
           i = Math.abs(mod(from[1] + change, factory.data.latLogs.length))
           while i isnt from[1]
             tempKey[1] = i
             tempLog = factory.data.latLogs[tempKey[1]]
-            if not tempLog?
-              console.log(tempKey[1])
-              console.log(factory.data.latLogs)
             tempKey = factory.data.logs[tempLog.id].key
-            break if factory.inRange(from, tempKey, direction, wrapNumber)
-            if Math.abs(mod(i + change, factory.data.latLogs.length)) >= factory.data.latLogs.length
-              console.log(i)
-            else
-              i = Math.abs(mod(i + change, factory.data.latLogs.length))
+            if factory.inRange(from, tempKey, direction, wrapNumber)
+              breakLoop = true
+              break
+            i = Math.abs(mod(i + change, factory.data.latLogs.length))
 
         else
           i = Math.abs(mod(from[0] + change,factory.data.lngLogs.length))
           while i isnt from[0]
             tempKey[0] = i
             tempLog = factory.data.lngLogs[tempKey[0]]
-            if not tempLog?
-              console.log(tempKey[0])
-              console.log(factory.data.lngLogs)
             tempKey = factory.data.logs[tempLog.id].key
-            break if factory.inRange(from, tempKey, direction, wrapNumber)
+            if factory.inRange(from, tempKey, direction, wrapNumber)
+              breakLoop = true
+              break
+            i = Math.abs(mod(i + change, factory.data.lngLogs.length))
 
-            if Math.abs(mod(i + change, factory.data.lngLogs.length)) >= factory.data.lngLogs.length
-              console.log(i)
-            else
-              i = Math.abs(mod(i + change, factory.data.lngLogs.length))
-
-      console.log("\n")
-      console.log(from)
-      console.log("closest to")
-      console.log(tempKey)
-      console.log("in direction "+direction)
       return tempKey
-
-
-    oldgetClosestLocation: (from, direction) ->
-
-      bestDistance = 180
-      searchRange = 0
-      bestPoint = null
-      currentOscillation = [0,0]
-
-      logs = factory.data.logs
-      latLogs = factory.data.latLogs
-      lngLogs = factory.data.lngLogs
-      initialLog = latLogs[from[0]]
-
-      # distanceWrapping = (initial, current) ->
-      #   if direction == 'N'
-      #     MathMath.abs(currentLog.lat-initialLog.lat) if current < initial then +90
-      #   else if direction == 'S'
-      #     if current > initial then return 90 else return 0
-      #   else if direction == 'E'
-      #     if current < initial then return 180 else return 0
-      #   else if direction == 'W'
-      #     if current > initial then return 180 else return 0
-
-      while (bestPoint == null or bestDistance < 2*searchRange)
-        for i in [0,1]
-          loop
-            currentOscillation[i] += if i == 0 then -1 else 1
-            currentLog = lngLogs[currentOscillation[i]]
-            searchRange = max(searchRange, MathMath.abs(currentLog.lng - initialLog.lng))
-            tempDistance =
-            if bestDistance > tempDistance
-              bestDistance = tempDistance
-            break if searchRange == MathMath.abs(currentLog.lng-initialLog.lng)
 
     inRange: (from, to, direction, wrapNumber) ->
       from = factory.data.lngLogs[from[0]]
@@ -152,30 +115,43 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
           mapData.latLogs = data.logs.slice().sort((b, a) ->
             return b.lat-a.lat
           )
-          console.log(mapData.latLogs)
           for log, i in mapData.latLogs
             mapData.logs[log.id] =
               id: log.id
               body: null
+              title: null
+              profileId: null
+              profileName: null
               lat: log.lat
               lng: log.lng
               key: [null, i]
           mapData.lngLogs = data.logs.slice().sort((b, a) ->
             return b.lng-a.lng
           )
-          console.log(mapData.lngLogs)
           for log, i in mapData.lngLogs
             mapData.logs[log.id].key = [i, mapData.logs[log.id].key[1]]
-          console.log(mapData.logs)
 
           keys = Object.keys(mapData.logs)
-          current = mapData.logs[keys[(Math.random()*keys.length)>>0]].key
-          id = mapData.lngLogs[current[0]].id
-          factory.getLog(id)
-          factory.getClosestLogs(current)
+          mapData.current = mapData.logs[keys[(Math.random()*keys.length)>>0]].key
+          console.log(factory.data.current)
+          id = mapData.lngLogs[factory.data.current[0]].id
+          factory.getLog(id,
+            (data, status, headers, config)->
+              factory.data.logs[data.log.id].title = data.log.title
+              factory.data.logs[data.log.id].profileId = data.log.profileId
+              factory.data.logs[data.log.id].profileId = data.log.profileName
+              factory.data.logs[data.log.id].body = data.log.body
+              $rootScope.$broadcast('gotFirstLog')
+          )
+          factory.getClosestLogs(factory.data.current)
 
       factory.getLogs(getLogsCallback(factory.data))
 
+
   return factory
 
+])
+
+srv.factory('User', [() ->
+  return
 ])

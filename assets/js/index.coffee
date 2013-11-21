@@ -25,9 +25,10 @@ move = (direction) ->
 		$(".main").transition(mainOut,800)
 		setTimeout(() ->
 			$(".log-details").removeClass("animate").toggleClass("main launch").attr({"style": ""})
+			angular.element("html").scope().$broadcast("animation-done")
 		, 1000)
 	, 100)
-	
+
 
 $(".sidenav-top").click () ->
 	move("top")
@@ -48,8 +49,7 @@ window.changeCountry = (newCountry) ->
 		$("#country").removeClass("fadeout").html(newCountry);
 	, 500)
 
-$("#add").click () ->
-	startAddMap()
+$("#add, #question").click () ->
 	$("#overlay, #overlay-content").addClass("fadein")
 
 $("#escape").click () ->

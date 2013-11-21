@@ -48,6 +48,9 @@
 #loading.hide-4 li:nth-child(4) {
   visibility: hidden;
 }
+#loading.bigLoadCenter {
+  bottom: 50%;
+}
 #minimap {
   height: 25%;
   width: calc(100% - 60px);
@@ -64,6 +67,10 @@
   width: 100%;
   bottom: -50px;
   position: absolute;
+  display: none;
+}
+#add-map-canvas.show {
+  display: block;
 }
 .active {
   color: #ed4d4a;

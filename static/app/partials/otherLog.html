@@ -1,0 +1,13 @@
+	<div class="log-details launch">
+<button ng-click="getLog()">getLog</button>
+<button ng-click="dropPins()">dropPins</button>
+	<div id="log-wrapper">
+		<div class="log-title">
+			{{otherLog.title}}
+		</div>
+		<div id="plus-badge" class="log-author">
+			{{otherLog.author}}
+		</div>
+		<div class="log-content" ng-bind-html="log.body">
+		</div>
+	</div>

@@ -4,6 +4,7 @@ import models
 
 from google.appengine.ext import ndb
 import gdrive
+import dateutil.parser
 
 class LogHandler(webapp2.RequestHandler):
   post_params = ["gdriveId", "lat", "lng"]
@@ -65,15 +66,40 @@ class LogHandler(webapp2.RequestHandler):
 
 class DriveHandler(webapp2.RequestHandler):
   def get(self):
+    self.response.headers['Content-Type'] = "application/json"
     # preferably, get the ids of the articles for a specific country
     if "id" in self.request.arguments():
       try:
         document = drive.get_file()
+        self.response.write(json.dumps({"status": 200, "gdrive": gdrive.all_files()}))
       except:
-        self.response.headers['Content-Type'] = "application/json"
         self.response.write(json.dumps({"status": 404, "error":\
           "drive document with id %s not found" % self.request.get("id")}))
+        return
     # if there is no param for id, return all drive documents
     else:
       self.response.headers['Content-Type'] = "application/json"
       self.response.write(json.dumps({"status": 200, "gdrive": gdrive.all_files()}))
+
+class DriveSyncHandler(webapp2.RequestHandler):
+  def get(self):
+    # sync the documents
+    updated = []
+    old_documents = models.get_all_logs_objects()
+    new_documents = gdrive.retrieve_all_changes()
+    for document in new_documents:
+      # make sure the file hasn't been deleted and is in our database
+      if "file" in document.keys() and document["file"]["id"] in old_documents:
+        document = document[u'file']
+        updatedTime = dateutil.parser.parse(document["modifiedDate"][:-1])
+        # invalidate the db record if it exists already and is newer
+        old_document = old_documents[document["id"]]
+        if old_document.modifiedDate < updatedTime:
+          old_document.modifiedDate = updatedTime
+          old_document.title = document["title"]
+          old_document.body = gdrive.file_to_html(document)
+          old_document.put()
+          updated.append(document["id"])
+    self.response.write(json.dumps({"status": 200, "updated": updated}))
+    return
+
