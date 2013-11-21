@@ -5,8 +5,9 @@ class Log(ndb.Model):
   profileName = ndb.StringProperty()
   body = ndb.TextProperty()
   title = ndb.TextProperty()
-  lat = ndb.FloatProperty()
-  lng = ndb.FloatProperty()
+  lat = ndb.FloatProperty(required=True)
+  lng = ndb.FloatProperty(required=True)
+  modifiedDate = ndb.DateTimeProperty()
 
 def get_log_by_key(key):
   log = ndb.Key(Log, key).get()
@@ -15,7 +16,8 @@ def get_log_by_key(key):
     "title": log.title,
     "body": log.body,
     "lat": log.lat,
-    "lng": log.lng
+    "lng": log.lng,
+    "modifiedDate": unicode(log.modifiedDate)
   }
   if log.profileId:
     response['profileId'] = log.profileId
@@ -26,6 +28,13 @@ def get_log_by_key(key):
 def get_all_logs():
   logs = Log.query().fetch(200);
   return map(lambda x: {"id": x.key.id(), "lat": x.lat, "lng": x.lng}, logs)
+
+def get_all_logs_objects():
+  logs = Log.query().fetch(200);
+  resp = {}
+  for log in logs:
+    resp[log.key.id()] = log
+  return resp
 
 def create_log(gdriveId, lat, lng):
   log = Log(id=gdriveId, lat=lat, lng=lng)

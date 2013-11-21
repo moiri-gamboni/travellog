@@ -36,6 +36,9 @@
   left: 50%;
   margin-left: -50px;
 }
+#loading.bigLoadCenter {
+  bottom: 50%;
+}
 #minimap {
   height: 20%;
   width: calc(100% - 60px);

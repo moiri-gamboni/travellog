@@ -10,6 +10,14 @@
       var switchLogs;
       Map.initMap();
       switchLogs = true;
+      $rootScope.loadingClass = "";
+      $rootScope.loadingSize = "";
+      $scope.loadingClass = function() {
+        var classString, loadSize;
+        classString = $rootScope.loadingClass;
+        loadSize = $rootScope.loadingSize;
+        return classString + " " + loadSize;
+      };
       $scope.dropPins = function() {
         var dropPin, i, log, logId, _ref;
         dropPin = function(log) {
@@ -53,25 +61,46 @@
   ]);
 
   ctrl.controller("MyFilesController", [
-    '$http', '$scope', '$rootScope', 'User', function($http, $scope, $rootScope, User) {
-      var _this = this;
-      $scope.myfiles = {
+    '$http', '$scope', '$rootScope', function($http, $scope, $rootScope) {
+      var callback, callback2,
+        _this = this;
+      $rootScope.showing = 'loading';
+      console.log('going false');
+      $scope.loggedIn = false;
+      console.log($scope);
+      $scope.myfilesa = {
         "title": "empty"
       };
       $scope.selectedFile = null;
       $scope.addMapSelected = false;
-      $rootScope.$on('loggedIn', function(event, resp) {
-        User = resp;
-        $scope.$apply(function() {
-          return $scope.loggedIn = true;
-        });
-        return retrieveAllFiles(function(resp) {
-          return $scope.$apply(function() {
-            return $scope.myfiles = resp;
+      $scope.overlayIsActive = false;
+      console.log($scope.myfilesa);
+      $scope.loadingMessage = "";
+      $scope.completeUrl = "";
+      callback = function(passedScope) {
+        return function(event, name, profileId) {
+          console.log("you've been logged in");
+          passedScope.loggedIn = true;
+          passedScope.loading = false;
+          retrieveAllFiles(function(resp) {
+            return passedScope.$apply(function() {
+              return passedScope.myfilesa = resp;
+            });
           });
-        });
-      });
+          console.log(passedScope.showing);
+          if (profileId) {
+            passedScope.hasGoogle = true;
+            return $scope.profileId = profileId;
+          } else {
+            passedScope.hasGoogle = false;
+            return $scope.name = name;
+          }
+        };
+      };
+      $rootScope.$on('loggedIn', callback($scope));
+      callback2 = function(passedScope) {};
       $rootScope.$on('addMapSelected', function() {
+        console.log("working away to make mapSelected True");
         return $scope.$apply(function() {
           return $scope.addMapSelected = true;
         });
@@ -80,13 +109,83 @@
         return file === $scope.selectedFile;
       };
       $scope.selectFile = function(file) {
-        console.log(User);
+        console.log("selecting file!");
         return $scope.selectedFile = file;
       };
+      $scope.changeShowing = function(view) {
+        console.log(view);
+        $rootScope.showing = view;
+        return console.log($rootScope.showing);
+      };
+      $scope.getShowing = function() {
+        if ($rootScope.showing === "help") {
+          return $rootScope.showing;
+        }
+        if ($rootScope.showing === "addFile") {
+          if ($scope.loading) {
+            return 'loading';
+          } else if ($scope.complete) {
+            return 'complete';
+          } else if ($scope.loggedIn) {
+            return 'loggedIn';
+          } else {
+            return 'login';
+          }
+        }
+      };
       $scope.canSubmit = function() {
+        console.log("checking submit" + $scope.addMapSelected + ($scope.selectedFile != null));
         return $scope.addMapSelected && ($scope.selectedFile != null);
       };
-      return $scope.upload = function() {};
+      $scope.activateOverlay = function(view) {
+        $scope.overlayIsActive = true;
+        return $scope.changeShowing(view);
+      };
+      $scope.overlayActive = function() {
+        console.log("activate overlay");
+        return $scope.overlayIsActive;
+      };
+      $scope.upload = function() {
+        var payload;
+        if (!$scope.canSubmit()) {
+          return;
+        }
+        payload = {
+          gdriveId: $scope.selectedFile.id,
+          lat: addMapMarker.position.lat(),
+          lng: addMapMarker.position.lng()
+        };
+        if ($scope.hasGoogle) {
+          payload.profileId = $scope.profileId;
+        } else {
+          payload.profileName = $scope.name;
+        }
+        $scope.loadingMessage = "Sending your message up!";
+        $scope.loading = true;
+        $rootScope.loadingClass = "bigLoadCenter";
+        $rootScope.loadingSize = "large";
+        return $http({
+          method: "POST",
+          url: "/logs",
+          data: payload
+        }).success(function(data, status, headers, config) {
+          if (data.status === 200) {
+            $scope.loading = false;
+            $scope.complete = true;
+            return $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id;
+          } else {
+            return console.log("no idea what happened");
+          }
+        }).error(function(data, status, headers, config) {});
+      };
+      return $scope.startLogin = function() {
+        if (!$scope.loggedIn) {
+          $scope.loading = true;
+          $rootScope.loadingClass = "bigLoadCenter";
+          $rootScope.loadingSize = "large";
+          return $scope.loadingMessage = "Logging you in";
+        }
+      };
     }
   ]);
 

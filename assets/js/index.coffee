@@ -49,8 +49,7 @@ window.changeCountry = (newCountry) ->
 		$("#country").removeClass("fadeout").html(newCountry);
 	, 500)
 
-$("#add").click () ->
-	startAddMap()
+$("#add, #question").click () ->
 	$("#overlay, #overlay-content").addClass("fadein")
 
 $("#escape").click () ->
