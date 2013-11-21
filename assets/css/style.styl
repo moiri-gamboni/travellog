@@ -35,7 +35,7 @@
 
 
 #minimap
-	height: 20%
+	height: 25%
 	width: calc(100% - 60px)
 	position: absolute
 	z-index: 1
@@ -46,7 +46,7 @@
 #add-map-canvas
 	height: 40%
 	width: 100%
-	bottom: -10%
+	bottom: -50px
 	position: absolute
 
 .active
@@ -124,17 +124,17 @@
 		&.top-bar
 			margin-top: -125px
 	h1
-		font-size: 4em
+		font-size: 3em
 		position: absolute
 		top: 50%
-		margin-top: -100px
+		margin-top: -80px
 		left: 50%
-		margin-left: -170px
+		margin-left: -130px
 		font-weight: 100
 		text-transform:uppercase
 		color:#292929
 	p
-		font-size: 2em
+		font-size: 1.5em
 		position: absolute
 		top: 50%
 		left: 50%
@@ -205,6 +205,12 @@
 		transition:.5s ease-in-out
 		-moz-transition: .5s ease-in-out
 		-webkit-transition: .5s ease-in-out
+		#escape
+			position: absolute
+			top: 0
+			right: 40px
+			font-size: 2em
+			cursor: pointer
 		#blackblur
 			height:100%
 			width:100%
@@ -233,14 +239,18 @@
 				color:#aaa
 				font-size:2em
 				padding:0px
-				float:right
+				position:absolute
+				top:50%
+				right:10px
 			span
 				font-size:1.3em
 			p
-				font-size:1.2em
-				color:#aaa
+				font-size: 1em
+				color: #aaa
+				position: absolute
+				top: -30px
 			#search
-				margin-top:15px
+				margin-top:60px
 				color:#aaa
 				input
 					border:none
@@ -250,8 +260,13 @@
 					outline:none
 					margin-top: 10px
 					padding-left: 10px
+					color:#aaa
 				ul
 					padding-left: 0px
+					overflow: scroll
+					height: 120px
+					width: 300px
+
 					li
 						list-style:none
 						line-height:2em
@@ -267,7 +282,7 @@
 		z-index: 10
 		position: absolute
 		margin-left: 50px
-		padding: 30px 50px 30px 90px
+		padding: 0px
 		&.launch
 			left:-200%	
 		.log-title
@@ -288,7 +303,7 @@
 				width: 100%
 				height: auto
 		#log-wrapper
-			height: 80%
+			height: 95%
 			overflow-y: scroll
 			overflow-x: none
 			padding-right: 30px
@@ -314,6 +329,8 @@
 				transition: opacity .25s ease-in-out
 				-moz-transition: opacity .25s ease-in-out
 				-webkit-transition: opacity .25s ease-in-out
+				cursor:pointer
+
 	#country
 		text-transform: uppercase
 		font-size: 1.5em
@@ -405,15 +422,24 @@
 			padding: 0px
 			.log-title
 				font-size: 1.7em
+
 @media (min-width:480px)
 	#container 
 		.log-details
-			padding: 10px
 			.log-content
-				margin-top: 20px
-		
+				margin-top: -5px
+	#launch-screen
+		h1
+			font-size: 4em
+			margin-top: -100px
+			left: 50%
+			margin-left: -175px
+
 
 @media (min-width:760px)
+	#launch-screen
+		h1
+			font-size:2em
 	#minimap
 		width: calc(100% - 100px)
 		top: 50px
@@ -422,15 +448,19 @@
 		.log-details
 			padding: 30px 30px 30px 50px
 			.log-content
+				margin-top:20px
 				img
 					padding: 0px 100px
 			.log-title
 				font-size:2.2em
 		#overlay-content
 			p
-				width:600px
 				margin-left:auto
 				margin-right:auto
+			#search	
+				ul
+					height: 200px
+
 		#country
 			font-size: 2em
 			margin-top: 60px

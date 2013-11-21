@@ -49,7 +49,7 @@
   visibility: hidden;
 }
 #minimap {
-  height: 20%;
+  height: 25%;
   width: calc(100% - 60px);
   position: absolute;
   z-index: 1;
@@ -62,7 +62,7 @@
 #add-map-canvas {
   height: 40%;
   width: 100%;
-  bottom: -10%;
+  bottom: -50px;
   position: absolute;
 }
 .active {
@@ -155,18 +155,18 @@
   margin-top: -125px;
 }
 #launch-screen h1 {
-  font-size: 4em;
+  font-size: 3em;
   position: absolute;
   top: 50%;
-  margin-top: -100px;
+  margin-top: -80px;
   left: 50%;
-  margin-left: -170px;
+  margin-left: -130px;
   font-weight: 100;
   text-transform: uppercase;
   color: #292929;
 }
 #launch-screen p {
-  font-size: 2em;
+  font-size: 1.5em;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -246,6 +246,13 @@
   opacity: 1;
   pointer-events: auto;
 }
+#container #overlay #escape {
+  position: absolute;
+  top: 0;
+  right: 40px;
+  font-size: 2em;
+  cursor: pointer;
+}
 #container #overlay #blackblur {
   height: 100%;
   width: 100%;
@@ -278,17 +285,21 @@
   color: #aaa;
   font-size: 2em;
   padding: 0px;
-  float: right;
+  position: absolute;
+  top: 50%;
+  right: 10px;
 }
 #container #overlay #overlay-content span {
   font-size: 1.3em;
 }
 #container #overlay #overlay-content p {
-  font-size: 1.2em;
+  font-size: 1em;
   color: #aaa;
+  position: absolute;
+  top: -30px;
 }
 #container #overlay #overlay-content #search {
-  margin-top: 15px;
+  margin-top: 60px;
   color: #aaa;
 }
 #container #overlay #overlay-content #search input {
@@ -299,9 +310,13 @@
   outline: none;
   margin-top: 10px;
   padding-left: 10px;
+  color: #aaa;
 }
 #container #overlay #overlay-content #search ul {
   padding-left: 0px;
+  overflow: scroll;
+  height: 120px;
+  width: 300px;
 }
 #container #overlay #overlay-content #search ul li {
   list-style: none;
@@ -315,7 +330,7 @@
   z-index: 10;
   position: absolute;
   margin-left: 50px;
-  padding: 30px 50px 30px 90px;
+  padding: 0px;
 }
 #container .log-details.launch {
   left: -200%;
@@ -342,7 +357,7 @@
   height: auto;
 }
 #container .log-details #log-wrapper {
-  height: 80%;
+  height: 95%;
   overflow-y: scroll;
   overflow-x: none;
   padding-right: 30px;
@@ -371,6 +386,7 @@
   transition: opacity 0.25s ease-in-out;
   -moz-transition: opacity 0.25s ease-in-out;
   -webkit-transition: opacity 0.25s ease-in-out;
+  cursor: pointer;
 }
 #container #country {
   text-transform: uppercase;
@@ -479,14 +495,20 @@
   }
 }
 @media (min-width:480px) {
-  #container .log-details {
-    padding: 10px;
-  }
   #container .log-details .log-content {
-    margin-top: 20px;
+    margin-top: -5px;
+  }
+  #launch-screen h1 {
+    font-size: 4em;
+    margin-top: -100px;
+    left: 50%;
+    margin-left: -175px;
   }
 }
 @media (min-width:760px) {
+  #launch-screen h1 {
+    font-size: 2em;
+  }
   #minimap {
     width: calc(100% - 100px);
     top: 50px;
@@ -495,6 +517,9 @@
   #container .log-details {
     padding: 30px 30px 30px 50px;
   }
+  #container .log-details .log-content {
+    margin-top: 20px;
+  }
   #container .log-details .log-content img {
     padding: 0px 100px;
   }
@@ -502,9 +527,11 @@
     font-size: 2.2em;
   }
   #container #overlay-content p {
-    width: 600px;
     margin-left: auto;
     margin-right: auto;
+  }
+  #container #overlay-content #search ul {
+    height: 200px;
   }
   #container #country {
     font-size: 2em;
