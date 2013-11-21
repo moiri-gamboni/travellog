@@ -39,7 +39,6 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
           passedScope.myfilesa = resp
         )
       )
-      startAddMap()
       console.log(passedScope.showing)
       if profileId
         passedScope.hasGoogle = true

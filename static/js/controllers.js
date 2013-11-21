@@ -49,7 +49,6 @@
               return passedScope.myfilesa = resp;
             });
           });
-          startAddMap();
           console.log(passedScope.showing);
           if (profileId) {
             passedScope.hasGoogle = true;
