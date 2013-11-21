@@ -40,7 +40,7 @@ body:after {
     left: 50%;
     top: 0;
     margin: 0 0 0 -.1em;
-    background: #000;
+    background-color: rgba(0,0,0,1);
     -webkit-transform-origin: 50% 250%;
     -moz-transform-origin: 50% 250%;
     -ms-transform-origin: 50% 250%;

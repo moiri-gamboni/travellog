@@ -14,14 +14,15 @@
 
 	</head>
 	<body>
-		<div id="loading">
-			<ul class="bokeh">
-					<li></li>
-					<li></li>
-					<li></li>
-					<li></li>
-				</ul>
-		</div>
+		<div data-counter="0" class="background background-0 slow-fade active"></div>
+		<div data-counter="1" class="background background-1 slow-fade passive"></div>
+
+		<ul id="loading" class="bokeh fade">
+			<li id="child-1"></li>
+			<li id="child-2"></li>
+			<li id="child-3"></li>
+			<li id="child-4"></li>
+		</ul>
 		<div id="launch-screen">
 			<div id="logo">
 				<hr class="top-bar">
@@ -44,12 +45,13 @@
 							<input type="text" ng-model="user.email" required>
 							<h2>password</h2>
 							<input type="password" ng-model="user.password" required>
-							<button type="submit">Sign In</button>
-							<p>or</p>
-							<a href="#/sign_up">Sign Up</a>
+							<br>
+							<div id="button">
+								<button type="submit">sign in</button> or <button href="#/sign_up">sign up</button>
+							</div>
 						</form>
 					</div>
-					<div ng-show="loggedIn">
+					<div id="search" ng-show="loggedIn">
 						Search: <input ng-model="query">
 						<ul decorations:"none">
 							<li ng-repeat="file in myfilesa | filter:query | limitTo:5" ng-click="uploads(file.id)">

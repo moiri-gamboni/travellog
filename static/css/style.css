@@ -36,6 +36,18 @@
   left: 50%;
   margin-left: -50px;
 }
+#loading.large {
+  font-size: 100px;
+}
+#loading.hide-all {
+  opacity: 0;
+}
+#loading.hide-1 li:nth-child(1),
+#loading.hide-2 li:nth-child(2),
+#loading.hide-3 li:nth-child(3),
+#loading.hide-4 li:nth-child(4) {
+  visibility: hidden;
+}
 #minimap {
   height: 20%;
   width: calc(100% - 60px);
@@ -58,9 +70,15 @@
 }
 .fade {
   opacity: 1;
-  transition: opacity 0.25s ease-in-out;
-  -moz-transition: opacity 0.25s ease-in-out;
-  -webkit-transition: opacity 0.25s ease-in-out;
+  transition: opacity 0.5s ease-in-out;
+  -moz-transition: opacity 0.5s ease-in-out;
+  -webkit-transition: opacity 0.5s ease-in-out;
+}
+.slow-fade {
+  opacity: 1;
+  transition: opacity 1.5s ease-in-out;
+  -moz-transition: opacity 1.5s ease-in-out;
+  -webkit-transition: opacity 1.5s ease-in-out;
 }
 .fadeout {
   opacity: 0;
@@ -68,15 +86,43 @@
 .fadein {
   opacity: 1;
 }
+.background {
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.background.background-0 {
+  background: url("/static/img/boat.jpg");
+  background-size: cover;
+}
+.background.background-1 {
+  background: url("/static/img/wave.jpg");
+}
+.background.background-2 {
+  background: url("/static/img/stars.jpg");
+}
+.background.background-3 {
+  background: url("/static/img/mountain.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.background.background-4 {
+  background: url("/static/img/cars.jpg");
+}
+.background.passive {
+  opacity: 0;
+}
 #launch-screen {
   height: 100%;
   width: 100%;
   top: 0;
   left: 0;
   position: absolute;
-  background: url("/static/img/boat.jpg");
-  background-size: cover;
-  background-position: center;
   font-family: "Roboto", sans-serif;
 }
 #launch-screen hr {
@@ -191,11 +237,7 @@
   opacity: 0.9;
 }
 #container #overlay h2 {
-  text-transform: uppercase;
-  font-size: 2.2em;
-  position: absolute;
-  top: 0;
-  right: 50px;
+  font-size: 1em;
 }
 #container #overlay #overlay-content {
   position: absolute;
@@ -204,7 +246,6 @@
   height: calc(100% - 130px);
   margin-left: 50px;
   margin-top: 50px;
-  padding-top: 100px;
   opacity: 0;
   pointer-events: none;
   z-index: 1;
@@ -213,12 +254,43 @@
   opacity: 1;
   pointer-events: auto;
 }
+#container #overlay #overlay-content #search input {
+  border: none;
+  background: transparent;
+  font-size: 1.5em;
+  border-bottom: 1px solid #999;
+  outline: none;
+}
 #container #overlay #overlay-content h1 {
   text-align: center;
 }
 #container #overlay #overlay-content p {
   line-height: 1.5em;
   overflow-y: scroll;
+}
+#container #overlay #overlay-content form {
+  margin-left: auto;
+  margin-right: auto;
+  width: 300px;
+}
+#container #overlay #overlay-content form input {
+  border: none;
+  background: transparent;
+  font-size: 1.5em;
+  border-bottom: 1px solid #999;
+  outline: none;
+  color: #fff;
+}
+#container #overlay #overlay-content form #button {
+  margin-top: 25px;
+}
+#container #overlay #overlay-content form #button button {
+  background: transparent;
+  color: #fff;
+  font-size: 1.8em;
+  outline: none;
+  border: none;
+  font-weight: 300;
 }
 #container .log-details {
   width: calc(100% - 100px);
@@ -293,9 +365,8 @@
   transition: all 0.2s ease-in-out;
 }
 #container .sidenav {
-  background: rgba(225,225,225,0.8);
+  background: rgba(255,255,255,0.4);
   z-index: 2;
-  opacity: 0.8;
   position: absolute;
   -webkit-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
@@ -303,7 +374,7 @@
   transition: all 0.2s ease-in-out;
 }
 #container .sidenav:hover {
-  opacity: 1;
+  background: rgba(255,255,255,0.9);
   cursor: pointer;
 }
 #container .sidenav-top {

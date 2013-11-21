@@ -99,9 +99,21 @@
     return $("#overlay, #overlay-content").removeClass("fadein");
   });
 
-  $("#launch-screen h1, h3").click(function() {
-    $("#launch-screen").addClass("hide");
+  $("#launch-screen h1").click(function() {
+    console.log("working");
+    $("#launch-screen, .background").addClass("hide");
     return $("#container").removeClass("hide");
   });
+
+  window.incrementBackground = function() {
+    var counter, newCounter, passive;
+    $(".background").toggleClass("active passive");
+    passive = $(".passive");
+    counter = passive.attr("data-counter");
+    newCounter = (parseInt(counter) + 2) % 5;
+    return setTimeout(function() {
+      return passive.removeClass("background-" + counter).addClass("background-" + newCounter).attr("data-counter", newCounter);
+    }, 2000);
+  };
 
 }).call(this);
