@@ -50,11 +50,21 @@ function getUserInfo() {
           request.execute(function(resp) {
             console.log(resp);
             $("#name").html(resp.name);
+            setTimeout(function() {
+              angular.element("html").scope().$broadcast('loggedIn', resp.name, false);
+              console.log("broadcasting")
+            }, 1000);
           });
         });
       } else {
         // else retrieve their information from the g+ info
-        $("#name").html(resp.displayName);  
+        $("#name").html(resp.displayName);
+        console.log("try auth")
+        
+        setTimeout(function() {
+              angular.element("html").scope().$broadcast('loggedIn', resp.displayName, resp.id);
+              console.log("broadcasting")
+            }, 1000);
       }
       
     });

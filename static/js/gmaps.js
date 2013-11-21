@@ -3,7 +3,63 @@ idMarkerMap = {};
 function initialize() {
   var mapOptions = {
     center: new google.maps.LatLng(20, 0),
-    zoom: 1
+    zoom: 1,
+    styles: [
+  {
+    "featureType": "administrative",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "transit",
+    "stylers": [
+      { "color": "#000027" },
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "road",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "poi",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "administrative.locality",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      { "visibility": "on" },
+      { "color": "#bfc5bf" }
+    ]
+  },{
+    "featureType": "administrative.country",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      { "visibility": "on" },
+      { "color": "#ffffff" }
+    ]
+  },{
+    "featureType": "administrative.province",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      { "visibility": "on" },
+      { "color": "#d3d1d1" }
+    ]
+  },{
+    "featureType": "water",
+    "stylers": [
+      { "color": "#1c1c1c" }
+    ]
+  },{
+    "featureType": "landscape",
+    "stylers": [
+      { "visibility": "on" },
+      { "color": "#808080" }
+    ]
+  }
+]
   };
   miniMap = new google.maps.Map(document.getElementById("map-canvas"),
     mapOptions);
@@ -13,11 +69,67 @@ addMapMarker = null;
 function startAddMap() {
   var mapOptions = {
     center: new google.maps.LatLng(0, 0),
-    zoom: 1
-  };
+    zoom: 1,
+    styles: [
+  {
+    "featureType": "administrative",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "transit",
+    "stylers": [
+      { "color": "#000027" },
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "road",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "poi",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "administrative.locality",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      { "visibility": "on" },
+      { "color": "#bfc5bf" }
+    ]
+  },{
+    "featureType": "administrative.country",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      { "visibility": "on" },
+      { "color": "#ffffff" }
+    ]
+  },{
+    "featureType": "administrative.province",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      { "visibility": "on" },
+      { "color": "#d3d1d1" }
+    ]
+  },{
+    "featureType": "water",
+    "stylers": [
+      { "color": "#1c1c1c" }
+    ]
+  },{
+    "featureType": "landscape",
+    "stylers": [
+      { "visibility": "on" },
+      { "color": "#808080" }
+    ]
+  }
+]};
   addMap = new google.maps.Map(document.getElementById("add-map-canvas"),
     mapOptions);
   google.maps.event.addListener(addMap, 'click', function(event) {
+    angular.element("html").scope().$broadcast('addMapSelected');
     if (addMapMarker) {
       addMapMarker.setPosition(event.latLng);
     } else {
@@ -71,6 +183,11 @@ function changeLocation(markerId) {
   // push the new url
   history.pushState(currentMiniMarker.title, null,
     "/log/" + currentMiniMarker.title);
+  // focus the map to the new marker
+  miniMap.panTo(currentMiniMarker.position);
+  if (miniMap.getZoom() == 1) {
+    miniMap.setZoom(3);
+  }
 }
 
 // bind the state changes to change locations
