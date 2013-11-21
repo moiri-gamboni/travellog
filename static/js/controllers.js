@@ -7,36 +7,47 @@
 
   ctrl.controller("mainCtrl", [
     '$http', '$scope', '$rootScope', '$timeout', 'Map', function($http, $scope, $rootScope, $timeout, Map) {
-      console.log("A");
+      var switchLogs;
       Map.initMap();
-      $rootScope.$on('map-init', function() {
-        return console.log("init");
-      });
-      $scope.$watch(function() {
-        return Map.data.current;
-      }, function(current) {
-        return $scope.log = Map.getCurrentLog();
-      });
-      $scope.getLog = function() {
-        return $scope.log = Map.getCurrentLog();
-      };
-      $scope.move = function(direction) {
-        return Map.move(direction);
-      };
-      return $scope.dropPins = function() {
-        var dropPin, i, log, _i, _len, _ref, _results;
+      switchLogs = true;
+      $scope.dropPins = function() {
+        var dropPin, i, log, logId, _ref;
         dropPin = function(log) {
           return function() {
             return placeMarkerMiniMap(log);
           };
         };
-        _ref = Object.keys(Map.data.logs);
-        _results = [];
-        for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
-          log = _ref[i];
-          _results.push($timeout(dropPin(log), 200 * i));
+        i = 0;
+        _ref = Map.data.logs;
+        for (logId in _ref) {
+          log = _ref[logId];
+          $timeout(dropPin(log), 200 * i);
+          i++;
         }
-        return _results;
+        return $timeout(function() {
+          console.log($scope.log.id);
+          return changeLocation($scope.log.id);
+        }, 2800);
+      };
+      $rootScope.$on('animation-done', function() {
+        console.log("firing");
+        return switchLogs = !switchLogs;
+      });
+      $rootScope.$on('gotFirstLog', function() {
+        $scope.log = Map.getCurrentLog();
+        return $scope.dropPins();
+      });
+      $scope.getLog = function() {
+        return $scope.log = Map.getCurrentLog();
+      };
+      return $scope.move = function(direction) {
+        if (switchLogs) {
+          $scope.otherLog = Map.move(direction);
+          return changeLocation($scope.otherLog.id);
+        } else {
+          $scope.log = Map.move(direction);
+          return changeLocation($scope.log.id);
+        }
       };
     }
   ]);

@@ -28,32 +28,36 @@
           return get = $http.get(window.location.protocol + "//" + window.location.host + "/logs").success(success);
         },
         move: function(direction) {
-          var change, newCurrent;
+          var change, newCurrentLog;
           change = direction === 'N' || direction === 'E' ? +1 : -1;
           if (direction === 'N' || direction === 'S') {
-            newCurrent = factory.data.logs[factory.data.latLogs[mod(factory.data.current[1] + change, factory.data.latLogs.length)].id].key;
+            newCurrentLog = factory.data.logs[factory.data.latLogs[mod(factory.data.current[1] + change, factory.data.latLogs.length)].id];
           } else {
-            newCurrent = factory.data.logs[factory.data.lngLogs[mod(factory.data.current[0] + change, factory.data.latLogs.length)].id].key;
+            newCurrentLog = factory.data.logs[factory.data.lngLogs[mod(factory.data.current[0] + change, factory.data.latLogs.length)].id];
           }
-          factory.getClosestLogs(newCurrent);
-          return $rootScope.$on('animation-done', function() {
-            return factory.data.current = newCurrent;
-          });
+          factory.getClosestLogs(newCurrentLog.key);
+          factory.data.current = newCurrentLog.key;
+          return newCurrentLog;
         },
-        getLog: function(logId) {
+        getLog: function(logId, callback) {
           var get;
           if (factory.data.logs[logId].body == null) {
-            return get = $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
+            get = $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
               params: {
                 id: logId
               }
-            }).success(function(data, status, headers, config) {
-              console.log(data);
-              factory.data.logs[data.log.id].title = data.log.title;
-              factory.data.logs[data.log.id].profileId = data.log.profileId;
-              factory.data.logs[data.log.id].profileId = data.log.profileName;
-              return factory.data.logs[data.log.id].body = data.log.body;
             });
+            if (callback != null) {
+              return get.success(callback);
+            } else {
+              return get.success(function(data, status, headers, config) {
+                console.log(data);
+                factory.data.logs[data.log.id].title = data.log.title;
+                factory.data.logs[data.log.id].profileId = data.log.profileId;
+                factory.data.logs[data.log.id].profileId = data.log.profileName;
+                return factory.data.logs[data.log.id].body = data.log.body;
+              });
+            }
           }
         },
         getClosestLogs: function(around) {
@@ -159,12 +163,17 @@
                 mapData.logs[log.id].key = [i, mapData.logs[log.id].key[1]];
               }
               keys = Object.keys(mapData.logs);
-              factory.data.current = mapData.logs[keys[(Math.random() * keys.length) >> 0]].key;
+              mapData.current = mapData.logs[keys[(Math.random() * keys.length) >> 0]].key;
               console.log(factory.data.current);
               id = mapData.lngLogs[factory.data.current[0]].id;
-              factory.getLog(id);
-              factory.getClosestLogs(factory.data.current);
-              return $rootScope.$broadcast('map-init');
+              factory.getLog(id, function(data, status, headers, config) {
+                factory.data.logs[data.log.id].title = data.log.title;
+                factory.data.logs[data.log.id].profileId = data.log.profileId;
+                factory.data.logs[data.log.id].profileId = data.log.profileName;
+                factory.data.logs[data.log.id].body = data.log.body;
+                return $rootScope.$broadcast('gotFirstLog');
+              });
+              return factory.getClosestLogs(factory.data.current);
             };
           };
           return factory.getLogs(getLogsCallback(factory.data));

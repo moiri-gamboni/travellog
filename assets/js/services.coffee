@@ -25,27 +25,30 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
     move: (direction) ->
       change = if direction in ['N', 'E'] then +1 else -1
       if direction in ['N', 'S']
-        newCurrent = factory.data.logs[factory.data.latLogs[mod(factory.data.current[1]+change,factory.data.latLogs.length)].id].key
+        newCurrentLog = factory.data.logs[factory.data.latLogs[mod(factory.data.current[1]+change,factory.data.latLogs.length)].id]
       else
-        newCurrent = factory.data.logs[factory.data.lngLogs[mod(factory.data.current[0]+change,factory.data.latLogs.length)].id].key
-      factory.getClosestLogs(newCurrent)
-      $rootScope.$on('animation-done', () ->
-        factory.data.current = newCurrent
-      )
+        newCurrentLog = factory.data.logs[factory.data.lngLogs[mod(factory.data.current[0]+change,factory.data.latLogs.length)].id]
+      factory.getClosestLogs(newCurrentLog.key)
+      factory.data.current = newCurrentLog.key
+      return newCurrentLog
 
 
-    getLog: (logId) ->
+    getLog: (logId, callback) ->
       if not factory.data.logs[logId].body?
         get = $http.get(
           window.location.protocol + "//" + window.location.host + "/logs",
           {params:{id:logId}}
-        ).success((data, status, headers, config)->
-          console.log(data)
-          factory.data.logs[data.log.id].title = data.log.title
-          factory.data.logs[data.log.id].profileId = data.log.profileId
-          factory.data.logs[data.log.id].profileId = data.log.profileName
-          factory.data.logs[data.log.id].body = data.log.body
         )
+        if callback?
+          get.success(callback)
+        else
+          get.success((data, status, headers, config)->
+            console.log(data)
+            factory.data.logs[data.log.id].title = data.log.title
+            factory.data.logs[data.log.id].profileId = data.log.profileId
+            factory.data.logs[data.log.id].profileId = data.log.profileName
+            factory.data.logs[data.log.id].body = data.log.body
+          )
 
     getClosestLogs: (around) ->
       for direction in ['N','E','S','W']
@@ -123,13 +126,18 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
             mapData.logs[log.id].key = [i, mapData.logs[log.id].key[1]]
 
           keys = Object.keys(mapData.logs)
-          factory.data.current = mapData.logs[keys[(Math.random()*keys.length)>>0]].key
+          mapData.current = mapData.logs[keys[(Math.random()*keys.length)>>0]].key
           console.log(factory.data.current)
           id = mapData.lngLogs[factory.data.current[0]].id
-          factory.getLog(id)
+          factory.getLog(id,
+            (data, status, headers, config)->
+              factory.data.logs[data.log.id].title = data.log.title
+              factory.data.logs[data.log.id].profileId = data.log.profileId
+              factory.data.logs[data.log.id].profileId = data.log.profileName
+              factory.data.logs[data.log.id].body = data.log.body
+              $rootScope.$broadcast('gotFirstLog')
+          )
           factory.getClosestLogs(factory.data.current)
-
-          $rootScope.$broadcast('map-init')
 
       factory.getLogs(getLogsCallback(factory.data))
 

@@ -2,34 +2,53 @@
 ctrl = angular.module("mainModule.controllers", [])
 
 ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map', ($http, $scope, $rootScope, $timeout, Map) ->
-  console.log("A")
   Map.initMap()
-  $rootScope.$on('map-init', ()->
-    console.log("init")
-
-  )
-  $scope.$watch(
-    -> Map.data.current,
-    (current) ->
-      $scope.log = Map.getCurrentLog()
-  )
-  $scope.getLog = () ->
-    $scope.log = Map.getCurrentLog()
-
-  $scope.move = (direction) ->
-    Map.move(direction)
+  switchLogs = true
 
   $scope.dropPins = () ->
     dropPin = (log) ->
       return ()->
         placeMarkerMiniMap(log)
 
-    for log, i in Object.keys(Map.data.logs)
+    i = 0
+    for logId, log of Map.data.logs
       $timeout(
         dropPin(log)
         ,
         200*i
       )
+      i++
+    $timeout(
+        () ->
+          console.log($scope.log.id)
+          changeLocation($scope.log.id)
+        ,
+        2800
+      )
+
+  $rootScope.$on('animation-done', () ->
+    console.log("firing")
+    switchLogs = not switchLogs
+  )
+
+  $rootScope.$on('gotFirstLog', () ->
+    $scope.log = Map.getCurrentLog()
+    $scope.dropPins()
+  )
+
+  $scope.getLog = () ->
+    $scope.log = Map.getCurrentLog()
+
+  $scope.move = (direction) ->
+    if switchLogs
+      $scope.otherLog = Map.move(direction)
+      changeLocation($scope.otherLog.id)
+    else
+      $scope.log = Map.move(direction)
+      changeLocation($scope.log.id)
+
+
+
 
 
 ])

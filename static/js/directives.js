@@ -12,4 +12,11 @@
     };
   });
 
+  drct.directive("otherlog", function() {
+    return {
+      restrict: 'E',
+      templateUrl: "/static/app/partials/otherLog.html"
+    };
+  });
+
 }).call(this);
