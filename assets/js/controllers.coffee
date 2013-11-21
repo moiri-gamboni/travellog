@@ -61,11 +61,11 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
   console.log('going false')
   $scope.loggedIn = false
   console.log($scope)
-  $scope.myfilesa = {"title":"empty"}
+  $scope.myfiles = {"title":"empty"}
   $scope.selectedFile = null
   $scope.addMapSelected = false
   $scope.overlayIsActive = false
-  console.log $scope.myfilesa
+  console.log $scope.myfiles
   $scope.loadingMessage = ""
   $scope.completeUrl = ""
 
@@ -76,9 +76,10 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
       passedScope.loading = false
       retrieveAllFiles((resp) ->
         passedScope.$apply(() ->
-          passedScope.myfilesa = resp
+          passedScope.myfiles = resp
         )
       )
+      startAddMap()
       console.log(passedScope.showing)
       if profileId
         passedScope.hasGoogle = true
@@ -117,6 +118,9 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
       else if $scope.complete
         return 'complete'
       else if $scope.loggedIn
+        setTimeout( ()->
+          google.maps.event.trigger(addMap, 'resize')
+        , 200)
         return 'loggedIn'
       else
         return 'login'
@@ -161,9 +165,6 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
       else
         console.log "no idea what happened"
     ).error (data, status, headers, config) ->
-
-
-    
 
   $scope.startLogin = () ->
     if not $scope.loggedIn

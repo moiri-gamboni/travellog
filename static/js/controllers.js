@@ -68,13 +68,13 @@
       console.log('going false');
       $scope.loggedIn = false;
       console.log($scope);
-      $scope.myfilesa = {
+      $scope.myfiles = {
         "title": "empty"
       };
       $scope.selectedFile = null;
       $scope.addMapSelected = false;
       $scope.overlayIsActive = false;
-      console.log($scope.myfilesa);
+      console.log($scope.myfiles);
       $scope.loadingMessage = "";
       $scope.completeUrl = "";
       callback = function(passedScope) {
@@ -84,9 +84,10 @@
           passedScope.loading = false;
           retrieveAllFiles(function(resp) {
             return passedScope.$apply(function() {
-              return passedScope.myfilesa = resp;
+              return passedScope.myfiles = resp;
             });
           });
+          startAddMap();
           console.log(passedScope.showing);
           if (profileId) {
             passedScope.hasGoogle = true;
@@ -127,6 +128,9 @@
           } else if ($scope.complete) {
             return 'complete';
           } else if ($scope.loggedIn) {
+            setTimeout(function() {
+              return google.maps.event.trigger(addMap, 'resize');
+            }, 200);
             return 'loggedIn';
           } else {
             return 'login';
