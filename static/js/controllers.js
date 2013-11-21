@@ -80,9 +80,10 @@
           passedScope.loading = false;
           retrieveAllFiles(function(resp) {
             return passedScope.$apply(function() {
-              return passedScope.myfilesa = resp;
+              return passedScope.myfiles = resp;
             });
           });
+          startAddMap();
           if (profileId) {
             passedScope.hasGoogle = true;
             return $scope.profileId = profileId;
@@ -118,6 +119,9 @@
           } else if ($scope.complete) {
             return 'complete';
           } else if ($scope.loggedIn) {
+            setTimeout(function() {
+              return google.maps.event.trigger(addMap, 'resize');
+            }, 200);
             return 'loggedIn';
           } else {
             return 'login';

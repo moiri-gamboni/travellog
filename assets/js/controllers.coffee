@@ -71,9 +71,10 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
       passedScope.loading = false
       retrieveAllFiles((resp) ->
         passedScope.$apply(() ->
-          passedScope.myfilesa = resp
+          passedScope.myfiles = resp
         )
       )
+      startAddMap()
       if profileId
         passedScope.hasGoogle = true
         $scope.profileId = profileId
@@ -107,6 +108,9 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
       else if $scope.complete
         return 'complete'
       else if $scope.loggedIn
+        setTimeout( ()->
+          google.maps.event.trigger(addMap, 'resize')
+        , 200)
         return 'loggedIn'
       else
         return 'login'
@@ -148,9 +152,6 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
         $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id
       else
     ).error (data, status, headers, config) ->
-
-
-
 
   $scope.startLogin = () ->
     if not $scope.loggedIn

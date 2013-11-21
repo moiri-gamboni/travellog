@@ -43,6 +43,9 @@
 			<!-- 	<div ng-hide="loggedIn">
 
 		</div> -->
+			<div id="add-map-canvas" ng-class="{show: getShowing() == 'loggedIn'}"></div>
+			
+
 			<div ng-show="getShowing() == 'loading'">
 				{{loadingMessage}}
 			</div>
@@ -65,7 +68,6 @@
 						File: {{file.title}}
 					</li>
 				</ul>
-				<div id="add-map-canvas"></div>
 			</div>
 			<div ng-show="getShowing() =='help'">
 				This is the about text
