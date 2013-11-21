@@ -6,5 +6,5 @@ apiclient
 httplib2
 oauth2client
 uritemplate
-six
+six.py
 dateutil
