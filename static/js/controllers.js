@@ -33,12 +33,10 @@
           i++;
         }
         return $timeout(function() {
-          console.log($scope.log.id);
           return changeLocation($scope.log.id);
         }, 2800);
       };
       $rootScope.$on('animation-done', function() {
-        console.log("firing");
         return switchLogs = !switchLogs;
       });
       $rootScope.$on('gotFirstLog', function() {
@@ -49,12 +47,14 @@
         return $scope.log = Map.getCurrentLog();
       };
       return $scope.move = function(direction) {
-        if (switchLogs) {
-          $scope.otherLog = Map.move(direction);
-          return changeLocation($scope.otherLog.id);
-        } else {
-          $scope.log = Map.move(direction);
-          return changeLocation($scope.log.id);
+        if (window.loadingDone) {
+          if (switchLogs) {
+            $scope.otherLog = Map.move(direction);
+            return changeLocation($scope.otherLog.id);
+          } else {
+            $scope.log = Map.move(direction);
+            return changeLocation($scope.log.id);
+          }
         }
       };
     }
@@ -65,21 +65,17 @@
       var callback, callback2,
         _this = this;
       $rootScope.showing = 'loading';
-      console.log('going false');
       $scope.loggedIn = false;
-      console.log($scope);
       $scope.myfilesa = {
         "title": "empty"
       };
       $scope.selectedFile = null;
       $scope.addMapSelected = false;
       $scope.overlayIsActive = false;
-      console.log($scope.myfilesa);
       $scope.loadingMessage = "";
       $scope.completeUrl = "";
       callback = function(passedScope) {
         return function(event, name, profileId) {
-          console.log("you've been logged in");
           passedScope.loggedIn = true;
           passedScope.loading = false;
           retrieveAllFiles(function(resp) {
@@ -87,7 +83,6 @@
               return passedScope.myfilesa = resp;
             });
           });
-          console.log(passedScope.showing);
           if (profileId) {
             passedScope.hasGoogle = true;
             return $scope.profileId = profileId;
@@ -100,7 +95,6 @@
       $rootScope.$on('loggedIn', callback($scope));
       callback2 = function(passedScope) {};
       $rootScope.$on('addMapSelected', function() {
-        console.log("working away to make mapSelected True");
         return $scope.$apply(function() {
           return $scope.addMapSelected = true;
         });
@@ -109,13 +103,10 @@
         return file === $scope.selectedFile;
       };
       $scope.selectFile = function(file) {
-        console.log("selecting file!");
         return $scope.selectedFile = file;
       };
       $scope.changeShowing = function(view) {
-        console.log(view);
-        $rootScope.showing = view;
-        return console.log($rootScope.showing);
+        return $rootScope.showing = view;
       };
       $scope.getShowing = function() {
         if ($rootScope.showing === "help") {
@@ -134,7 +125,6 @@
         }
       };
       $scope.canSubmit = function() {
-        console.log("checking submit" + $scope.addMapSelected + ($scope.selectedFile != null));
         return $scope.addMapSelected && ($scope.selectedFile != null);
       };
       $scope.activateOverlay = function(view) {
@@ -142,7 +132,6 @@
         return $scope.changeShowing(view);
       };
       $scope.overlayActive = function() {
-        console.log("activate overlay");
         return $scope.overlayIsActive;
       };
       $scope.upload = function() {
@@ -174,7 +163,7 @@
             $scope.complete = true;
             return $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id;
           } else {
-            return console.log("no idea what happened");
+
           }
         }).error(function(data, status, headers, config) {});
       };

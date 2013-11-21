@@ -9,10 +9,10 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
       latLogs: []
       lngLogs: []
       current: null
+      loadingLogs: 0
 
     getCurrentLog: () ->
       if factory.data.current? and factory.data.lngLogs? and factory.data.lngLogs[factory.data.current[0]]?
-        console.log(factory.data.current)
         return factory.data.logs[factory.data.lngLogs[factory.data.current[0]].id]
       else
         return null
@@ -35,19 +35,27 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
 
     getLog: (logId, callback) ->
       if not factory.data.logs[logId].body?
+        factory.data.loadingLogs++
         get = $http.get(
           window.location.protocol + "//" + window.location.host + "/logs",
           {params:{id:logId}}
         )
         if callback?
-          get.success(callback)
+          get.success((data, status, headers, config)->
+            factory.data.loadingLogs--
+            callback(data, status, headers, config)
+          ).error((data, status, headers, config)->
+            factory.data.loadingLogs--
+          )
         else
           get.success((data, status, headers, config)->
-            console.log(data)
+            factory.data.loadingLogs--
             factory.data.logs[data.log.id].title = data.log.title
             factory.data.logs[data.log.id].profileId = data.log.profileId
             factory.data.logs[data.log.id].profileId = data.log.profileName
             factory.data.logs[data.log.id].body = data.log.body
+          ).error((data, status, headers, config)->
+            factory.data.loadingLogs--
           )
 
     getClosestLogs: (around) ->
@@ -68,6 +76,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
             tempKey[1] = i
             tempLog = factory.data.latLogs[tempKey[1]]
             tempKey = factory.data.logs[tempLog.id].key
+            return tempKey
             if factory.inRange(from, tempKey, direction, wrapNumber)
               breakLoop = true
               break
@@ -79,6 +88,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
             tempKey[0] = i
             tempLog = factory.data.lngLogs[tempKey[0]]
             tempKey = factory.data.logs[tempLog.id].key
+            return tempKey
             if factory.inRange(from, tempKey, direction, wrapNumber)
               breakLoop = true
               break
@@ -133,7 +143,6 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
 
           keys = Object.keys(mapData.logs)
           mapData.current = mapData.logs[keys[(Math.random()*keys.length)>>0]].key
-          console.log(factory.data.current)
           id = mapData.lngLogs[factory.data.current[0]].id
           factory.getLog(id,
             (data, status, headers, config)->
@@ -144,8 +153,19 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
               $rootScope.$broadcast('gotFirstLog')
           )
           factory.getClosestLogs(factory.data.current)
+          $rootScope.$watch(
+            ()->
+              return factory.data.loadingLogs
+            (loadingLogs)->
+              console.log(loadingLogs)
+              if loadingLogs == 0
+                window.loadingDone = true
+              else
+                window.loadingDone = false
+          )
 
       factory.getLogs(getLogsCallback(factory.data))
+
 
 
   return factory

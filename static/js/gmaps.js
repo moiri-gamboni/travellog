@@ -145,9 +145,8 @@ function startAddMap() {
 function seedMap() {
   function dropCallback(resp, i) {
     return function() {
-      console.log(resp.logs[i]);
       placeMarkerMiniMap(resp.logs[i]);
-    }; 
+    };
   }
   $.get("/logs", function(resp) {
     for (var i=0; i < resp.logs.length; i++) {
@@ -201,7 +200,6 @@ function switchMiniMarker() {
 
 
 function placeMarkerMiniMap(log_object) {
-  console.log(log_object);
   var marker = new google.maps.Marker({
     position: new google.maps.LatLng(log_object.lat, log_object.lng),
       animation: google.maps.Animation.DROP,
@@ -212,7 +210,7 @@ function placeMarkerMiniMap(log_object) {
   idMarkerMap[log_object.id] = marker;
   google.maps.event.addListener(marker, 'click', switchMiniMarker);
 }
-                      
+
 google.maps.event.addDomListener(window, 'load', initialize);
 
 

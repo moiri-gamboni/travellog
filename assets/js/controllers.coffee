@@ -10,12 +10,12 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     classString = $rootScope.loadingClass
     loadSize = $rootScope.loadingSize
     return classString + " " + loadSize
- 
+
   $scope.dropPins = () ->
     dropPin = (log) ->
       return ()->
         placeMarkerMiniMap(log)
- 
+
     i = 0
     for logId, log of Map.data.logs
       $timeout(
@@ -26,52 +26,47 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       i++
     $timeout(
         () ->
-          console.log($scope.log.id)
           changeLocation($scope.log.id)
         ,
         2800
       )
- 
+
   $rootScope.$on('animation-done', () ->
-    console.log("firing")
     switchLogs = not switchLogs
   )
- 
+
   $rootScope.$on('gotFirstLog', () ->
     $scope.log = Map.getCurrentLog()
     $scope.dropPins()
   )
- 
+
   $scope.getLog = () ->
     $scope.log = Map.getCurrentLog()
- 
+
   $scope.move = (direction) ->
-    if switchLogs
-      $scope.otherLog = Map.move(direction)
-      changeLocation($scope.otherLog.id)
-    else
-      $scope.log = Map.move(direction)
-      changeLocation($scope.log.id)
+    if window.loadingDone
+      if switchLogs
+        $scope.otherLog = Map.move(direction)
+        changeLocation($scope.otherLog.id)
+      else
+        $scope.log = Map.move(direction)
+        changeLocation($scope.log.id)
 ])
 
 ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $scope, $rootScope) ->
     #if user is signed_in
   #$scope.map = Map
   $rootScope.showing = 'loading'
-  console.log('going false')
   $scope.loggedIn = false
-  console.log($scope)
   $scope.myfilesa = {"title":"empty"}
   $scope.selectedFile = null
   $scope.addMapSelected = false
   $scope.overlayIsActive = false
-  console.log $scope.myfilesa
   $scope.loadingMessage = ""
   $scope.completeUrl = ""
 
   callback = (passedScope)=>
     return (event, name, profileId)=>
-      console.log "you've been logged in"
       passedScope.loggedIn = true
       passedScope.loading = false
       retrieveAllFiles((resp) ->
@@ -79,7 +74,6 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
           passedScope.myfilesa = resp
         )
       )
-      console.log(passedScope.showing)
       if profileId
         passedScope.hasGoogle = true
         $scope.profileId = profileId
@@ -89,24 +83,20 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
   $rootScope.$on('loggedIn', callback($scope))
 
   callback2 = (passedScope) =>
-    return 
+    return
 
   $rootScope.$on('addMapSelected', () ->
-    console.log("working away to make mapSelected True")
     $scope.$apply ()->
       $scope.addMapSelected = true
-  ) 
-  $scope.isSelected = (file) -> 
+  )
+  $scope.isSelected = (file) ->
     return file == $scope.selectedFile
-  
+
   $scope.selectFile = (file) ->
-    console.log("selecting file!")
     $scope.selectedFile = file
 
   $scope.changeShowing = (view) ->
-    console.log(view)
     $rootScope.showing = view
-    console.log $rootScope.showing
 
   $scope.getShowing = () ->
     if $rootScope.showing == "help"
@@ -122,7 +112,6 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
         return 'login'
 
   $scope.canSubmit = () ->
-    console.log("checking submit" + $scope.addMapSelected + $scope.selectedFile?)
     return $scope.addMapSelected and $scope.selectedFile?
 
   $scope.activateOverlay = (view) ->
@@ -130,13 +119,12 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
     $scope.changeShowing(view)
 
   $scope.overlayActive = () ->
-    console.log("activate overlay")
     return $scope.overlayIsActive
 
   $scope.upload = () ->
     if not $scope.canSubmit()
       return
-    payload = 
+    payload =
       gdriveId: $scope.selectedFile.id
       lat: addMapMarker.position.lat()
       lng: addMapMarker.position.lng()
@@ -159,11 +147,10 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope',($http, $s
         $scope.complete = true
         $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id
       else
-        console.log "no idea what happened"
     ).error (data, status, headers, config) ->
 
 
-    
+
 
   $scope.startLogin = () ->
     if not $scope.loggedIn

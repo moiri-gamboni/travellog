@@ -1,3 +1,4 @@
+window.loadingDone = false
 move = (direction) ->
 	windowHeight = $(".main").height();
 	windowWidth = $(".main").width();
@@ -31,16 +32,17 @@ move = (direction) ->
 
 
 $(".sidenav-top").click () ->
-	move("top")
+	move("top") if loadingDone
 
 $(".sidenav-bottom").click () ->
-	move("down")
+	move("down") if loadingDone
 
 $(".sidenav-right").click () ->
-	move("right")
+	console.log(loadingDone)
+	move("right") if loadingDone
 
 $(".sidenav-left").click () ->
-	move("left")
+	move("left") if loadingDone
 
 
 window.changeCountry = (newCountry) ->
