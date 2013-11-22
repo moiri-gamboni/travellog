@@ -2,6 +2,8 @@
 (function() {
   var move;
 
+  window.loadingDone = false;
+
   move = function(direction) {
     var launchIn, mainOut, prepare, screenHeight, screenWidth, topDistance, windowHeight, windowWidth;
     windowHeight = $(".main").height();
@@ -71,19 +73,28 @@
   };
 
   $(".sidenav-top").click(function() {
-    return move("top");
+    if (loadingDone) {
+      return move("top");
+    }
   });
 
   $(".sidenav-bottom").click(function() {
-    return move("down");
+    if (loadingDone) {
+      return move("down");
+    }
   });
 
   $(".sidenav-right").click(function() {
-    return move("right");
+    console.log(loadingDone);
+    if (loadingDone) {
+      return move("right");
+    }
   });
 
   $(".sidenav-left").click(function() {
-    return move("left");
+    if (loadingDone) {
+      return move("left");
+    }
   });
 
   window.changeCountry = function(newCountry) {
