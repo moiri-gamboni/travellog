@@ -1,15 +1,17 @@
 move = (direction) ->
 	windowHeight = $(".main").height();
 	windowWidth = $(".main").width();
+	screenHeight = $(window).height();
+	screenWidth = $(window).width();
 	topDistance = parseInt($(".main").css("top"), 10)
 	if direction == "top"
 		prepare = {"left":"0", "top":-windowHeight}
 		launchIn = {"y": windowHeight + topDistance + 1}
 		mainOut = {"y": windowHeight + topDistance + 1}
 	else if direction == "down"
-		prepare = {"left":"0", "top":2*windowHeight}
-		launchIn = {"top": windowHeight*0.2 + 50}
-		mainOut = {"top": -windowHeight}
+		prepare = {"left":"0", "top":screenHeight}
+		launchIn = {"y": -(windowHeight + (screenHeight - topDistance))}
+		mainOut = {"y": -(windowHeight + (screenHeight - topDistance))}
 	else if direction == "left"
 		prepare = {"left":-windowWidth, "top": windowHeight*0.2 + 50}
 		launchIn = {"left": 0}

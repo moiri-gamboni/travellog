@@ -3,9 +3,11 @@
   var move;
 
   move = function(direction) {
-    var launchIn, mainOut, prepare, topDistance, windowHeight, windowWidth;
+    var launchIn, mainOut, prepare, screenHeight, screenWidth, topDistance, windowHeight, windowWidth;
     windowHeight = $(".main").height();
     windowWidth = $(".main").width();
+    screenHeight = $(window).height();
+    screenWidth = $(window).width();
     topDistance = parseInt($(".main").css("top"), 10);
     if (direction === "top") {
       prepare = {
@@ -21,13 +23,13 @@
     } else if (direction === "down") {
       prepare = {
         "left": "0",
-        "top": 2 * windowHeight
+        "top": screenHeight
       };
       launchIn = {
-        "top": windowHeight * 0.2 + 50
+        "y": -(windowHeight + (screenHeight - topDistance))
       };
       mainOut = {
-        "top": -windowHeight
+        "y": -(windowHeight + (screenHeight - topDistance))
       };
     } else if (direction === "left") {
       prepare = {
