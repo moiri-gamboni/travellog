@@ -1,5 +1,5 @@
 window.loadingDone = false
-move = (direction) ->
+window.move = (direction) ->
 	windowHeight = $(".main").height();
 	windowWidth = $(".main").width();
 	screenHeight = $(window).height();
@@ -30,21 +30,6 @@ move = (direction) ->
 			angular.element("html").scope().$broadcast("sliding-animation-done")
 		, 1000)
 	, 100)
-
-
-$(".sidenav-top").click () ->
-	move("top") if loadingDone
-
-$(".sidenav-bottom").click () ->
-	move("down") if loadingDone
-
-$(".sidenav-right").click () ->
-	console.log(loadingDone)
-	move("right") if loadingDone
-
-$(".sidenav-left").click () ->
-	move("left") if loadingDone
-
 
 window.changeCountry = (newCountry) ->
 	$("#country").addClass("fadeout")

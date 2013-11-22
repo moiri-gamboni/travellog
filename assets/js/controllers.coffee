@@ -19,16 +19,15 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
     i = 0
     for logId, log of Map.data.logs
-      console.log i
       $timeout(dropPin(log),200*i)
       i++
     $timeout(
         () ->
           flow.arePinsDropped = true
-          console.log 'pins are dropped'
           if flow.isFirstLogReady
             $(".main.fade").removeClass("fadeout")
             $(".main.fade").addClass("fadein")
+            loadingWatch()
             switchLoading("small corner")
             showLog()
         ,
@@ -36,31 +35,28 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       )
 
   $rootScope.$on('map-ready', () ->
-    console.log 'map-ready'
     flow.isMapReady = true
     if flow.areLogsReady
       unblockBegin()
   )
 
   $rootScope.$on('logs-ready', () ->
-    console.log 'logs-ready'
     flow.areLogsReady = true
     if flow.isMapReady
       unblockBegin()
   )
 
   $rootScope.$on('first-log-ready', () ->
-    console.log 'first-log-ready'
     flow.isFirstLogReady = true
     if flow.arePinsDropped
       $(".main.fade").removeClass("fadeout")
       $(".main.fade").addClass("fadein")
+      loadingWatch()
       switchLoading("small corner")
       showLog()
   )
 
   unblockBegin = ()->
-    console.log 'unlock begin'
     $("#loading").addClass("fadeout")
     $("#start-here").addClass("fadein")
     flow.canBegin = true
@@ -69,8 +65,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     if flow.canBegin
       $("#launch-screen, .background").addClass("hide")
       $("#container").removeClass("hide")
-      $("#loading").removeClass("fadeout")
-      $("#loading").addClass("fadein")
+      fadeLoading(false)
       switchLoading("big center")
       flow.hasBegun = true
       $timeout(()->
@@ -78,7 +73,6 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       , 500)
 
   switchLoading = (classString) ->
-    console.log 'switchLoading'+ " " + classString
     loading = $("#loading")
     loading.removeClass("small big center corner")
     loading.addClass(classString)
@@ -107,6 +101,26 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       else
         $scope.log = Map.move(direction)
         changeLocation($scope.log.id)
+
+  loadingWatch = () ->
+    if Map.data.loadingLogs == 0
+      fadeLoading(true)
+    else
+      fadeLoading(false)
+    $rootScope.$on('is-loading-log', (event, isLoading) ->
+      if isLoading
+        fadeLoading(false)
+      else
+        fadeLoading(true)
+    )
+
+  fadeLoading = (fadeOut) ->
+    if fadeOut
+      $("#loading").addClass("fadeout")
+      $("#loading").removeClass("fadein")
+    else
+      $("#loading").removeClass("fadeout")
+      $("#loading").addClass("fadein")
 
 
   Map.initMap()

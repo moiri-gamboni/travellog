@@ -7,7 +7,7 @@
 
   ctrl.controller("mainCtrl", [
     '$http', '$scope', '$rootScope', '$timeout', 'Map', function($http, $scope, $rootScope, $timeout, Map) {
-      var dropPins, flow, showLog, switchLoading, switchLogs, unblockBegin;
+      var dropPins, fadeLoading, flow, loadingWatch, showLog, switchLoading, switchLogs, unblockBegin;
       switchLogs = false;
       flow = {
         isMapReady: false,
@@ -28,47 +28,43 @@
         _ref = Map.data.logs;
         for (logId in _ref) {
           log = _ref[logId];
-          console.log(i);
           $timeout(dropPin(log), 200 * i);
           i++;
         }
         return $timeout(function() {
           flow.arePinsDropped = true;
-          console.log('pins are dropped');
           if (flow.isFirstLogReady) {
             $(".main.fade").removeClass("fadeout");
             $(".main.fade").addClass("fadein");
+            loadingWatch();
             switchLoading("small corner");
             return showLog();
           }
         }, 200 * Object.keys(Map.data.logs).length);
       };
       $rootScope.$on('map-ready', function() {
-        console.log('map-ready');
         flow.isMapReady = true;
         if (flow.areLogsReady) {
           return unblockBegin();
         }
       });
       $rootScope.$on('logs-ready', function() {
-        console.log('logs-ready');
         flow.areLogsReady = true;
         if (flow.isMapReady) {
           return unblockBegin();
         }
       });
       $rootScope.$on('first-log-ready', function() {
-        console.log('first-log-ready');
         flow.isFirstLogReady = true;
         if (flow.arePinsDropped) {
           $(".main.fade").removeClass("fadeout");
           $(".main.fade").addClass("fadein");
+          loadingWatch();
           switchLoading("small corner");
           return showLog();
         }
       });
       unblockBegin = function() {
-        console.log('unlock begin');
         $("#loading").addClass("fadeout");
         $("#start-here").addClass("fadein");
         return flow.canBegin = true;
@@ -77,8 +73,7 @@
         if (flow.canBegin) {
           $("#launch-screen, .background").addClass("hide");
           $("#container").removeClass("hide");
-          $("#loading").removeClass("fadeout");
-          $("#loading").addClass("fadein");
+          fadeLoading(false);
           switchLoading("big center");
           flow.hasBegun = true;
           return $timeout(function() {
@@ -88,7 +83,6 @@
       };
       switchLoading = function(classString) {
         var loading;
-        console.log('switchLoading' + " " + classString);
         loading = $("#loading");
         loading.removeClass("small big center corner");
         return loading.addClass(classString);
@@ -118,6 +112,29 @@
             $scope.log = Map.move(direction);
             return changeLocation($scope.log.id);
           }
+        }
+      };
+      loadingWatch = function() {
+        if (Map.data.loadingLogs === 0) {
+          fadeLoading(true);
+        } else {
+          fadeLoading(false);
+        }
+        return $rootScope.$on('is-loading-log', function(event, isLoading) {
+          if (isLoading) {
+            return fadeLoading(false);
+          } else {
+            return fadeLoading(true);
+          }
+        });
+      };
+      fadeLoading = function(fadeOut) {
+        if (fadeOut) {
+          $("#loading").addClass("fadeout");
+          return $("#loading").removeClass("fadein");
+        } else {
+          $("#loading").removeClass("fadeout");
+          return $("#loading").addClass("fadein");
         }
       };
       return Map.initMap();
