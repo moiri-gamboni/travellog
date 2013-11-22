@@ -26,14 +26,18 @@
 	bottom: 50px
 	left: 50%
 	margin-left: -50px
-	&.large
+	&.big
 		font-size:100px
+		height: 200px
 	&.hide-all
 		opacity:0
 	&.hide-1 li:nth-child(1), &.hide-2 li:nth-child(2), &.hide-3 li:nth-child(3), &.hide-4 li:nth-child(4)
 		visibility: hidden
 	&.bigLoadCenter
 		bottom: 50%
+	&.small
+		font-size: 30px
+		height: 15px
 	
 
 #minimap
@@ -54,8 +58,7 @@
 	&.show
 		display: block
 
-.active
-  color:#ed4d4a
+
 
 .move-up
 	top: 100px
@@ -111,12 +114,6 @@
 		margin-left: -200px
 		top: 50%
 		margin-top: -60px
-		opacity:0.8
-		&:hover
-			opacity:1
-			transition: opacity 0.5s ease-in-out;
-			-moz-transition: opacity 0.5s ease-in-out;
-			-webkit-transition: opacity 0.5s ease-in-out;
 	hr
 		height: 15px
 		width: 170px
@@ -154,9 +151,19 @@
 		margin-top: 120px
 		left: 50%
 		margin-left: -90px
-		font-weight: 500
+		font-weight: 300
 		text-transform: uppercase
-		visibility:hidden
+		opacity: 0
+		text-align: center;
+		width: 400px;
+		margin-left: -200px;
+	h1:hover, h3:hover
+		cursor: pointer
+	h3
+		&.fadein
+			opacity: 0.6
+			&:hover
+				opacity: 1
 #container
 	font-family: "Roboto", sans-serif
 	position:absolute
@@ -266,6 +273,9 @@
 			#search
 				margin-top:60px
 				color:#aaa
+				.active
+  					color:#ed4d4a
+  					cursor: pointer
 				input
 					border:none
 					background:transparent
@@ -319,7 +329,7 @@
 		#log-wrapper
 			height: 95%
 			overflow-y: scroll
-			overflow-x: none
+			overflow-x: hidden
 			padding-right: 30px
 	#blackshade
 		height:100%

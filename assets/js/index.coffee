@@ -4,26 +4,25 @@ move = (direction) ->
 	windowWidth = $(".main").width();
 	screenHeight = $(window).height();
 	screenWidth = $(window).width();
-	topDistance = parseInt($(".main").css("top"), 10)
+	topDistance = parseInt($(".main").css("top"), 10) 
 	if direction == "top"
 		prepare = {"left":"0", "top":-windowHeight}
-		launchIn = {"y": windowHeight + topDistance + 1}
-		mainOut = {"y": windowHeight + topDistance + 1}
+		launchIn = {"y": windowHeight + topDistance + 1, x: 0}
+		mainOut = {"y": screenHeight, x: 0}
 	else if direction == "down"
 		prepare = {"left":"0", "top": screenHeight}
-		launchIn = {"y": -(screenHeight - topDistance)}
-		mainOut = {"y": -(screenHeight - topDistance)}
+		launchIn = {"y": -(screenHeight - topDistance), x: 0}
+		mainOut = {"y": -(screenHeight), x: 0}
 	else if direction == "left"
-		prepare = {"left":-windowWidth, "top": windowHeight - topDistance}
-		launchIn = {"left": 0}
-		mainOut = {"left": windowWidth + 50}
+		prepare = {"left":-screenWidth, "top": topDistance}
+		launchIn = {"x": screenWidth, y: 0}
+		mainOut = {"x": screenWidth, y: 0}
 	else
-		prepare = {"left":2*windowWidth, "top": windowHeight - topDistance}
-		launchIn = {"left": 0}
-		mainOut = {"left": -windowWidth}
+		prepare = {"left":screenWidth, "top": topDistance}
+		launchIn = {"x": -screenWidth, y: 0}
+		mainOut = {"x": -screenWidth, y: 0}
 	$(".launch").attr({"style": ""}).css(prepare)
 	setTimeout(() ->
-		$(".log-details").addClass("animate")
 		$(".launch").transition(launchIn,800)
 		$(".main").transition(mainOut,800)
 		setTimeout(() ->
@@ -59,10 +58,12 @@ $("#add, #question").click () ->
 $("#escape").click () ->
 	$("#overlay, #overlay-content").removeClass("fadein")
 
-$("#logo").click () ->
-		console.log("working")
+$("#logo, #start-here").click () ->
+	if window.loadingDone and miniMap?
 		$("#launch-screen, .background").addClass("hide")
 		$("#container").removeClass("hide")
+		angular.element('html').scope().$broadcast('map-init')
+		window.loadingDone = false
 
 window.incrementBackground = () ->
 	$(".background").toggleClass("active passive")

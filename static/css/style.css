@@ -36,8 +36,9 @@
   left: 50%;
   margin-left: -50px;
 }
-#loading.large {
+#loading.big {
   font-size: 100px;
+  height: 200px;
 }
 #loading.hide-all {
   opacity: 0;
@@ -50,6 +51,10 @@
 }
 #loading.bigLoadCenter {
   bottom: 50%;
+}
+#loading.small {
+  font-size: 30px;
+  height: 15px;
 }
 #minimap {
   height: 25%;
@@ -71,9 +76,6 @@
 }
 #add-map-canvas.show {
   display: block;
-}
-.active {
-  color: #ed4d4a;
 }
 .move-up {
   top: 100px;
@@ -140,13 +142,6 @@
   margin-left: -200px;
   top: 50%;
   margin-top: -60px;
-  opacity: 0.8;
-}
-#launch-screen #logo:hover {
-  opacity: 1;
-  transition: opacity 0.5s ease-in-out;
-  -moz-transition: opacity 0.5s ease-in-out;
-  -webkit-transition: opacity 0.5s ease-in-out;
 }
 #launch-screen hr {
   height: 15px;
@@ -189,9 +184,22 @@
   margin-top: 120px;
   left: 50%;
   margin-left: -90px;
-  font-weight: 500;
+  font-weight: 300;
   text-transform: uppercase;
-  visibility: hidden;
+  opacity: 0;
+  text-align: center;
+  width: 400px;
+  margin-left: -200px;
+}
+#launch-screen h1:hover,
+#launch-screen h3:hover {
+  cursor: pointer;
+}
+#launch-screen h3.fadein {
+  opacity: 0.6;
+}
+#launch-screen h3.fadein:hover {
+  opacity: 1;
 }
 #container {
   font-family: "Roboto", sans-serif;
@@ -318,6 +326,10 @@
   margin-top: 60px;
   color: #aaa;
 }
+#container #overlay #overlay-content #search .active {
+  color: #ed4d4a;
+  cursor: pointer;
+}
 #container #overlay #overlay-content #search input {
   border: none;
   background: transparent;
@@ -375,7 +387,7 @@
 #container .log-details #log-wrapper {
   height: 95%;
   overflow-y: scroll;
-  overflow-x: none;
+  overflow-x: hidden;
   padding-right: 30px;
 }
 #container #blackshade {

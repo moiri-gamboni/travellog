@@ -15,7 +15,7 @@
 	<div data-counter="0" class="background background-0 slow-fade active"></div>
 	<div data-counter="1" class="background background-1 slow-fade passive"></div>
 
-	<ul id="loading" ng-class="applyClass" class="bokeh fade">
+	<ul id="loading" ng-class="applyclass" class="bokeh fade">
 		<li id="child-1"></li>
 		<li id="child-2"></li>
 		<li id="child-3"></li>
@@ -29,8 +29,8 @@
 			<h1>Travellog</h1>
 			<hr>
 		</div>
-		<p> Document and share your adventures. </p>
-		<h3 id="start-here"> Start Here </h3>
+		<p> Stories that travel </p>
+		<h3 id="start-here" ng-class="enterfade" class="fade"> Begin </h3>
 	</div>
 
 	<div id="container" class="hide">
@@ -60,7 +60,6 @@
 
 			</div>
 			<div id="search" ng-show="getShowing() =='loggedIn'">
-				<p>Logged:{{loggedIn}}</p>
 				<button ng-click="upload()" ng-class="{active: canSubmit()}">Submit</button>	
 				<input ng-model="query" placeholder="search">
 				<ul decorations:"none">

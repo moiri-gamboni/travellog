@@ -192,7 +192,7 @@
               return $rootScope.$watch(function() {
                 return factory.data.loadingLogs;
               }, function(loadingLogs) {
-                $rootScope.$broadcast('loading-circles', loadingLogs);
+                console.log(loadingLogs);
                 if (loadingLogs === 0) {
                   return window.loadingDone = true;
                 } else {

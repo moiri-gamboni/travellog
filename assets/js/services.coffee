@@ -157,7 +157,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
             ()->
               return factory.data.loadingLogs
             (loadingLogs)->
-              $rootScope.$broadcast('loading-circles', loadingLogs)
+              console.log loadingLogs
               if loadingLogs == 0
                 window.loadingDone = true
               else

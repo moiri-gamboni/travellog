@@ -4,27 +4,19 @@ ctrl = angular.module("mainModule.controllers", [])
 ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map', ($http, $scope, $rootScope, $timeout, Map) ->
   Map.initMap()
   switchLogs = true
-  $scope.loadingClass = ""
-  $scope.loadingNumber = ""
+  $scope.enterfade = ""
+  $scope.applyclass = ""
 
-  $rootScope.$on('loading-circle', (circleNumber) ->
-    $scope.loadingNumber = circleNumber.toString()
-  )
-
-  $scope.$watch('loadingClass',
-    () ->
-      $scope.getClass()
-  )
-  $scope.$watch('loadingNumber',
-    () ->
-      $scope.getClass()
-  )
+  $scope.$watch( () ->
+    return window.loadingDone
+  , () ->
+    $scope.getClass()
+  ) 
 
   $scope.getClass = () ->
-    $scope.applyClass = $scope.loadingClass + " " + $scope.loadingNumber
-
-  $scope.enter = () ->
-    $scope.loadingClass = "big"
+    console.log window.loadingDone
+    $scope.applyclass = if window.loadingDone then "fadeout" else ""
+    $scope.enterfade = if window.loadingDone then "fadein" else ""
 
   $scope.dropPins = () ->
     dropPin = (log) ->
@@ -42,8 +34,10 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     $timeout(
         () ->
           changeLocation($scope.log.id)
+          $(".main.fade").removeClass("fadeout")
+          window.loadingDone = true
         ,
-        2800
+        200*Object.keys(Map.data.logs).length
       )
 
   $rootScope.$on('animation-done', () ->
@@ -52,10 +46,12 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
   $rootScope.$on('gotFirstLog', () ->
     $scope.log = Map.getCurrentLog()
-    $scope.loadingClass = "small"
+    $scope.getClass()
+    
+  )
+  $rootScope.$on('map-init', () ->
     $scope.dropPins()
   )
-
 
 
   $scope.getLog = () ->

@@ -17,10 +17,12 @@
         "top": -windowHeight
       };
       launchIn = {
-        "y": windowHeight + topDistance + 1
+        "y": windowHeight + topDistance + 1,
+        x: 0
       };
       mainOut = {
-        "y": windowHeight + topDistance + 1
+        "y": screenHeight,
+        x: 0
       };
     } else if (direction === "down") {
       prepare = {
@@ -28,39 +30,44 @@
         "top": screenHeight
       };
       launchIn = {
-        "y": -(screenHeight - topDistance)
+        "y": -(screenHeight - topDistance),
+        x: 0
       };
       mainOut = {
-        "y": -(screenHeight - topDistance)
+        "y": -screenHeight,
+        x: 0
       };
     } else if (direction === "left") {
       prepare = {
-        "left": -windowWidth,
-        "top": windowHeight - topDistance
+        "left": -screenWidth,
+        "top": topDistance
       };
       launchIn = {
-        "left": 0
+        "x": screenWidth,
+        y: 0
       };
       mainOut = {
-        "left": windowWidth + 50
+        "x": screenWidth,
+        y: 0
       };
     } else {
       prepare = {
-        "left": 2 * windowWidth,
-        "top": windowHeight - topDistance
+        "left": screenWidth,
+        "top": topDistance
       };
       launchIn = {
-        "left": 0
+        "x": -screenWidth,
+        y: 0
       };
       mainOut = {
-        "left": -windowWidth
+        "x": -screenWidth,
+        y: 0
       };
     }
     $(".launch").attr({
       "style": ""
     }).css(prepare);
     return setTimeout(function() {
-      $(".log-details").addClass("animate");
       $(".launch").transition(launchIn, 800);
       $(".main").transition(mainOut, 800);
       return setTimeout(function() {
@@ -112,10 +119,13 @@
     return $("#overlay, #overlay-content").removeClass("fadein");
   });
 
-  $("#logo").click(function() {
-    console.log("working");
-    $("#launch-screen, .background").addClass("hide");
-    return $("#container").removeClass("hide");
+  $("#logo, #start-here").click(function() {
+    if (window.loadingDone && (typeof miniMap !== "undefined" && miniMap !== null)) {
+      $("#launch-screen, .background").addClass("hide");
+      $("#container").removeClass("hide");
+      angular.element('html').scope().$broadcast('map-init');
+      return window.loadingDone = false;
+    }
   });
 
   window.incrementBackground = function() {

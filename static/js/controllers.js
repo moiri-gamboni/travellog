@@ -10,22 +10,17 @@
       var switchLogs;
       Map.initMap();
       switchLogs = true;
-      $scope.loadingClass = "";
-      $scope.loadingNumber = "";
-      $rootScope.$on('loading-circle', function(circleNumber) {
-        return $scope.loadingNumber = circleNumber.toString();
-      });
-      $scope.$watch('loadingClass', function() {
-        return $scope.getClass();
-      });
-      $scope.$watch('loadingNumber', function() {
+      $scope.enterfade = "";
+      $scope.applyclass = "";
+      $scope.$watch(function() {
+        return window.loadingDone;
+      }, function() {
         return $scope.getClass();
       });
       $scope.getClass = function() {
-        return $scope.applyClass = $scope.loadingClass + " " + $scope.loadingNumber;
-      };
-      $scope.enter = function() {
-        return $scope.loadingClass = "big";
+        console.log(window.loadingDone);
+        $scope.applyclass = window.loadingDone ? "fadeout" : "";
+        return $scope.enterfade = window.loadingDone ? "fadein" : "";
       };
       $scope.dropPins = function() {
         var dropPin, i, log, logId, _ref;
@@ -42,15 +37,19 @@
           i++;
         }
         return $timeout(function() {
-          return changeLocation($scope.log.id);
-        }, 2800);
+          changeLocation($scope.log.id);
+          $(".main.fade").removeClass("fadeout");
+          return window.loadingDone = true;
+        }, 200 * Object.keys(Map.data.logs).length);
       };
       $rootScope.$on('animation-done', function() {
         return switchLogs = !switchLogs;
       });
       $rootScope.$on('gotFirstLog', function() {
         $scope.log = Map.getCurrentLog();
-        $scope.loadingClass = "small";
+        return $scope.getClass();
+      });
+      $rootScope.$on('map-init', function() {
         return $scope.dropPins();
       });
       $scope.getLog = function() {
