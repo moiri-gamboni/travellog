@@ -36,11 +36,23 @@
   left: 50%;
   margin-left: -50px;
 }
+#loading.large {
+  font-size: 100px;
+}
+#loading.hide-all {
+  opacity: 0;
+}
+#loading.hide-1 li:nth-child(1),
+#loading.hide-2 li:nth-child(2),
+#loading.hide-3 li:nth-child(3),
+#loading.hide-4 li:nth-child(4) {
+  visibility: hidden;
+}
 #loading.bigLoadCenter {
   bottom: 50%;
 }
 #minimap {
-  height: 20%;
+  height: 25%;
   width: calc(100% - 60px);
   position: absolute;
   z-index: 1;
@@ -53,7 +65,7 @@
 #add-map-canvas {
   height: 40%;
   width: 100%;
-  bottom: -10%;
+  bottom: -50px;
   position: absolute;
   display: none;
 }
@@ -61,16 +73,22 @@
   display: block;
 }
 .active {
-  background: #f00;
+  color: #ed4d4a;
 }
 .move-up {
   top: 100px;
 }
 .fade {
   opacity: 1;
-  transition: opacity 0.25s ease-in-out;
-  -moz-transition: opacity 0.25s ease-in-out;
-  -webkit-transition: opacity 0.25s ease-in-out;
+  transition: opacity 0.5s ease-in-out;
+  -moz-transition: opacity 0.5s ease-in-out;
+  -webkit-transition: opacity 0.5s ease-in-out;
+}
+.slow-fade {
+  opacity: 1;
+  transition: opacity 1.5s ease-in-out;
+  -moz-transition: opacity 1.5s ease-in-out;
+  -webkit-transition: opacity 1.5s ease-in-out;
 }
 .fadeout {
   opacity: 0;
@@ -78,21 +96,62 @@
 .fadein {
   opacity: 1;
 }
+.background {
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.background.background-0 {
+  background: url("/static/img/1280calmlake.jpg");
+  background-size: cover;
+}
+.background.background-1 {
+  background: url("/static/img/1280eveningsky.jpg");
+}
+.background.background-2 {
+  background: url("/static/img/1280roughwaves.jpg");
+}
+.background.background-3 {
+  background: url("/static/img/1280snowymountain.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.background.passive {
+  opacity: 0;
+}
 #launch-screen {
   height: 100%;
   width: 100%;
   top: 0;
   left: 0;
   position: absolute;
-  background: url("/static/img/boat.jpg");
-  background-size: cover;
-  background-position: center;
   font-family: "Roboto", sans-serif;
+}
+#launch-screen #logo {
+  width: 400px;
+  height: 120px;
+  position: absolute;
+  left: 50%;
+  margin-left: -200px;
+  top: 50%;
+  margin-top: -60px;
+  opacity: 0.8;
+}
+#launch-screen #logo:hover {
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+  -moz-transition: opacity 0.5s ease-in-out;
+  -webkit-transition: opacity 0.5s ease-in-out;
 }
 #launch-screen hr {
   height: 15px;
   width: 170px;
-  background: #000;
+  background: #292929;
   border: transparent;
   top: 48%;
   left: 50%;
@@ -103,17 +162,18 @@
   margin-top: -125px;
 }
 #launch-screen h1 {
-  font-size: 4em;
+  font-size: 3em;
   position: absolute;
   top: 50%;
-  margin-top: -108px;
+  margin-top: -80px;
   left: 50%;
-  margin-left: -170px;
+  margin-left: -130px;
   font-weight: 100;
   text-transform: uppercase;
+  color: #292929;
 }
 #launch-screen p {
-  font-size: 2em;
+  font-size: 1.5em;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -193,6 +253,13 @@
   opacity: 1;
   pointer-events: auto;
 }
+#container #overlay #escape {
+  position: absolute;
+  top: 0;
+  right: 40px;
+  font-size: 2em;
+  cursor: pointer;
+}
 #container #overlay #blackblur {
   height: 100%;
   width: 100%;
@@ -201,11 +268,7 @@
   opacity: 0.9;
 }
 #container #overlay h2 {
-  text-transform: uppercase;
-  font-size: 2.2em;
-  position: absolute;
-  top: 0;
-  right: 50px;
+  font-size: 1em;
 }
 #container #overlay #overlay-content {
   position: absolute;
@@ -214,7 +277,6 @@
   height: calc(100% - 130px);
   margin-left: 50px;
   margin-top: 50px;
-  padding-top: 100px;
   opacity: 0;
   pointer-events: none;
   z-index: 1;
@@ -223,12 +285,58 @@
   opacity: 1;
   pointer-events: auto;
 }
-#container #overlay #overlay-content h1 {
+#container #overlay #overlay-content .message {
+  font-size: 1.5em;
+  position: absolute;
+  top: 40%;
+  left: 50%;
   text-align: center;
+  width: 290px;
+  margin-left: -145px;
+}
+#container #overlay #overlay-content button {
+  background: transparent;
+  border: transparent;
+  outline: transparent;
+  color: #aaa;
+  font-size: 1.5em;
+  padding: 0px;
+  position: absolute;
+  top: 60%;
+  right: 10px;
+}
+#container #overlay #overlay-content span {
+  font-size: 1.3em;
 }
 #container #overlay #overlay-content p {
-  line-height: 1.5em;
-  overflow-y: scroll;
+  font-size: 1em;
+  color: #aaa;
+  position: absolute;
+  top: -30px;
+}
+#container #overlay #overlay-content #search {
+  margin-top: 60px;
+  color: #aaa;
+}
+#container #overlay #overlay-content #search input {
+  border: none;
+  background: transparent;
+  font-size: 1.5em;
+  border-bottom: 1px solid #aaa;
+  outline: none;
+  margin-top: 10px;
+  padding-left: 10px;
+  color: #aaa;
+}
+#container #overlay #overlay-content #search ul {
+  padding-left: 0px;
+  overflow: scroll;
+  height: 120px;
+  width: 300px;
+}
+#container #overlay #overlay-content #search ul li {
+  list-style: none;
+  line-height: 2em;
 }
 #container .log-details {
   width: calc(100% - 100px);
@@ -238,7 +346,7 @@
   z-index: 10;
   position: absolute;
   margin-left: 50px;
-  padding: 30px 50px 30px 90px;
+  padding: 0px;
 }
 #container .log-details.launch {
   left: -200%;
@@ -265,7 +373,7 @@
   height: auto;
 }
 #container .log-details #log-wrapper {
-  height: 80%;
+  height: 95%;
   overflow-y: scroll;
   overflow-x: none;
   padding-right: 30px;
@@ -287,6 +395,14 @@
 #container #nav img {
   height: 30px;
   margin-right: 10px;
+  opacity: 0.5;
+}
+#container #nav img:hover {
+  opacity: 1;
+  transition: opacity 0.25s ease-in-out;
+  -moz-transition: opacity 0.25s ease-in-out;
+  -webkit-transition: opacity 0.25s ease-in-out;
+  cursor: pointer;
 }
 #container #country {
   text-transform: uppercase;
@@ -303,9 +419,8 @@
   transition: all 0.2s ease-in-out;
 }
 #container .sidenav {
-  background: rgba(225,225,225,0.8);
+  background: rgba(255,255,255,0.4);
   z-index: 2;
-  opacity: 0.4;
   position: absolute;
   -webkit-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
@@ -313,7 +428,7 @@
   transition: all 0.2s ease-in-out;
 }
 #container .sidenav:hover {
-  opacity: 1;
+  background: rgba(255,255,255,0.9);
   cursor: pointer;
 }
 #container .sidenav-top {
@@ -389,25 +504,37 @@
     margin-top: 130px;
   }
   #container .log-details {
-    padding: 30px;
+    padding: 0px;
   }
   #container .log-details .log-title {
     font-size: 1.7em;
   }
 }
-@media (min-height:480px) {
+@media (min-width:480px) {
+  #container .log-details .log-content {
+    margin-top: -5px;
+  }
+  #launch-screen h1 {
+    font-size: 4em;
+    margin-top: -100px;
+    left: 50%;
+    margin-left: -175px;
+  }
+}
+@media (min-width:760px) {
+  #launch-screen h1 {
+    font-size: 2em;
+  }
+  #minimap {
+    width: calc(100% - 100px);
+    top: 50px;
+    left: 50px;
+  }
   #container .log-details {
     padding: 30px 30px 30px 50px;
   }
   #container .log-details .log-content {
     margin-top: 20px;
-  }
-}
-@media (min-width:760px) {
-  #minimap {
-    width: calc(100% - 100px);
-    top: 50px;
-    left: 50px;
   }
   #container .log-details .log-content img {
     padding: 0px 100px;
@@ -416,9 +543,14 @@
     font-size: 2.2em;
   }
   #container #overlay-content p {
-    width: 600px;
     margin-left: auto;
     margin-right: auto;
+  }
+  #container #overlay-content #search ul {
+    height: 200px;
+  }
+  #container #overlay-content #search button {
+    font-size: 2em;
   }
   #container #country {
     font-size: 2em;
@@ -467,5 +599,19 @@
     border-right: 20px solid #fff;
     left: 0;
     margin-left: 15px;
+  }
+}
+@media (min-height:1000px) {
+  .background.background-0 {
+    background: url("/static/img/2000calmlake.jpg");
+  }
+  .background.background-1 {
+    background: url("/static/img/2000eveningsky.jpg");
+  }
+  .background.background-2 {
+    background: url("/static/img/2000roughwaves.jpg");
+  }
+  .background.background-3 {
+    background: url("/static/img/2000snowymountain.jpg");
   }
 }

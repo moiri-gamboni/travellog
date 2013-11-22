@@ -8,7 +8,7 @@
 *::-webkit-scrollbar 
 	width: 3px
 *::-webkit-scrollbar-track
- 	background-color: transparent
+	background-color: transparent
 *::-webkit-scrollbar-track-piece 
 	background-color: transparent
 *::-webkit-scrollbar-thumb 
@@ -26,55 +26,101 @@
 	bottom: 50px
 	left: 50%
 	margin-left: -50px
+	&.large
+		font-size:100px
+	&.hide-all
+		opacity:0
+	&.hide-1 li:nth-child(1), &.hide-2 li:nth-child(2), &.hide-3 li:nth-child(3), &.hide-4 li:nth-child(4)
+		visibility: hidden
 	&.bigLoadCenter
 		bottom: 50%
 	
+
 #minimap
-  height: 20%
-  width: calc(100% - 60px)
-  position: absolute
-  z-index: 1
-  top: 30px
-  left: 30px
-  #map-canvas
-    height: 100%
+	height: 25%
+	width: calc(100% - 60px)
+	position: absolute
+	z-index: 1
+	top: 30px
+	left: 30px
+	#map-canvas
+		height: 100%
 #add-map-canvas
-  height: 40%
-  width: 100%
-  bottom: -10%
-  position: absolute
-  display: none
-  &.show
-  	display: block
+	height: 40%
+	width: 100%
+	bottom: -50px
+	position: absolute
+	display: none
+	&.show
+		display: block
 
 .active
-  background: red
+  color:#ed4d4a
 
 .move-up
 	top: 100px
 .fade
 	opacity: 1;
-	transition: opacity .25s ease-in-out;
-	-moz-transition: opacity .25s ease-in-out;
-	-webkit-transition: opacity .25s ease-in-out;
+	transition: opacity .5s ease-in-out;
+	-moz-transition: opacity .5s ease-in-out;
+	-webkit-transition: opacity .5s ease-in-out;
+.slow-fade
+	opacity: 1;
+	transition: opacity 1.5s ease-in-out;
+	-moz-transition: opacity 1.5s ease-in-out;
+	-webkit-transition: opacity 1.5s ease-in-out;
 .fadeout
 	opacity:0
 .fadein
 	opacity:1
+.background
+	height:100%
+	width:100%
+	top:0
+	left:0
+	position:absolute
+	background-size:cover
+	background-position:center
+	background-repeat:no-repeat
+	&.background-0
+		background: url('/static/img/1280calmlake.jpg')
+		background-size:cover	
+	&.background-1
+		background: url('/static/img/1280eveningsky.jpg')
+	&.background-2
+		background: url('/static/img/1280roughwaves.jpg')
+	&.background-3
+		background: url('/static/img/1280snowymountain.jpg')
+		background-repeat:no-repeat
+		background-size:cover	
+	&.passive
+		opacity:0
+
 #launch-screen
 	height:100%
 	width:100%
 	top:0
 	left:0
-	position:absolute	
-	background: url('/static/img/boat.jpg')
-	background-size:cover
-	background-position:center
+	position:absolute
 	font-family: "Roboto", sans-serif
+	#logo
+		width: 400px
+		height: 120px
+		position: absolute
+		left: 50%
+		margin-left: -200px
+		top: 50%
+		margin-top: -60px
+		opacity:0.8
+		&:hover
+			opacity:1
+			transition: opacity 0.5s ease-in-out;
+			-moz-transition: opacity 0.5s ease-in-out;
+			-webkit-transition: opacity 0.5s ease-in-out;
 	hr
 		height: 15px
 		width: 170px
-		background: #000
+		background: #292929
 		border: transparent
 		top: 48%
 		left: 50%
@@ -83,16 +129,17 @@
 		&.top-bar
 			margin-top: -125px
 	h1
-		font-size: 4em
+		font-size: 3em
 		position: absolute
 		top: 50%
-		margin-top: -108px
+		margin-top: -80px
 		left: 50%
-		margin-left: -170px
+		margin-left: -130px
 		font-weight: 100
 		text-transform:uppercase
+		color:#292929
 	p
-		font-size: 2em
+		font-size: 1.5em
 		position: absolute
 		top: 50%
 		left: 50%
@@ -163,6 +210,13 @@
 		transition:.5s ease-in-out
 		-moz-transition: .5s ease-in-out
 		-webkit-transition: .5s ease-in-out
+		
+		#escape
+			position: absolute
+			top: 0
+			right: 40px
+			font-size: 2em
+			cursor: pointer
 		#blackblur
 			height:100%
 			width:100%
@@ -170,11 +224,7 @@
 			z-index: 1
 			opacity:0.9
 		h2
-			text-transform: uppercase
-			font-size: 2.2em
-			position: absolute
-			top: 0
-			right: 50px
+			font-size: 1em
 		#overlay-content
 			position: absolute
 			top: 0
@@ -182,18 +232,62 @@
 			height: calc(100% - 130px)
 			margin-left: 50px
 			margin-top: 50px
-			padding-top: 100px
 			opacity:0
 			&.fadein
 				opacity: 1
 				pointer-events:auto
 			pointer-events:none
 			z-index:1	
-			h1
-				text-align:center
+			.message
+				font-size: 1.5em;
+				position: absolute;
+				top: 40%;
+				left: 50%;
+				text-align: center;
+				width: 290px;
+				margin-left: -145px;
+			button
+				background:transparent
+				border:transparent
+				outline:transparent
+				color:#aaa
+				font-size:1.5em
+				padding:0px
+				position:absolute
+				top:60%
+				right:10px
+			span
+				font-size:1.3em
 			p
-				line-height:1.5em
-				overflow-y:scroll
+				font-size: 1em
+				color: #aaa
+				position: absolute
+				top: -30px
+			#search
+				margin-top:60px
+				color:#aaa
+				input
+					border:none
+					background:transparent
+					font-size:1.5em
+					border-bottom:1px solid #aaa
+					outline:none
+					margin-top: 10px
+					padding-left: 10px
+					color:#aaa
+				ul
+					padding-left: 0px
+					overflow: scroll
+					height: 120px
+					width: 300px
+
+					li
+						list-style:none
+						line-height:2em
+
+
+
+
 	.log-details
 		width: calc(100% - 100px)
 		height: calc(80% - 180px)
@@ -202,7 +296,7 @@
 		z-index: 10
 		position: absolute
 		margin-left: 50px
-		padding: 30px 50px 30px 90px
+		padding: 0px
 		&.launch
 			left:-200%	
 		.log-title
@@ -223,7 +317,7 @@
 				width: 100%
 				height: auto
 		#log-wrapper
-			height: 80%
+			height: 95%
 			overflow-y: scroll
 			overflow-x: none
 			padding-right: 30px
@@ -239,9 +333,18 @@
 		position:absolute
 		bottom: 0
 		right: 0
+
 		img
 			height:30px
 			margin-right:10px
+			opacity:0.5
+			&:hover
+				opacity:1
+				transition: opacity .25s ease-in-out
+				-moz-transition: opacity .25s ease-in-out
+				-webkit-transition: opacity .25s ease-in-out
+				cursor:pointer
+
 	#country
 		text-transform: uppercase
 		font-size: 1.5em
@@ -256,16 +359,15 @@
 		-o-transition:all 0.2s ease-in-out;
 		transition:all 0.2s ease-in-out;
 	.sidenav
-		background:rgba(225,225,225,0.8)
+		background:rgba(255,255,255,0.4)
 		z-index: 2
-		opacity: 0.4
 		position:absolute
 		-webkit-transition:all 0.2s ease-in-out
 		-moz-transition:all 0.2s ease-in-out
 		-o-transition:all 0.2s ease-in-out
 		transition:all 0.2s ease-in-out
 		&:hover
-			opacity: 1
+			background:rgba(255,255,255,0.9)
 			cursor:pointer
 	.sidenav-top
 		width:100%
@@ -331,34 +433,50 @@
 			margin-top: 130px
 	#container
 		.log-details
-			padding: 30px
+			padding: 0px
 			.log-title
 				font-size: 1.7em
-@media (min-height:480px)
+
+@media (min-width:480px)
 	#container 
 		.log-details
-			padding: 30px 30px 30px 50px
 			.log-content
-				margin-top: 20px
-		
+				margin-top: -5px
+	#launch-screen
+		h1
+			font-size: 4em
+			margin-top: -100px
+			left: 50%
+			margin-left: -175px
+
 
 @media (min-width:760px)
+	#launch-screen
+		h1
+			font-size:2em
 	#minimap
 		width: calc(100% - 100px)
 		top: 50px
 		left: 50px
 	#container
 		.log-details
+			padding: 30px 30px 30px 50px
 			.log-content
+				margin-top:20px
 				img
 					padding: 0px 100px
 			.log-title
 				font-size:2.2em
 		#overlay-content
 			p
-				width:600px
 				margin-left:auto
 				margin-right:auto
+			#search	
+				ul
+					height: 200px
+				button
+					font-size:2em
+
 		#country
 			font-size: 2em
 			margin-top: 60px
@@ -397,3 +515,15 @@
 				border-right:20px solid #fff
 				left:0
 				margin-left: 15px
+
+@media (min-height:1000px)
+	.background
+		&.background-0
+			background: url('/static/img/2000calmlake.jpg')
+		&.background-1
+			background: url('/static/img/2000eveningsky.jpg')
+		&.background-2
+			background: url('/static/img/2000roughwaves.jpg')
+		&.background-3
+			background: url('/static/img/2000snowymountain.jpg')
+	
