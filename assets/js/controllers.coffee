@@ -28,6 +28,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
           console.log 'pins are dropped'
           if flow.isFirstLogReady
             $(".main.fade").removeClass("fadeout")
+            $(".main.fade").addClass("fadein")
             switchLoading("small corner")
             showLog()
         ,
@@ -53,6 +54,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     flow.isFirstLogReady = true
     if flow.arePinsDropped
       $(".main.fade").removeClass("fadeout")
+      $(".main.fade").addClass("fadein")
       switchLoading("small corner")
       showLog()
   )
@@ -62,15 +64,14 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     $("#loading").addClass("fadeout")
     $("#start-here").addClass("fadein")
     flow.canBegin = true
-    $rootScope.$on('unlock-animation-done', () ->
-      console.log 'unlock-animation-done'
-      switchLoading("big center")
-    )
 
   $scope.begin = () ->
     if flow.canBegin
       $("#launch-screen, .background").addClass("hide")
       $("#container").removeClass("hide")
+      $("#loading").removeClass("fadeout")
+      $("#loading").addClass("fadein")
+      switchLoading("big center")
       flow.hasBegun = true
       $timeout(()->
         dropPins()
@@ -78,8 +79,9 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
   switchLoading = (classString) ->
     console.log 'switchLoading'+ " " + classString
-    $("#loading").removeClass("small big center corner")
-    $("#loading").addClass(classString)
+    loading = $("#loading")
+    loading.removeClass("small big center corner")
+    loading.addClass(classString)
 
 
   $rootScope.$on('sliding-animation-done', () ->

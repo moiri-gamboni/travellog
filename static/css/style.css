@@ -54,8 +54,8 @@
   bottom: 20%;
 }
 #loading.corner {
-  bottom: 70px;
-  left: 120px;
+  bottom: 50px;
+  left: 100px;
 }
 #loading.small {
   font-size: 30px;

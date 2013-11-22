@@ -37,6 +37,7 @@
           console.log('pins are dropped');
           if (flow.isFirstLogReady) {
             $(".main.fade").removeClass("fadeout");
+            $(".main.fade").addClass("fadein");
             switchLoading("small corner");
             return showLog();
           }
@@ -61,6 +62,7 @@
         flow.isFirstLogReady = true;
         if (flow.arePinsDropped) {
           $(".main.fade").removeClass("fadeout");
+          $(".main.fade").addClass("fadein");
           switchLoading("small corner");
           return showLog();
         }
@@ -69,16 +71,15 @@
         console.log('unlock begin');
         $("#loading").addClass("fadeout");
         $("#start-here").addClass("fadein");
-        flow.canBegin = true;
-        return $rootScope.$on('unlock-animation-done', function() {
-          console.log('unlock-animation-done');
-          return switchLoading("big center");
-        });
+        return flow.canBegin = true;
       };
       $scope.begin = function() {
         if (flow.canBegin) {
           $("#launch-screen, .background").addClass("hide");
           $("#container").removeClass("hide");
+          $("#loading").removeClass("fadeout");
+          $("#loading").addClass("fadein");
+          switchLoading("big center");
           flow.hasBegun = true;
           return $timeout(function() {
             return dropPins();
@@ -86,9 +87,11 @@
         }
       };
       switchLoading = function(classString) {
+        var loading;
         console.log('switchLoading' + " " + classString);
-        $("#loading").removeClass("small big center corner");
-        return $("#loading").addClass(classString);
+        loading = $("#loading");
+        loading.removeClass("small big center corner");
+        return loading.addClass(classString);
       };
       $rootScope.$on('sliding-animation-done', function() {
         return switchLogs = !switchLogs;

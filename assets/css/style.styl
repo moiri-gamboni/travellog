@@ -1,18 +1,18 @@
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
-*, 
+*,
 *:after,
 *::before
 	box-sizing:border-box
-*::-webkit-scrollbar 
+*::-webkit-scrollbar
 	width: 3px
 *::-webkit-scrollbar-track
 	background-color: transparent
-*::-webkit-scrollbar-track-piece 
+*::-webkit-scrollbar-track-piece
 	background-color: transparent
-*::-webkit-scrollbar-thumb 
-	height: 15px 
+*::-webkit-scrollbar-thumb
+	height: 15px
 	background-color: #999
 	border-radius: 15px
 *::-webkit-scrollbar-corner
@@ -37,8 +37,8 @@
 	&.center
 		bottom: 20%
 	&.corner
-		bottom: 70px
-		left: 120px
+		bottom: 50px
+		left: 100px
 	&.small
 		font-size: 30px
 		height: 15px
@@ -90,7 +90,7 @@
 	background-repeat:no-repeat
 	&.background-0
 		background: url('/static/img/1280calmlake.jpg')
-		background-size:cover	
+		background-size:cover
 	&.background-1
 		background: url('/static/img/1280eveningsky.jpg')
 	&.background-2
@@ -98,7 +98,7 @@
 	&.background-3
 		background: url('/static/img/1280snowymountain.jpg')
 		background-repeat:no-repeat
-		background-size:cover	
+		background-size:cover
 	&.passive
 		opacity:0
 
@@ -219,7 +219,7 @@
 		transition:.5s ease-in-out
 		-moz-transition: .5s ease-in-out
 		-webkit-transition: .5s ease-in-out
-		
+
 		#escape
 			position: absolute
 			top: 0
@@ -251,7 +251,7 @@
 				opacity: 1
 				pointer-events:auto
 			pointer-events:none
-			z-index:1	
+			z-index:1
 			.message
 				font-size: 1.5em;
 				position: absolute;
@@ -340,7 +340,7 @@
 		margin-left: 50px
 		padding: 0px
 		&.launch
-			left:-200%	
+			left:-200%
 		.log-title
 			text-transform: uppercase
 			font-size: 1.8em
@@ -446,7 +446,7 @@
 			border-bottom: 15px solid transparent
 			top:50%
 			margin-top:-10px
-		&.arrow-up		
+		&.arrow-up
 			border-bottom: 15px solid #fff
 			margin-top: 5px
 		&.arrow-down
@@ -457,7 +457,7 @@
 			border-left: 15px solid #fff
 			right:0
 			margin-right: 5px
-		&.arrow-left 
+		&.arrow-left
 			border-right:15px solid #fff
 			left:0
 			margin-left: 5px
@@ -480,7 +480,7 @@
 				font-size: 1.7em
 
 @media (min-width:480px)
-	#container 
+	#container
 		.log-details
 			.log-content
 				margin-top: -5px
@@ -505,7 +505,7 @@
 			p
 				margin-left:auto
 				margin-right:auto
-			#search	
+			#search
 				ul
 					height: 200px
 				button
@@ -533,7 +533,7 @@
 				border-bottom: 20px solid transparent
 				top:50%
 				margin-top:-10px
-			&.arrow-up		
+			&.arrow-up
 				border-bottom: 20px solid #fff
 				top: 0
 				margin-top: 15px
@@ -545,7 +545,7 @@
 				border-left: 20px solid #fff
 				right:0
 				margin-right: 15px
-			&.arrow-left 
+			&.arrow-left
 				border-right:20px solid #fff
 				left:0
 				margin-left: 15px
