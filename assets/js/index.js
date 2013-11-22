@@ -89,13 +89,15 @@ window.changeCountry = function(newCountry) {
   }, 500);
 };
 
-$("#add").click(function() {
+$("#add, #question").click(function() {
   startAddMap();
   return $("#overlay, #overlay-content").addClass("fadein");
+  $("#loading").addClass("big center")
 });
 
 $("#escape").click(function() {
   return $("#overlay, #overlay-content").removeClass("fadein");
+  $("#loading").removeClass("big center")
 });
 
 $("#launch-screen h1, h3").click(function() {

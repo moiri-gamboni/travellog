@@ -19,7 +19,7 @@ for ids in ["1bMUS1TNaLZtJ8khEpa1RdutsLTJoCh6p5aGUlwwzLRM",
   data["gdriveId"] = ids
   data["lat"] = randLat()
   data["lng"] = randLng()
-  r = requests.post("http://localhost:8080/logs", data=json.dumps(data))
+  r = requests.post("http://gcdc2013-travellog.appspot.com/logs", data=json.dumps(data))
   print r.text
 
 
@@ -30,7 +30,7 @@ for ids in ["1nLlul_8Oh2RmwvkPEIS1_flDkIAhk9pT_SQqKlLNh_8",
   data["gdriveId"] = ids
   data["lat"] = randLat()
   data["lng"] = randLng()
-  r = requests.post("http://localhost:8080/logs", data=json.dumps(data))
+  r = requests.post("http://gcdc2013-travellog.appspot.com/logs", data=json.dumps(data))
   print r.text
        
 data["country"] = "UAE"
@@ -38,7 +38,7 @@ for ids in ["1XPUPhLyL3akl7tQ0ODHFxo2kUmd4U05Q9ROvGY3qmow"]:
   data["gdriveId"] = ids
   data["lat"] = randLat()
   data["lng"] = randLng()
-  r = requests.post("http://localhost:8080/logs", data=json.dumps(data))
+  r = requests.post("http://gcdc2013-travellog.appspot.com/logs", data=json.dumps(data))
   print r.text
 
 data["country"] = "Oman"
@@ -51,7 +51,7 @@ for ids in ["1_1vivrYBkxBf2DAVI5dkI3A-uCnDNZFHWq3_cQTxyOs",
   data["gdriveId"] = ids
   data["lat"] = randLat()
   data["lng"] = randLng()
-  r = requests.post("http://localhost:8080/logs", data=json.dumps(data))
+  r = requests.post("http://gcdc2013-travellog.appspot.com/logs", data=json.dumps(data))
   print r.text
 
 data["country"] = "New Zealand"
@@ -61,6 +61,6 @@ for ids in ["1mSUcNM7gInwrN1IwvLSJyOb3WQuRHrSTV6nLj34GUkI",
   data["gdriveId"] = ids
   data["lat"] = randLat()
   data["lng"] = randLng()
-  r = requests.post("http://localhost:8080/logs", data=json.dumps(data))
+  r = requests.post("http://gcdc2013-travellog.appspot.com/logs", data=json.dumps(data))
   print r.text
 

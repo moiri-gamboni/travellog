@@ -63,6 +63,7 @@ function initialize() {
   };
   miniMap = new google.maps.Map(document.getElementById("map-canvas"),
     mapOptions);
+  angular.element("html").scope().$broadcast('map-ready');
 }
 
 addMapMarker = null;
@@ -192,6 +193,7 @@ function changeLocation(markerId) {
 // bind the state changes to change locations
 window.onpopstate = function() {
   changeLocation(history.state);
+  angular.element("html").scope().$broadcast('history-change', history.state);
 };
 
 function switchMiniMarker() {

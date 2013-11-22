@@ -53,9 +53,12 @@ window.changeCountry = (newCountry) ->
 	, 500)
 
 $("#add, #question").click () ->
-	$("#overlay, #overlay-content").addClass("fadein")
+	if loadingDone
+		$("#loading").addClass("big center")
+		$("#overlay, #overlay-content").addClass("fadein")
 
 $("#escape").click () ->
+	$("#loading").removeClass("big center")
 	$("#overlay, #overlay-content").removeClass("fadein")
 
 $("#logo, #start-here").click () ->

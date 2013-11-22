@@ -192,7 +192,6 @@
               return $rootScope.$watch(function() {
                 return factory.data.loadingLogs;
               }, function(loadingLogs) {
-                console.log(loadingLogs);
                 if (loadingLogs === 0) {
                   return window.loadingDone = true;
                 } else {

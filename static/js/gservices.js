@@ -18,10 +18,10 @@ function handleAuthResult(authResult) {
   var authorizeButton = $("#authorize-button");
   if (authResult && !authResult.error) {
     getUserInfo();
-  } else {
-    authorizeButton.on("click", handleAuthClick);
   }
 }
+
+$("#authorize-button").on("click", handleAuthClick);
 
 function handleAuthClick(event) {
   // Step 3: get authorization to use private data
@@ -101,17 +101,18 @@ function addToTravellog(fileId, callback) {
   var body = {
     "value": "stories@travellog.io",
     "type": "user",
-    "role": "owner"
+    "role": "reader"
   };
   var request = gapi.client.drive.permissions.insert({
     "fileId": fileId,
     "resource": body
   });
-  request.execute(callback);
-
+  if (callback && typeof(callback) === "function") {
+    request.execute(callback);
+  }
 }
 
-function makePublic(fileId) {
+function makePublic(fileId, callback) {
   var body = {
     "value": "",
     "type": "anyone",
@@ -121,6 +122,8 @@ function makePublic(fileId) {
     "fileId": fileId,
     "resource": body
   });
-  request.execute(callback);
+  if (callback && typeof(callback) === "function") {
+    request.execute(callback);
+  }
 
 }

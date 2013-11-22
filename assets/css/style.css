@@ -317,14 +317,8 @@
 #container #overlay #overlay-content .message .small {
   font-size: 0.9em;
 }
-#container #overlay #overlay-content .message .link {
-  font-size: 0.5em;
-}
 #container #overlay #overlay-content .message.push-down {
   top: 25%;
-}
-#container #overlay #overlay-content #complete button {
-  top: 150%;
 }
 #container #overlay #overlay-content button {
   background: transparent;
@@ -358,9 +352,6 @@
   margin-left: 0;
   text-align: left;
   left: 0;
-}
-#container #overlay #overlay-content #search button {
-  top: 70%;
 }
 #container #overlay #overlay-content #search .active {
   color: #ed4d4a;
@@ -570,8 +561,17 @@
   #container .log-details .log-content {
     margin-top: -5px;
   }
+  #launch-screen h1 {
+    font-size: 4em;
+    margin-top: -100px;
+    left: 50%;
+    margin-left: -175px;
+  }
 }
 @media (min-width:760px) {
+  #launch-screen h1 {
+    font-size: 2em;
+  }
   #minimap {
     width: calc(100% - 100px);
     top: 50px;

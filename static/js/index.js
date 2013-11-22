@@ -112,10 +112,14 @@
   };
 
   $("#add, #question").click(function() {
-    return $("#overlay, #overlay-content").addClass("fadein");
+    if (loadingDone) {
+      $("#loading").addClass("big center");
+      return $("#overlay, #overlay-content").addClass("fadein");
+    }
   });
 
   $("#escape").click(function() {
+    $("#loading").removeClass("big center");
     return $("#overlay, #overlay-content").removeClass("fadein");
   });
 

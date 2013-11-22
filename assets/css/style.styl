@@ -26,6 +26,7 @@
 	bottom: 50px
 	left: 50%
 	margin-left: -50px
+	pointer-events: none
 	&.big
 		font-size:100px
 		height: 200px
@@ -33,12 +34,14 @@
 		opacity:0
 	&.hide-1 li:nth-child(1), &.hide-2 li:nth-child(2), &.hide-3 li:nth-child(3), &.hide-4 li:nth-child(4)
 		visibility: hidden
-	&.bigLoadCenter
-		bottom: 50%
+	&.center
+		bottom: 20%
+	&.corner
+		bottom: 70px
+		left: 120px
 	&.small
 		font-size: 30px
 		height: 15px
-	
 
 #minimap
 	height: 25%
@@ -147,16 +150,15 @@
 	h3
 		position: absolute
 		font-size: 2em
-		top: 50%
-		margin-top: 120px
-		left: 50%
-		margin-left: -90px
+		bottom: 50px
+		margin-top: 100px
+		left: calc(50% - 200px)
 		font-weight: 300
 		text-transform: uppercase
 		opacity: 0
 		text-align: center;
-		width: 400px;
-		margin-left: -200px;
+		width: 400px
+		height: 80px
 	h1:hover, h3:hover
 		cursor: pointer
 	h3
@@ -187,7 +189,7 @@
 		position:absolute
 		height:100%
 		width:100%
-		top:0
+		bottom: 50px
 		left:0
 		visibility:hidden
 		span
@@ -221,6 +223,11 @@
 		#escape
 			position: absolute
 			top: 0
+			width: 50px
+			height: 50px
+			opacity: 0.8
+			&:hover
+				opacity: 1
 			right: 40px
 			font-size: 2em
 			cursor: pointer
@@ -248,21 +255,35 @@
 			.message
 				font-size: 1.5em;
 				position: absolute;
-				top: 40%;
 				left: 50%;
 				text-align: center;
 				width: 290px;
 				margin-left: -145px;
+				.white
+					color: white
+				.small
+					font-size: 0.9em
+				.link
+					font-size: 0.5em
+				&.push-down
+					top: 25%;
+			#complete
+				button
+					top: 150%
 			button
 				background:transparent
 				border:transparent
 				outline:transparent
-				color:#aaa
+				color:#fff
 				font-size:1.5em
 				padding:0px
 				position:absolute
 				top:60%
 				right:10px
+				opacity: 0.7
+				&:hover
+					cursor: pointer
+					opacity: 1
 			span
 				font-size:1.3em
 			p
@@ -271,8 +292,14 @@
 				position: absolute
 				top: -30px
 			#search
-				margin-top:60px
+				margin-top:0px
 				color:#aaa
+				width: 100%;
+				margin-left: 0;
+				text-align: left;
+				left: 0;
+				button
+					top: 70%
 				.active
   					color:#ed4d4a
   					cursor: pointer
@@ -288,12 +315,17 @@
 				ul
 					padding-left: 0px
 					overflow: scroll
-					height: 120px
+					height: 150px
 					width: 300px
-
 					li
 						list-style:none
 						line-height:2em
+						opacity: 0.8
+						cursor: pointer
+						&:hover
+							opacity: 1
+						&.active
+							opacity: 1
 
 
 
@@ -440,7 +472,7 @@
 			margin-left: -150px
 			text-align:center
 		h3
-			margin-top: 130px
+			margin-top: 90px
 	#container
 		.log-details
 			padding: 0px
@@ -452,18 +484,10 @@
 		.log-details
 			.log-content
 				margin-top: -5px
-	#launch-screen
-		h1
-			font-size: 4em
-			margin-top: -100px
-			left: 50%
-			margin-left: -175px
+
 
 
 @media (min-width:760px)
-	#launch-screen
-		h1
-			font-size:2em
 	#minimap
 		width: calc(100% - 100px)
 		top: 50px
@@ -526,7 +550,7 @@
 				left:0
 				margin-left: 15px
 
-@media (min-height:1000px)
+@media (min-height: 1000px)
 	.background
 		&.background-0
 			background: url('/static/img/2000calmlake.jpg')
@@ -536,4 +560,12 @@
 			background: url('/static/img/2000roughwaves.jpg')
 		&.background-3
 			background: url('/static/img/2000snowymountain.jpg')
-	
+
+@media (max-height: 550px)
+	.message
+		top: 10%
+	#launch-screen
+		h3
+			bottom: 0px
+	#loading
+		bottom: 10px
