@@ -3,6 +3,7 @@ ctrl = angular.module("mainModule.controllers", [])
 
 ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map', ($http, $scope, $rootScope, $timeout, Map) ->
 
+  $rootScope.overlayIsActive = false
   switchLogs = false
   flow =
     isMapReady: false
@@ -74,7 +75,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         dropPins()
       , 500)
 
-  switchLoading = (classString) ->
+  window.switchLoading = (classString) ->
     loading = $("#loading")
     loading.removeClass("small big center corner")
     loading.addClass(classString)
@@ -117,13 +118,17 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         fadeLoading(true)
     )
 
-  fadeLoading = (fadeOut) ->
+  window.fadeLoading = (fadeOut) ->
     if fadeOut
       $("#loading").addClass("fadeout")
       $("#loading").removeClass("fadein")
     else
       $("#loading").removeClass("fadeout")
       $("#loading").addClass("fadein")
+
+
+  $scope.deactivateOverlay = (view) ->
+    $rootScope.overlayIsActive = false
 
 
   Map.initMap()
@@ -139,7 +144,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
   $scope.myfilesa = {"title":"empty"}
   $scope.selectedFile = null
   $scope.addMapSelected = false
-  $scope.overlayIsActive = false
+  $scope.loading = false
   $scope.loadingMessage = ""
   $scope.completeUrl = ""
   $scope.successMessage = ""
@@ -152,13 +157,17 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
       passedScope.$apply ()->
         passedScope.loggedIn = true
       passedScope.loading = true
-      passedScope.loadingMessage = "Loading your drive(this could take a while)"
+      passedScope.loadingMessage = "Loading your drive (this could take a while)"
+      # if $rootScope.overlayIsActive
+      #   fadeLoading(false)
       retrieveAllFiles((resp) ->
         passedScope.$apply(() ->
           passedScope.myfiles = resp
         )
         $scope.$apply(() ->
           $scope.loading = false
+          # if $rootScope.overlayIsActive
+          #   fadeLoading(true)
         )
         angular.element("html").scope().$broadcast('update-load');
       )
@@ -178,9 +187,10 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     $scope.selectedFile = file
 
   $scope.changeShowing = (view) ->
-    if window.loadingDone
+    if !$("#loading").hasClass("fadein")
       $rootScope.loadingposition = "big center"
       $rootScope.showing = view
+      $rootScope.overlayIsActive = true
 
   $scope.$watch( () ->
     return $scope.loading
@@ -190,23 +200,30 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
 
   $scope.getShowing = () ->
     if $rootScope.showing == "help"
+      if $rootScope.overlayIsActive
+          fadeLoading(true)
       return $rootScope.showing
     returnVal = ""
     if $rootScope.showing == "addFile"
       if $scope.loading
-        window.loadingDone = false
+        if $rootScope.overlayIsActive
+          fadeLoading(false)
         returnVal = 'loading'
       else if $scope.complete
-        window.loadingDone = true
+        if $rootScope.overlayIsActive
+          fadeLoading(true)
         returnVal = 'complete'
       else if $scope.loggedIn
-        window.loadingDone = true
+        if $rootScope.overlayIsActive
+          fadeLoading(true)
         setTimeout( ()->
           google.maps.event.trigger(addMap, 'resize')
         , 200)
         returnVal = 'loggedIn'
       else
         returnVal = 'login'
+        if $rootScope.overlayIsActive
+          fadeLoading(true)
     angular.element("html").scope().$broadcast('update-load');
 
     return returnVal
@@ -215,11 +232,8 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     return $scope.addMapSelected and $scope.selectedFile?
 
   $scope.activateOverlay = (view) ->
-    $scope.overlayIsActive = true
-    $rootScope.loadingposition = "big center"
-
+    $rootScope.overlayIsActive = true
     $scope.changeShowing(view)
-
 
   $scope.overlayActive = () ->
     return $scope.overlayIsActive
@@ -239,11 +253,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     $scope.loadingMessage = "Sharing your story!"
     $scope.loading = true
     makePublic(payload.gdriveId, (resp) ->
-
-
       addToTravellog(payload.gdriveId, (resp) ->
-
-
         $http(
           method: "POST"
           url: "/logs"

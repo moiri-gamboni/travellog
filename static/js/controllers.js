@@ -7,7 +7,8 @@
 
   ctrl.controller("mainCtrl", [
     '$http', '$scope', '$rootScope', '$timeout', 'Map', function($http, $scope, $rootScope, $timeout, Map) {
-      var dropPins, fadeLoading, flow, loadingWatch, showLog, switchLoading, switchLogs, unblockBegin;
+      var dropPins, flow, loadingWatch, showLog, switchLogs, unblockBegin;
+      $rootScope.overlayIsActive = false;
       switchLogs = false;
       flow = {
         isMapReady: false,
@@ -83,7 +84,7 @@
           }, 500);
         }
       };
-      switchLoading = function(classString) {
+      window.switchLoading = function(classString) {
         var loading;
         loading = $("#loading");
         loading.removeClass("small big center corner");
@@ -131,7 +132,7 @@
           }
         });
       };
-      fadeLoading = function(fadeOut) {
+      window.fadeLoading = function(fadeOut) {
         if (fadeOut) {
           $("#loading").addClass("fadeout");
           return $("#loading").removeClass("fadein");
@@ -139,6 +140,9 @@
           $("#loading").removeClass("fadeout");
           return $("#loading").addClass("fadein");
         }
+      };
+      $scope.deactivateOverlay = function(view) {
+        return $rootScope.overlayIsActive = false;
       };
       return Map.initMap();
     }
@@ -155,7 +159,7 @@
       };
       $scope.selectedFile = null;
       $scope.addMapSelected = false;
-      $scope.overlayIsActive = false;
+      $scope.loading = false;
       $scope.loadingMessage = "";
       $scope.completeUrl = "";
       $scope.successMessage = "";
@@ -168,7 +172,7 @@
             return passedScope.loggedIn = true;
           });
           passedScope.loading = true;
-          passedScope.loadingMessage = "Loading your drive(this could take a while)";
+          passedScope.loadingMessage = "Loading your drive (this could take a while)";
           retrieveAllFiles(function(resp) {
             passedScope.$apply(function() {
               return passedScope.myfiles = resp;
@@ -197,9 +201,10 @@
         return $scope.selectedFile = file;
       };
       $scope.changeShowing = function(view) {
-        if (window.loadingDone) {
+        if (!$("#loading").hasClass("fadein")) {
           $rootScope.loadingposition = "big center";
-          return $rootScope.showing = view;
+          $rootScope.showing = view;
+          return $rootScope.overlayIsActive = true;
         }
       };
       $scope.$watch(function() {
@@ -210,24 +215,36 @@
       $scope.getShowing = function() {
         var returnVal;
         if ($rootScope.showing === "help") {
+          if ($rootScope.overlayIsActive) {
+            fadeLoading(true);
+          }
           return $rootScope.showing;
         }
         returnVal = "";
         if ($rootScope.showing === "addFile") {
           if ($scope.loading) {
-            window.loadingDone = false;
+            if ($rootScope.overlayIsActive) {
+              fadeLoading(false);
+            }
             returnVal = 'loading';
           } else if ($scope.complete) {
-            window.loadingDone = true;
+            if ($rootScope.overlayIsActive) {
+              fadeLoading(true);
+            }
             returnVal = 'complete';
           } else if ($scope.loggedIn) {
-            window.loadingDone = true;
+            if ($rootScope.overlayIsActive) {
+              fadeLoading(true);
+            }
             setTimeout(function() {
               return google.maps.event.trigger(addMap, 'resize');
             }, 200);
             returnVal = 'loggedIn';
           } else {
             returnVal = 'login';
+            if ($rootScope.overlayIsActive) {
+              fadeLoading(true);
+            }
           }
         }
         angular.element("html").scope().$broadcast('update-load');
@@ -237,8 +254,7 @@
         return $scope.addMapSelected && ($scope.selectedFile != null);
       };
       $scope.activateOverlay = function(view) {
-        $scope.overlayIsActive = true;
-        $rootScope.loadingposition = "big center";
+        $rootScope.overlayIsActive = true;
         return $scope.changeShowing(view);
       };
       $scope.overlayActive = function() {

@@ -39,7 +39,7 @@
 		</div>
 		<div id="overlay">
 			<div id="blackblur" ></div>
-			<h2 id="escape" ng-click="popout()" class="fade">X</h2>
+			<h2 id="escape" ng-click="deactiveOverlay()" class="fade">X</h2>
 			<div id="overlay-content" ng-controller="MyFilesController">
 			<!-- 	<div ng-hide="loggedIn">
 
@@ -52,7 +52,7 @@
 			</div>
 			<div id="complete" class="message" ng-show="getShowing() == 'complete'" class="push-down">
 				{{successMessage}}<br/><br/>
-				<span class="small pre">{{completeUrl}}</span><br/><br/>
+				<a class="link" href={{completeUrl}}>{{completeUrl}}</a><br/><br/>
 				<button ng-click="submitAgain()" class="fade">Submit Another</button>
 			</div>
 			<div ng-show="getShowing() =='login'" class="push-down">
