@@ -10,13 +10,22 @@
       var switchLogs;
       Map.initMap();
       switchLogs = true;
-      $rootScope.loadingClass = "";
-      $rootScope.loadingSize = "";
-      $scope.loadingClass = function() {
-        var classString, loadSize;
-        classString = $rootScope.loadingClass;
-        loadSize = $rootScope.loadingSize;
-        return classString + " " + loadSize;
+      $scope.loadingClass = "";
+      $scope.loadingNumber = "";
+      $rootScope.$on('loading-circle', function(circleNumber) {
+        return $scope.loadingNumber = circleNumber.toString();
+      });
+      $scope.$watch('loadingClass', function() {
+        return $scope.getClass();
+      });
+      $scope.$watch('loadingNumber', function() {
+        return $scope.getClass();
+      });
+      $scope.getClass = function() {
+        return $scope.applyClass = $scope.loadingClass + " " + $scope.loadingNumber;
+      };
+      $scope.enter = function() {
+        return $scope.loadingClass = "big";
       };
       $scope.dropPins = function() {
         var dropPin, i, log, logId, _ref;
@@ -41,6 +50,7 @@
       });
       $rootScope.$on('gotFirstLog', function() {
         $scope.log = Map.getCurrentLog();
+        $scope.loadingClass = "small";
         return $scope.dropPins();
       });
       $scope.getLog = function() {

@@ -4,12 +4,27 @@ ctrl = angular.module("mainModule.controllers", [])
 ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map', ($http, $scope, $rootScope, $timeout, Map) ->
   Map.initMap()
   switchLogs = true
-  $rootScope.loadingClass = ""
-  $rootScope.loadingSize = ""
-  $scope.loadingClass = () ->
-    classString = $rootScope.loadingClass
-    loadSize = $rootScope.loadingSize
-    return classString + " " + loadSize
+  $scope.loadingClass = ""
+  $scope.loadingNumber = ""
+
+  $rootScope.$on('loading-circle', (circleNumber) ->
+    $scope.loadingNumber = circleNumber.toString()
+  )
+
+  $scope.$watch('loadingClass',
+    () ->
+      $scope.getClass()
+  )
+  $scope.$watch('loadingNumber',
+    () ->
+      $scope.getClass()
+  )
+
+  $scope.getClass = () ->
+    $scope.applyClass = $scope.loadingClass + " " + $scope.loadingNumber
+
+  $scope.enter = () ->
+    $scope.loadingClass = "big"
 
   $scope.dropPins = () ->
     dropPin = (log) ->
@@ -37,8 +52,11 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
   $rootScope.$on('gotFirstLog', () ->
     $scope.log = Map.getCurrentLog()
+    $scope.loadingClass = "small"
     $scope.dropPins()
   )
+
+
 
   $scope.getLog = () ->
     $scope.log = Map.getCurrentLog()
