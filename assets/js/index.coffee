@@ -4,7 +4,7 @@ move = (direction) ->
 	windowWidth = $(".main").width();
 	screenHeight = $(window).height();
 	screenWidth = $(window).width();
-	topDistance = parseInt($(".main").css("top"), 10) 
+	topDistance = parseInt($(".main").css("top"), 10)
 	if direction == "top"
 		prepare = {"left":"0", "top":-windowHeight}
 		launchIn = {"y": windowHeight + topDistance + 1, x: 0}
@@ -27,7 +27,7 @@ move = (direction) ->
 		$(".main").transition(mainOut,800)
 		setTimeout(() ->
 			$(".log-details").removeClass("animate").toggleClass("main launch").attr({"style": ""})
-			angular.element("html").scope().$broadcast("animation-done")
+			angular.element("html").scope().$broadcast("sliding-animation-done")
 		, 1000)
 	, 100)
 
@@ -60,13 +60,6 @@ $("#add, #question").click () ->
 $("#escape").click () ->
 	$("#loading").removeClass("big center")
 	$("#overlay, #overlay-content").removeClass("fadein")
-
-$("#logo, #start-here").click () ->
-	if window.loadingDone and miniMap?
-		$("#launch-screen, .background").addClass("hide")
-		$("#container").removeClass("hide")
-		angular.element('html').scope().$broadcast('map-init')
-		window.loadingDone = false
 
 window.incrementBackground = () ->
 	$(".background").toggleClass("active passive")

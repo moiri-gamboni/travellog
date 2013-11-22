@@ -7,39 +7,17 @@
 
   ctrl.controller("mainCtrl", [
     '$http', '$scope', '$rootScope', '$timeout', 'Map', function($http, $scope, $rootScope, $timeout, Map) {
-      var switchLogs;
-      Map.initMap();
-      switchLogs = true;
-      $scope.enterfade = "";
-      $scope.applyclass = "";
-      $rootScope.loadingposition = "";
-      $rootScope.$on('history-change', function(logId) {
-        console.log("history change");
-        console.log(logId);
-        Map.data.current = Map.data.logs[logId].key;
-        if (switchLogs) {
-          return $scope.otherLog = Map.data.logs[logId];
-        } else {
-          return $scope.log = Map.data.logs[logId];
-        }
-      });
-      $scope.$watch(function() {
-        return $rootScope.loadingposition;
-      }, function() {
-        return $scope.getClass();
-      });
-      $scope.enter = function() {
-        return $rootScope.loadingposition = "center big";
+      var dropPins, flow, showLog, switchLoading, switchLogs, unblockBegin;
+      switchLogs = false;
+      flow = {
+        isMapReady: false,
+        isFirstLogReady: false,
+        areLogsReady: false,
+        hasBegun: false,
+        arePinsDropped: false,
+        canBegin: false
       };
-      $scope.popout = function() {
-        return $rootScope.loadingposition = "corner small";
-      };
-      $scope.getClass = function() {
-        $scope.applyclass = (window.loadingDone ? "fadeout" : "") + " " + $rootScope.loadingposition;
-        console.log($scope.applyclass);
-        return $scope.enterfade = window.loadingDone ? "fadein" : "";
-      };
-      $scope.dropPins = function() {
+      dropPins = function() {
         var dropPin, i, log, logId, _ref;
         dropPin = function(log) {
           return function() {
@@ -50,41 +28,85 @@
         _ref = Map.data.logs;
         for (logId in _ref) {
           log = _ref[logId];
+          console.log(i);
           $timeout(dropPin(log), 200 * i);
           i++;
         }
         return $timeout(function() {
-          changeLocation($scope.log.id);
-          $(".main.fade").removeClass("fadeout");
-          $rootScope.loadingposition = "corner small";
-          $scope.getClass();
-          return window.loadingDone = true;
+          flow.arePinsDropped = true;
+          console.log('pins are dropped');
+          if (flow.isFirstLogReady) {
+            $(".main.fade").removeClass("fadeout");
+            switchLoading("small corner");
+            return showLog();
+          }
         }, 200 * Object.keys(Map.data.logs).length);
       };
-      $rootScope.$on('update-load', function() {
-        return $scope.getClass();
+      $rootScope.$on('map-ready', function() {
+        console.log('map-ready');
+        flow.isMapReady = true;
+        if (flow.areLogsReady) {
+          return unblockBegin();
+        }
       });
-      $rootScope.$on('animation-done', function() {
+      $rootScope.$on('logs-ready', function() {
+        console.log('logs-ready');
+        flow.areLogsReady = true;
+        if (flow.isMapReady) {
+          return unblockBegin();
+        }
+      });
+      $rootScope.$on('first-log-ready', function() {
+        console.log('first-log-ready');
+        flow.isFirstLogReady = true;
+        if (flow.arePinsDropped) {
+          $(".main.fade").removeClass("fadeout");
+          switchLoading("small corner");
+          return showLog();
+        }
+      });
+      unblockBegin = function() {
+        console.log('unlock begin');
+        $("#loading").addClass("fadeout");
+        $("#start-here").addClass("fadein");
+        flow.canBegin = true;
+        return $rootScope.$on('unlock-animation-done', function() {
+          console.log('unlock-animation-done');
+          return switchLoading("big center");
+        });
+      };
+      $scope.begin = function() {
+        if (flow.canBegin) {
+          $("#launch-screen, .background").addClass("hide");
+          $("#container").removeClass("hide");
+          flow.hasBegun = true;
+          return $timeout(function() {
+            return dropPins();
+          }, 500);
+        }
+      };
+      switchLoading = function(classString) {
+        console.log('switchLoading' + " " + classString);
+        $("#loading").removeClass("small big center corner");
+        return $("#loading").addClass(classString);
+      };
+      $rootScope.$on('sliding-animation-done', function() {
         return switchLogs = !switchLogs;
       });
-      $rootScope.$on('gotFirstLog', function() {
-        $scope.log = Map.getCurrentLog();
-        return $scope.getClass();
-      });
-      $rootScope.$on('map-init', function() {
-        return $scope.dropPins();
-      });
-      $rootScope.$on('map-ready', function() {
-        return $scope.$watch(function() {
-          return window.loadingDone;
-        }, function() {
-          return $scope.getClass();
-        });
-      });
-      $scope.getLog = function() {
-        return $scope.log = Map.getCurrentLog();
+      showLog = function(logId) {
+        if (logId != null) {
+
+        } else {
+          if (switchLogs) {
+            $scope.otherLog = Map.getCurrentLog();
+            return changeLocation($scope.otherLog.id);
+          } else {
+            $scope.log = Map.getCurrentLog();
+            return changeLocation($scope.log.id);
+          }
+        }
       };
-      return $scope.move = function(direction) {
+      $scope.move = function(direction) {
         if (window.loadingDone) {
           if (switchLogs) {
             $scope.otherLog = Map.move(direction);
@@ -95,6 +117,7 @@
           }
         }
       };
+      return Map.initMap();
     }
   ]);
 
@@ -123,7 +146,6 @@
             passedScope.$apply(function() {
               return passedScope.myfiles = resp;
             });
-            console.log("finishing up");
             $scope.$apply(function() {
               return $scope.loading = false;
             });
@@ -182,7 +204,6 @@
           }
         }
         angular.element("html").scope().$broadcast('update-load');
-        console.log(returnVal);
         return returnVal;
       };
       $scope.canSubmit = function() {
@@ -191,7 +212,6 @@
       $scope.activateOverlay = function(view) {
         $scope.overlayIsActive = true;
         $rootScope.loadingposition = "big center";
-        console.log($rootScope.loadingposition);
         return $scope.changeShowing(view);
       };
       $scope.overlayActive = function() {
@@ -215,11 +235,7 @@
         $scope.loadingMessage = "Sharing your story!";
         $scope.loading = true;
         return makePublic(payload.gdriveId, function(resp) {
-          console.log("made Public");
-          console.log(resp);
           return addToTravellog(payload.gdriveId, function(resp) {
-            console.log("shared to travellog");
-            console.log(resp);
             return $http({
               method: "POST",
               url: "/logs",

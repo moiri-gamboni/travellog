@@ -180,9 +180,6 @@ function changeLocation(markerId) {
   } else {
     currentMiniMarker.setAnimation(google.maps.Animation.BOUNCE);
   }
-  // push the new url
-  history.pushState(currentMiniMarker.title, null,
-    "/log/" + currentMiniMarker.title);
   // focus the map to the new marker
   miniMap.panTo(currentMiniMarker.position);
   if (miniMap.getZoom() == 1) {
@@ -190,11 +187,6 @@ function changeLocation(markerId) {
   }
 }
 
-// bind the state changes to change locations
-window.onpopstate = function() {
-  changeLocation(history.state);
-  angular.element("html").scope().$broadcast('history-change', history.state);
-};
 
 function switchMiniMarker() {
   changeLocation(this.title);

@@ -2,91 +2,100 @@
 ctrl = angular.module("mainModule.controllers", [])
 
 ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map', ($http, $scope, $rootScope, $timeout, Map) ->
-  Map.initMap()
-  switchLogs = true
-  $scope.enterfade = ""
-  $scope.applyclass = ""
-  $rootScope.loadingposition = ""
 
+  switchLogs = false
+  flow =
+    isMapReady: false
+    isFirstLogReady: false
+    areLogsReady: false
+    hasBegun: false
+    arePinsDropped: false
+    canBegin: false
 
-  $rootScope.$on('history-change', (logId) ->
-    console.log("history change")
-    console.log(logId)
-    Map.data.current = Map.data.logs[logId].key
-    if switchLogs
-        $scope.otherLog = Map.data.logs[logId]
-      else
-        $scope.log = Map.data.logs[logId]
-  )
-  
-  $scope.$watch( () ->
-    return $rootScope.loadingposition
-  , () ->
-    $scope.getClass()
-  ) 
-
-  $scope.enter = () ->
-    $rootScope.loadingposition = "center big"
-
-  $scope.popout = () ->
-    $rootScope.loadingposition = "corner small"
-
-  $scope.getClass = () ->
-    $scope.applyclass = (if window.loadingDone then "fadeout" else "") + " " + $rootScope.loadingposition
-    console.log $scope.applyclass
-    $scope.enterfade = if window.loadingDone then "fadein" else ""
-
-  $scope.dropPins = () ->
+  dropPins = () ->
     dropPin = (log) ->
       return ()->
         placeMarkerMiniMap(log)
 
     i = 0
     for logId, log of Map.data.logs
-      $timeout(
-        dropPin(log)
-        ,
-        200*i
-      )
+      console.log i
+      $timeout(dropPin(log),200*i)
       i++
     $timeout(
         () ->
-          changeLocation($scope.log.id)
-          $(".main.fade").removeClass("fadeout")
-          $rootScope.loadingposition = "corner small"
-          $scope.getClass()
-          window.loadingDone = true
+          flow.arePinsDropped = true
+          console.log 'pins are dropped'
+          if flow.isFirstLogReady
+            $(".main.fade").removeClass("fadeout")
+            switchLoading("small corner")
+            showLog()
         ,
         200*Object.keys(Map.data.logs).length
       )
 
-  $rootScope.$on('update-load', () ->
-    $scope.getClass()
+  $rootScope.$on('map-ready', () ->
+    console.log 'map-ready'
+    flow.isMapReady = true
+    if flow.areLogsReady
+      unblockBegin()
   )
 
-  $rootScope.$on('animation-done', () ->
+  $rootScope.$on('logs-ready', () ->
+    console.log 'logs-ready'
+    flow.areLogsReady = true
+    if flow.isMapReady
+      unblockBegin()
+  )
+
+  $rootScope.$on('first-log-ready', () ->
+    console.log 'first-log-ready'
+    flow.isFirstLogReady = true
+    if flow.arePinsDropped
+      $(".main.fade").removeClass("fadeout")
+      switchLoading("small corner")
+      showLog()
+  )
+
+  unblockBegin = ()->
+    console.log 'unlock begin'
+    $("#loading").addClass("fadeout")
+    $("#start-here").addClass("fadein")
+    flow.canBegin = true
+    $rootScope.$on('unlock-animation-done', () ->
+      console.log 'unlock-animation-done'
+      switchLoading("big center")
+    )
+
+  $scope.begin = () ->
+    if flow.canBegin
+      $("#launch-screen, .background").addClass("hide")
+      $("#container").removeClass("hide")
+      flow.hasBegun = true
+      $timeout(()->
+        dropPins()
+      , 500)
+
+  switchLoading = (classString) ->
+    console.log 'switchLoading'+ " " + classString
+    $("#loading").removeClass("small big center corner")
+    $("#loading").addClass(classString)
+
+
+  $rootScope.$on('sliding-animation-done', () ->
     switchLogs = not switchLogs
   )
 
-  $rootScope.$on('gotFirstLog', () ->
-    $scope.log = Map.getCurrentLog()
-    $scope.getClass()
-    
-  )
-  $rootScope.$on('map-init', () ->
-    $scope.dropPins()
-  )
-  $rootScope.$on('map-ready', () ->
-    $scope.$watch( () ->
-      return window.loadingDone
-    , () ->
-      $scope.getClass()
-    ) 
-  )
+  showLog = (logId) ->
+    if logId?
 
-
-  $scope.getLog = () ->
-    $scope.log = Map.getCurrentLog()
+    else
+      if switchLogs
+        $scope.otherLog = Map.getCurrentLog()
+        changeLocation($scope.otherLog.id)
+      else
+        $scope.log = Map.getCurrentLog()
+        changeLocation($scope.log.id)
 
   $scope.move = (direction) ->
     if window.loadingDone
@@ -96,6 +105,11 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       else
         $scope.log = Map.move(direction)
         changeLocation($scope.log.id)
+
+
+  Map.initMap()
+
+
 ])
 
 ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', ($http, $scope, $rootScope, User) ->
@@ -121,7 +135,6 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
         passedScope.$apply(() ->
           passedScope.myfiles = resp
         )
-        console.log "finishing up"
         $scope.$apply(() ->
           $scope.loading = false
         )
@@ -151,7 +164,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     return $scope.loading
   , () ->
     $scope.getShowing()
-  ) 
+  )
 
   $scope.getShowing = () ->
     if $rootScope.showing == "help"
@@ -173,7 +186,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
       else
         returnVal = 'login'
     angular.element("html").scope().$broadcast('update-load');
-    console.log returnVal
+
     return returnVal
 
   $scope.canSubmit = () ->
@@ -182,7 +195,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
   $scope.activateOverlay = (view) ->
     $scope.overlayIsActive = true
     $rootScope.loadingposition = "big center"
-    console.log($rootScope.loadingposition)
+
     $scope.changeShowing(view)
 
 
@@ -204,11 +217,11 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     $scope.loadingMessage = "Sharing your story!"
     $scope.loading = true
     makePublic(payload.gdriveId, (resp) ->
-      console.log "made Public"
-      console.log resp
+
+
       addToTravellog(payload.gdriveId, (resp) ->
-        console.log "shared to travellog"
-        console.log resp
+
+
         $http(
           method: "POST"
           url: "/logs"

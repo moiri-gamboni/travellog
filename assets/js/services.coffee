@@ -36,6 +36,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
     getLog: (logId, callback) ->
       if not factory.data.logs[logId].body?
         factory.data.loadingLogs++
+        $rootScope.$broadcast('is-loading-log', true)
         get = $http.get(
           window.location.protocol + "//" + window.location.host + "/logs",
           {params:{id:logId}}
@@ -50,12 +51,16 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
         else
           get.success((data, status, headers, config)->
             factory.data.loadingLogs--
+            if factory.data.loadingLogs == 0
+              $rootScope.$broadcast('is-loading-log', false)
             factory.data.logs[data.log.id].title = data.log.title
             factory.data.logs[data.log.id].profileId = data.log.profileId
-            factory.data.logs[data.log.id].profileId = data.log.profileName
+            factory.data.logs[data.log.id].profileName = data.log.profileName
             factory.data.logs[data.log.id].body = data.log.body
           ).error((data, status, headers, config)->
             factory.data.loadingLogs--
+            if factory.data.loadingLogs == 0
+              window.isLogsLoading = false
           )
 
     getClosestLogs: (around) ->
@@ -64,7 +69,6 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
         factory.getLog(factory.data.lngLogs[location[0]].id)
 
     getClosestLocation: (from, direction) ->
-
       tempKey = from.slice()
       change = if direction in ['N', 'E'] then 1 else (-1)
       breakLoop = false
@@ -122,6 +126,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
     initMap: () ->
       getLogsCallback = (mapData) ->
         return (data, status, headers, config) ->
+          $rootScope.$broadcast('logs-ready')
           mapData.latLogs = data.logs.slice().sort((b, a) ->
             return b.lat-a.lat
           )
@@ -150,22 +155,11 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
               factory.data.logs[data.log.id].profileId = data.log.profileId
               factory.data.logs[data.log.id].profileId = data.log.profileName
               factory.data.logs[data.log.id].body = data.log.body
-              $rootScope.$broadcast('gotFirstLog')
+              $rootScope.$broadcast('first-log-ready')
           )
           factory.getClosestLogs(factory.data.current)
-          $rootScope.$watch(
-            ()->
-              return factory.data.loadingLogs
-            (loadingLogs)->
-              if loadingLogs == 0
-                window.loadingDone = true
-              else
-                window.loadingDone = false
-          )
 
       factory.getLogs(getLogsCallback(factory.data))
-
-
 
   return factory
 

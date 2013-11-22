@@ -74,7 +74,7 @@
         $(".log-details").removeClass("animate").toggleClass("main launch").attr({
           "style": ""
         });
-        return angular.element("html").scope().$broadcast("animation-done");
+        return angular.element("html").scope().$broadcast("sliding-animation-done");
       }, 1000);
     }, 100);
   };
@@ -121,15 +121,6 @@
   $("#escape").click(function() {
     $("#loading").removeClass("big center");
     return $("#overlay, #overlay-content").removeClass("fadein");
-  });
-
-  $("#logo, #start-here").click(function() {
-    if (window.loadingDone && (typeof miniMap !== "undefined" && miniMap !== null)) {
-      $("#launch-screen, .background").addClass("hide");
-      $("#container").removeClass("hide");
-      angular.element('html').scope().$broadcast('map-init');
-      return window.loadingDone = false;
-    }
   });
 
   window.incrementBackground = function() {

@@ -15,7 +15,7 @@
 	<div data-counter="0" class="background background-0 slow-fade active"></div>
 	<div data-counter="1" class="background background-1 slow-fade passive"></div>
 
-	<ul id="loading" ng-class="applyclass" class="bokeh fade">
+	<ul id="loading" class="bokeh fade">
 		<li id="child-1"></li>
 		<li id="child-2"></li>
 		<li id="child-3"></li>
@@ -24,13 +24,13 @@
 
 	<div id="launch-screen">
 		<div id="whiteshade"></div>
-		<div id="logo" ng-click="enter()">
+		<div id="logo" ng-click="begin()">
 			<hr class="top-bar">
 			<h1>Travellog</h1>
 			<hr>
 		</div>
 		<p> Stories that travel </p>
-		<h3 id="start-here" ng-class="enterfade" class="fade" ng-click="enter()"> Begin </h3>
+		<h3 id="start-here" class="fade" ng-click="begin()"> Begin </h3>
 	</div>
 
 	<div id="container" class="hide">
@@ -65,7 +65,7 @@
 			</div>
 			<div id="search" ng-show="getShowing() =='loggedIn'" class="message">
 				<span class="white small">Select your story from the drive, and place it on the map. Future changes on Google Drive will sync automatically.</span>
-				<button ng-click="upload()" ng-class="{active: canSubmit()}">Submit</button>	
+				<button ng-click="upload()" ng-class="{active: canSubmit()}">Submit</button>
 				<input ng-model="query" placeholder="search">
 				<ul decorations:"none">
 					<li ng-class="{active: isSelected(file)}" ng-repeat="file in myfiles | filter:query | limitTo:5" ng-click="selectFile(file)">
