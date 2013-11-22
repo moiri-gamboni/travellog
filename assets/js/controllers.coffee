@@ -30,6 +30,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
             loadingWatch()
             switchLoading("small corner")
             showLog()
+            switchLogs = not switchLogs
         ,
         200*Object.keys(Map.data.logs).length
       )
@@ -54,6 +55,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       loadingWatch()
       switchLoading("small corner")
       showLog()
+      switchLogs = not switchLogs
   )
 
   unblockBegin = ()->
@@ -79,28 +81,29 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
 
   $rootScope.$on('sliding-animation-done', () ->
+    console.log 'sliding-animation-done'
     switchLogs = not switchLogs
   )
 
   showLog = (logId) ->
     if logId?
-
+      if switchLogs
+        $scope.otherLog = Map.data.logs[logId]
+      else
+        $scope.log = Map.data.logs[logId]
     else
       if switchLogs
         $scope.otherLog = Map.getCurrentLog()
-        changeLocation($scope.otherLog.id)
+        logId = $scope.otherLog.id
       else
         $scope.log = Map.getCurrentLog()
-        changeLocation($scope.log.id)
+        logId = $scope.log.id
+    changeLocation(logId)
 
   $scope.move = (direction) ->
-    if window.loadingDone
-      if switchLogs
-        $scope.otherLog = Map.move(direction)
-        changeLocation($scope.otherLog.id)
-      else
-        $scope.log = Map.move(direction)
-        changeLocation($scope.log.id)
+    if Map.data.loadingLogs == 0
+      showLog(Map.move(direction).id)
+      move(direction)
 
   loadingWatch = () ->
     if Map.data.loadingLogs == 0

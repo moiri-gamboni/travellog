@@ -5,19 +5,19 @@ window.move = (direction) ->
 	screenHeight = $(window).height();
 	screenWidth = $(window).width();
 	topDistance = parseInt($(".main").css("top"), 10)
-	if direction == "top"
+	if direction == "N"
 		prepare = {"left":"0", "top":-windowHeight}
 		launchIn = {"y": windowHeight + topDistance, x: 0}
 		mainOut = {"y": screenHeight, x: 0}
-	else if direction == "down"
+	else if direction == "S"
 		prepare = {"left":"0", "top": screenHeight}
 		launchIn = {"y": -(screenHeight - topDistance), x: 0}
 		mainOut = {"y": -(screenHeight), x: 0}
-	else if direction == "left"
+	else if direction == "W"
 		prepare = {"left":-screenWidth, "top": topDistance}
 		launchIn = {"x": screenWidth, y: 0}
 		mainOut = {"x": screenWidth, y: 0}
-	else
+	else if direction == "E"
 		prepare = {"left":screenWidth, "top": topDistance}
 		launchIn = {"x": -screenWidth, y: 0}
 		mainOut = {"x": -screenWidth, y: 0}

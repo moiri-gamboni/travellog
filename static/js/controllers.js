@@ -38,7 +38,8 @@
             $(".main.fade").addClass("fadein");
             loadingWatch();
             switchLoading("small corner");
-            return showLog();
+            showLog();
+            return switchLogs = !switchLogs;
           }
         }, 200 * Object.keys(Map.data.logs).length);
       };
@@ -61,7 +62,8 @@
           $(".main.fade").addClass("fadein");
           loadingWatch();
           switchLoading("small corner");
-          return showLog();
+          showLog();
+          return switchLogs = !switchLogs;
         }
       });
       unblockBegin = function() {
@@ -88,30 +90,31 @@
         return loading.addClass(classString);
       };
       $rootScope.$on('sliding-animation-done', function() {
+        console.log('sliding-animation-done');
         return switchLogs = !switchLogs;
       });
       showLog = function(logId) {
         if (logId != null) {
-
+          if (switchLogs) {
+            $scope.otherLog = Map.data.logs[logId];
+          } else {
+            $scope.log = Map.data.logs[logId];
+          }
         } else {
           if (switchLogs) {
             $scope.otherLog = Map.getCurrentLog();
-            return changeLocation($scope.otherLog.id);
+            logId = $scope.otherLog.id;
           } else {
             $scope.log = Map.getCurrentLog();
-            return changeLocation($scope.log.id);
+            logId = $scope.log.id;
           }
         }
+        return changeLocation(logId);
       };
       $scope.move = function(direction) {
-        if (window.loadingDone) {
-          if (switchLogs) {
-            $scope.otherLog = Map.move(direction);
-            return changeLocation($scope.otherLog.id);
-          } else {
-            $scope.log = Map.move(direction);
-            return changeLocation($scope.log.id);
-          }
+        if (Map.data.loadingLogs === 0) {
+          showLog(Map.move(direction).id);
+          return move(direction);
         }
       };
       loadingWatch = function() {
