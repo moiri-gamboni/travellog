@@ -29,7 +29,9 @@
         return $scope.getClass();
       });
       $scope.enter = function() {
-        return $rootScope.loadingposition = "center big";
+        if ((typeof miniMap !== "undefined" && miniMap !== null) && loadingDone) {
+          return $rootScope.loadingposition = "center big";
+        }
       };
       $scope.popout = function() {
         return $rootScope.loadingposition = "corner small";
@@ -115,8 +117,12 @@
       $scope.successMessage = "";
       callback = function(passedScope) {
         return function(event, resp) {
+          console.log("finishing login");
           User = resp;
-          passedScope.loggedIn = true;
+          console.log(User);
+          passedScope.$apply(function() {
+            return passedScope.loggedIn = true;
+          });
           passedScope.loading = true;
           passedScope.loadingMessage = "Loading your drive(this could take a while)";
           retrieveAllFiles(function(resp) {

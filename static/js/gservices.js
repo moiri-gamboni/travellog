@@ -5,15 +5,18 @@ var scopes = "https://www.googleapis.com/auth/plus.me"+
   " https://www.googleapis.com/auth/userinfo.profile";
 function handleClientLoad() {
   // Step 2: Reference the API key
+  console.log('Checking client load');
   gapi.client.setApiKey(apiKey);
   window.setTimeout(checkAuth,1);
 }
 
 function checkAuth() {
+  console.log('checking auth');
   gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, handleAuthResult);
 }
 
 function handleAuthResult(authResult) {
+  console.log('Handling result');
   var successMessage = $("#loggedIn");
   var authorizeButton = $("#authorize-button");
   if (authResult && !authResult.error) {
@@ -24,6 +27,7 @@ function handleAuthResult(authResult) {
 $("#authorize-button").on("click", handleAuthClick);
 
 function handleAuthClick(event) {
+  console.log('handling auth click');
   // Step 3: get authorization to use private data
   gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, handleAuthResult);
   return false;
@@ -31,6 +35,7 @@ function handleAuthClick(event) {
 
 // Load the API and make an API call.  Display the results on the screen.
 function getUserInfo() {
+  console.log('get user info');
   // Step 4: Load the Google+ API
   gapi.client.load('plus', 'v1', function() {
     // Step 5: Assemble the API request
@@ -38,22 +43,24 @@ function getUserInfo() {
       'userId': 'me'
     });
     // Step 6: Execute the API request
+    console.log("user info being gotten")
     request.execute(function(resp) {
       // if the person has no google plus id
       if (resp.code == 404) {
         gapi.client.load('oauth2', 'v2', function() {
           var request = gapi.client.oauth2.userinfo.get();
-          request.execute(function(resp) {
-            $("#name").html(resp.name);
+          request.execute(function(resp) {;
             setTimeout(function() {
+              console.log("no google plus found");
               angular.element("html").scope().$broadcast('loggedIn', resp);
             }, 1000);
           });
         });
       } else {
         // else retrieve their information from the g+ info
-        $("#name").html(resp.displayName);
+        console.log("google plus found");
         setTimeout(function() {
+              console.log("broadcasting")
               angular.element("html").scope().$broadcast('loggedIn', resp);
             }, 1000);
       }
@@ -62,7 +69,6 @@ function getUserInfo() {
   });
   // load the drive client
   gapi.client.load('drive', 'v2');
-  gapi.client.load('person', 'v1');
 }
 
 // renders the google plus badge in the loader

@@ -7,7 +7,7 @@ move = (direction) ->
 	topDistance = parseInt($(".main").css("top"), 10) 
 	if direction == "top"
 		prepare = {"left":"0", "top":-windowHeight}
-		launchIn = {"y": windowHeight + topDistance + 1, x: 0}
+		launchIn = {"y": windowHeight + topDistance, x: 0}
 		mainOut = {"y": screenHeight, x: 0}
 	else if direction == "down"
 		prepare = {"left":"0", "top": screenHeight}
@@ -62,7 +62,11 @@ $("#escape").click () ->
 	$("#overlay, #overlay-content").removeClass("fadein")
 
 $("#logo, #start-here").click () ->
+	console.log window.loadingDone
+	console.log miniMap?
+	console.log window.loadingDone and miniMap?
 	if window.loadingDone and miniMap?
+		console.log "entering"
 		$("#launch-screen, .background").addClass("hide")
 		$("#container").removeClass("hide")
 		angular.element('html').scope().$broadcast('map-init')

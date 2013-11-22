@@ -17,7 +17,7 @@
         "top": -windowHeight
       };
       launchIn = {
-        "y": windowHeight + topDistance + 1,
+        "y": windowHeight + topDistance,
         x: 0
       };
       mainOut = {
@@ -124,7 +124,11 @@
   });
 
   $("#logo, #start-here").click(function() {
+    console.log(window.loadingDone);
+    console.log(typeof miniMap !== "undefined" && miniMap !== null);
+    console.log(window.loadingDone && (typeof miniMap !== "undefined" && miniMap !== null));
     if (window.loadingDone && (typeof miniMap !== "undefined" && miniMap !== null)) {
+      console.log("entering");
       $("#launch-screen, .background").addClass("hide");
       $("#container").removeClass("hide");
       angular.element('html').scope().$broadcast('map-init');
