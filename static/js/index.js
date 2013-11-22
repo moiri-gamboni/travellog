@@ -28,10 +28,10 @@
         "top": screenHeight
       };
       launchIn = {
-        "y": -(windowHeight + (screenHeight - topDistance))
+        "y": -(screenHeight - topDistance)
       };
       mainOut = {
-        "y": -(windowHeight + (screenHeight - topDistance))
+        "y": -(screenHeight - topDistance)
       };
     } else if (direction === "left") {
       prepare = {

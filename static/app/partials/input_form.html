@@ -1,8 +1,0 @@
-<div>
-	<form name="_form_name" ng-controller="FormController" method="POST" novalidate ng-submit="post_form(_form_answers)">
-		<div ng-repeat="field in _form.fields" style="list-style-type: none">
-                	<label>{{field}}: </lable> 
-                	<input ng-model="answer" blur="update(field.name,answer)">
-        </div>
-	</form>
-</div>

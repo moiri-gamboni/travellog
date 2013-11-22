@@ -10,9 +10,9 @@ move = (direction) ->
 		launchIn = {"y": windowHeight + topDistance + 1}
 		mainOut = {"y": windowHeight + topDistance + 1}
 	else if direction == "down"
-		prepare = {"left":"0", "top":screenHeight}
-		launchIn = {"y": -(windowHeight + (screenHeight - topDistance))}
-		mainOut = {"y": -(windowHeight + (screenHeight - topDistance))}
+		prepare = {"left":"0", "top": screenHeight}
+		launchIn = {"y": -(screenHeight - topDistance)}
+		mainOut = {"y": -(screenHeight - topDistance)}
 	else if direction == "left"
 		prepare = {"left":-windowWidth, "top": windowHeight*0.2 + 50}
 		launchIn = {"left": 0}
