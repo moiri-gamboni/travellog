@@ -127,8 +127,11 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
 
   callback = (passedScope)=>
     return (event, resp)=>
+      console.log "finishing login"
       User = resp
-      passedScope.loggedIn = true
+      console.log User
+      passedScope.$apply ()->
+        passedScope.loggedIn = true
       passedScope.loading = true
       passedScope.loadingMessage = "Loading your drive(this could take a while)"
       retrieveAllFiles((resp) ->

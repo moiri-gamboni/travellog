@@ -17,7 +17,7 @@
         "top": -windowHeight
       };
       launchIn = {
-        "y": windowHeight + topDistance + 1,
+        "y": windowHeight + topDistance,
         x: 0
       };
       mainOut = {

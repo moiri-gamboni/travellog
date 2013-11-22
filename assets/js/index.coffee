@@ -7,7 +7,7 @@ move = (direction) ->
 	topDistance = parseInt($(".main").css("top"), 10)
 	if direction == "top"
 		prepare = {"left":"0", "top":-windowHeight}
-		launchIn = {"y": windowHeight + topDistance + 1, x: 0}
+		launchIn = {"y": windowHeight + topDistance, x: 0}
 		mainOut = {"y": screenHeight, x: 0}
 	else if direction == "down"
 		prepare = {"left":"0", "top": screenHeight}
