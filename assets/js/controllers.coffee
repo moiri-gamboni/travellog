@@ -12,6 +12,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     hasBegun: false
     arePinsDropped: false
     canBegin: false
+    urlLogLoadWatch: null
 
   dropPins = () ->
     dropPin = (log) ->
@@ -30,7 +31,15 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
             $(".main.fade").addClass("fadein")
             loadingWatch()
             switchLoading("small corner")
-            showLog(Map.getCurrentLog().id, true)
+            if $rootScope.urlEntered?
+              Map.getLog($rootScope.urlEntered)
+              flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', (event, isLoading) ->
+                if not isLoading
+                  showLog($rootScope.urlEntered)
+                  flow.urlLogLoadWatch()
+              )
+            else
+              showLog(Map.getCurrentLog().id, true)
         ,
         200*Object.keys(Map.data.logs).length
       )
@@ -54,7 +63,15 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       $(".main.fade").addClass("fadein")
       loadingWatch()
       switchLoading("small corner")
-      showLog(Map.getCurrentLog().id, true)
+      if $rootScope.urlEntered?
+        Map.getLog($rootScope.urlEntered)
+        flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', (event, isLoading) ->
+          if not isLoading
+            showLog($rootScope.urlEntered)
+            flow.urlLogLoadWatch()
+        )
+      else
+        showLog(Map.getCurrentLog().id, true)
   )
 
   unblockBegin = ()->
@@ -80,7 +97,6 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
 
   $rootScope.$on('sliding-animation-done', () ->
-    console.log 'sliding-animation-done'
     switchLogs = not switchLogs
   )
 
@@ -95,7 +111,6 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
               $scope.log = log
           )
       else
-          console.log(log)
           history.pushState(log.id, log.title, "/log/"+log.id)
           if switchLogs
             $scope.otherLog = log
@@ -133,9 +148,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       $("#loading").addClass("fadein")
 
   window.onpopstate = (event) ->
-    console.log event
     if event.state?
-      console.log "triggering showlog"
       showLog(event.state, false, true)
 
 
@@ -163,9 +176,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
 
   callback = (passedScope)=>
     return (event, resp)=>
-      console.log "finishing login"
       User = resp
-      console.log User
       passedScope.$apply ()->
         passedScope.loggedIn = true
       passedScope.loading = true
