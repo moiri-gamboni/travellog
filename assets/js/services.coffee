@@ -82,11 +82,15 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
               $rootScope.$broadcast('is-loading-log', false)
           )
 
-    getClosestLogs: (around) ->
+    getClosestLogs: (logKey) ->
       console.log 'get get closests logs'
       for direction in ['N','E','S','W']
-        location = factory.getClosestLocation(around, direction)
-        factory.getLog(factory.data.lngLogs[location[0]].id)
+        change = if direction in ['N', 'E'] then +1 else -1
+        if direction in ['N', 'S']
+          location = factory.data.logs[factory.data.latLogs[mod(logKey[1]+change,factory.data.latLogs.length)].id]
+        else
+          location = factory.data.logs[factory.data.lngLogs[mod(logKey[0]+change,factory.data.lngLogs.length)].id]
+        factory.getLog(location.id)
 
     getClosestLocation: (from, direction) ->
       tempKey = from.slice()

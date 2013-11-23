@@ -96,15 +96,20 @@
             }
           }
         },
-        getClosestLogs: function(around) {
-          var direction, location, _i, _len, _ref, _results;
+        getClosestLogs: function(logKey) {
+          var change, direction, location, _i, _len, _ref, _results;
           console.log('get get closests logs');
           _ref = ['N', 'E', 'S', 'W'];
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             direction = _ref[_i];
-            location = factory.getClosestLocation(around, direction);
-            _results.push(factory.getLog(factory.data.lngLogs[location[0]].id));
+            change = direction === 'N' || direction === 'E' ? +1 : -1;
+            if (direction === 'N' || direction === 'S') {
+              location = factory.data.logs[factory.data.latLogs[mod(logKey[1] + change, factory.data.latLogs.length)].id];
+            } else {
+              location = factory.data.logs[factory.data.lngLogs[mod(logKey[0] + change, factory.data.lngLogs.length)].id];
+            }
+            _results.push(factory.getLog(location.id));
           }
           return _results;
         },
