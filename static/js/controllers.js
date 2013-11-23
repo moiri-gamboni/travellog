@@ -56,7 +56,7 @@
                   console.log('url watch');
                   if (!isLoading) {
                     console.log('stop watch');
-                    showLog($rootScope.urlEntered, true);
+                    showLog($rootScope.urlEntered, true, null, null, null, true);
                     return watch();
                   }
                 });
@@ -102,7 +102,7 @@
                 console.log('url watch');
                 if (!isLoading) {
                   console.log('stop url watch');
-                  showLog($rootScope.urlEntered, true);
+                  showLog($rootScope.urlEntered, true, null, null, null, true);
                   return watch();
                 }
               });
@@ -152,7 +152,7 @@
         return switchLogs = !switchLogs;
       });
       console.log('sliding animation defined');
-      showLog = function(logId, manualSwitch, invert, dontPushState) {
+      showLog = function(logId, manualSwitch, invert, dontPushState, notChangeMarker, renderBadgeInMain) {
         var log;
         console.log('showlog');
         if (logId != null) {
@@ -170,25 +170,6 @@
                 $scope.log = log;
               }
             }
-            if (log.profileId != null) {
-              console.log('profileid');
-              if (!switchLogs) {
-                console.log('not switchlogs -> launch');
-                renderBadge(log.profileId, '.launch');
-              } else {
-                console.log('switchlogs -> main');
-                renderBadge(log.profileId, '.main');
-              }
-            } else {
-              console.log('no profileid');
-              if (!switchLogs) {
-                console.log('not switchlogs -> launch');
-                $(".launch .log-author").html(log.profileName);
-              } else {
-                console.log('switchlogs -> main');
-                $(".main .log-author").html(log.profileName);
-              }
-            }
             $scope.$apply();
           } else {
             console.log('no invert');
@@ -199,26 +180,20 @@
               console.log('not switchlogs -> log');
               $scope.log = log;
             }
-            if (log.profileId != null) {
-              console.log('profile id');
-              if (switchLogs) {
-                console.log('switchlogs -> launch');
-                renderBadge(log.profileId, '.launch');
-              } else {
-                console.log('not switchlogs -> main');
-                renderBadge(log.profileId, '.main');
-              }
+          }
+          if (log.profileId != null) {
+            console.log('profileid');
+            if ((renderBadgeInMain != null) && renderBadgeInMain) {
+              renderBadge(log.profileId, '.main');
             } else {
-              console.log('no profileid');
-              console.log(log);
-              console.log(log.profileId);
-              if (switchLogs) {
-                console.log('switchlogs -> launch');
-                $(".launch .log-author").html(log.profileName);
-              } else {
-                console.log('not switchlogs -> main');
-                $(".main .log-author").html(log.profileName);
-              }
+              renderBadge(log.profileId, '.launch');
+            }
+          } else {
+            console.log('no profileid');
+            if ((renderBadgeInMain != null) && renderBadgeInMain) {
+              $(".main .log-author").html(log.profileName);
+            } else {
+              $(".launch .log-author").html(log.profileName);
             }
           }
           if ((dontPushState == null) || !dontPushState) {
@@ -230,7 +205,9 @@
             switchLogs = !switchLogs;
           }
           Map.data.current = log.key;
-          changeLocation(logId);
+          if ((notChangeMarker == null) || !notChangeMarker) {
+            changeLocation(logId);
+          }
           return console.log('finish showing log');
         } else {
           return console.log('no logid');
@@ -242,11 +219,14 @@
         if (Map.data.loadingLogs === 0) {
           log = Map.move(direction);
           console.log('showing log');
-          showLog(log.id);
+          showLog(log.id, null, null, null, true);
           console.log('moving');
           return $timeout(function() {
-            return move(direction);
-          }, 2000);
+            move(direction);
+            return $timeout(function() {
+              return changeLocation(log.id);
+            }, 500);
+          }, 500);
         }
       };
       console.log('move defined');

@@ -47,7 +47,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
                   console.log 'url watch'
                   if not isLoading
                     console.log 'stop watch'
-                    showLog($rootScope.urlEntered, true)
+                    showLog($rootScope.urlEntered, true, null, null, null, true)
                     watch()
                 )
               else
@@ -93,7 +93,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
             console.log 'url watch'
             if not isLoading
               console.log 'stop url watch'
-              showLog($rootScope.urlEntered, true)
+              showLog($rootScope.urlEntered, true, null, null, null, true)
               watch()
           )
         else
@@ -143,7 +143,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
   console.log 'sliding animation defined'
 
-  showLog = (logId, manualSwitch, invert, dontPushState) ->
+  showLog = (logId, manualSwitch, invert, dontPushState, notChangeMarker, renderBadgeInMain) ->
     console.log 'showlog'
     if logId?
       console.log 'log id'
@@ -158,22 +158,6 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
           else
             console.log 'switchlogs -> log'
             $scope.log = log
-        if log.profileId?
-          console.log 'profileid'
-          if not switchLogs
-            console.log 'not switchlogs -> launch'
-            renderBadge(log.profileId, '.launch')
-          else
-            console.log 'switchlogs -> main'
-            renderBadge(log.profileId, '.main')
-        else
-          console.log 'no profileid'
-          if not switchLogs
-            console.log 'not switchlogs -> launch'
-            $(".launch .log-author").html(log.profileName)
-          else
-            console.log 'switchlogs -> main'
-            $(".main .log-author").html(log.profileName)
         $scope.$apply()
       else
         console.log 'no invert'
@@ -183,24 +167,18 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         else
           console.log 'not switchlogs -> log'
           $scope.log = log
-        if log.profileId?
-          console.log 'profile id'
-          if switchLogs
-            console.log 'switchlogs -> launch'
-            renderBadge(log.profileId, '.launch')
-          else
-            console.log 'not switchlogs -> main'
-            renderBadge(log.profileId, '.main')
+      if log.profileId?
+        console.log 'profileid'
+        if renderBadgeInMain? and renderBadgeInMain
+          renderBadge(log.profileId, '.main')
         else
-          console.log 'no profileid'
-          console.log log
-          console.log log.profileId
-          if switchLogs
-            console.log 'switchlogs -> launch'
-            $(".launch .log-author").html(log.profileName)
-          else
-            console.log 'not switchlogs -> main'
-            $(".main .log-author").html(log.profileName)
+          renderBadge(log.profileId, '.launch')
+      else
+        console.log 'no profileid'
+        if renderBadgeInMain? and renderBadgeInMain
+          $(".main .log-author").html(log.profileName)
+        else
+          $(".launch .log-author").html(log.profileName)
       if not dontPushState? or not dontPushState
         console.log 'pushstate'
         history.pushState(log.id, log.title, "/log/"+log.id)
@@ -208,7 +186,8 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         console.log 'manual switch'
         switchLogs = not switchLogs
       Map.data.current = log.key
-      changeLocation(logId)
+      if not notChangeMarker? or not notChangeMarker
+        changeLocation(logId)
       console.log 'finish showing log'
     else
       console.log 'no logid'
@@ -219,11 +198,16 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     if Map.data.loadingLogs == 0
       log = Map.move(direction)
       console.log 'showing log'
-      showLog(log.id)
+      showLog(log.id, null, null, null, true)
       console.log 'moving'
       $timeout(()->
         move(direction)
-      ,2000)
+        $timeout(()->
+          changeLocation(log.id)
+        , 500
+        )
+
+      ,500)
 
   console.log 'move defined'
 
