@@ -1,7 +1,6 @@
 import requests
 import json
 import random
-import dateutil.parser
 
 data = {
   "profileId": "107803280249128570180"

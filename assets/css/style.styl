@@ -26,6 +26,15 @@
 	bottom: 50px
 	left: 50%
 	margin-left: -50px
+	span
+		font-size: 0.5em
+		font-family: "Roboto", sans-serif
+		color: #aaa
+		position: absolute
+		bottom: -30px
+		left: 50%
+		margin-left: -40px
+
 	&.large
 		font-size:100px
 	&.hide-all
@@ -37,12 +46,13 @@
 	
 
 #minimap
+	width: calc(100% - 100px)
+	width: -webkit-calc(100% - 100px)
+	top: 50px
+	left: 50px
 	height: 25%
-	width: calc(100% - 60px)
 	position: absolute
 	z-index: 1
-	top: 30px
-	left: 30px
 	#map-canvas
 		height: 100%
 #add-map-canvas
@@ -83,14 +93,14 @@
 	background-position:center
 	background-repeat:no-repeat
 	&.background-0
-		background: url('/static/img/1280calmlake.jpg')
+		background: url('/static/img/2000calmlake.jpg')
 		background-size:cover	
 	&.background-1
-		background: url('/static/img/1280eveningsky.jpg')
+		background: url('/static/img/2000eveningsky.jpg')
 	&.background-2
-		background: url('/static/img/1280roughwaves.jpg')
+		background: url('/static/img/2000roughwaves.jpg')
 	&.background-3
-		background: url('/static/img/1280snowymountain.jpg')
+		background: url('/static/img/2000snowymountain.jpg')
 		background-repeat:no-repeat
 		background-size:cover	
 	&.passive
@@ -122,36 +132,38 @@
 		width: 170px
 		background: #292929
 		border: transparent
-		top: 48%
+		top: 45%
 		left: 50%
 		position: absolute
 		margin-left: -85px
 		&.top-bar
-			margin-top: -125px
+			margin-top: -120px
 	h1
-		font-size: 3em
+		font-size: 4em
 		position: absolute
+		margin-top: -100px
 		top: 50%
-		margin-top: -80px
 		left: 50%
-		margin-left: -130px
-		font-weight: 100
-		text-transform:uppercase
-		color:#292929
+		margin-left: -175px
+		font-weight: 300
+		width: 300px
+		text-transform: uppercase
 	p
 		font-size: 1.5em
 		position: absolute
 		top: 50%
 		left: 50%
-		margin-left: -270px
-		font-weight:300
+		width: 400px
+		margin-top: 50px
+		margin-left: -200px
 		text-align:center
 		color:#666
+		font-weight:300
 	h3
 		position: absolute
 		font-size: 2em
 		top: 50%
-		margin-top: 120px
+		margin-top: 130px
 		left: 50%
 		margin-left: -90px
 		font-weight: 500
@@ -228,24 +240,27 @@
 		#overlay-content
 			position: absolute
 			top: 0
+			width: -webkit-calc(100% - 100px)
 			width: calc(100% - 100px)
-			height: calc(100% - 130px)
+			height: -webkit-calc(100% - 100px)
+			height: calc(100% - 100px)
 			margin-left: 50px
-			margin-top: 50px
-			opacity:0
+			margin-top: 30px
+
 			&.fadein
 				opacity: 1
 				pointer-events:auto
 			pointer-events:none
 			z-index:1	
 			.message
-				font-size: 1.5em;
-				position: absolute;
-				top: 40%;
-				left: 50%;
-				text-align: center;
-				width: 290px;
-				margin-left: -145px;
+				font-size: 1.5em
+				position: absolute
+				top: 50%
+				left: 50%
+				text-align: center
+				width: 290px
+				margin-left: -145px
+			.push-down
 			button
 				background:transparent
 				border:transparent
@@ -275,11 +290,14 @@
 					margin-top: 10px
 					padding-left: 10px
 					color:#aaa
+				button
+					font-size:2em
 				ul
+
 					padding-left: 0px
 					overflow: scroll
-					height: 120px
-					width: 300px
+					height: 200px
+					width: 00px
 
 					li
 						list-style:none
@@ -290,19 +308,22 @@
 
 	.log-details
 		width: calc(100% - 100px)
+		width: -webkit-calc(100% - 100px)
 		height: calc(80% - 180px)
+		height: -webkit-calc(80% - 180px)
 		padding-bottom: 0px
 		top: calc(25% + 50px)
+		top: -webkit-calc(25% + 50px)
 		z-index: 10
 		position: absolute
 		margin-left: 50px
-		padding: 0px
+		padding: 30px 30px 30px 50px
 		&.launch
 			left:-200%	
 		.log-title
 			text-transform: uppercase
-			font-size: 1.8em
 			color: white
+			font-size:2.2em
 		.log-author
 			padding: 10px 0px
 			color:#ed4d4a
@@ -313,13 +334,16 @@
 			line-height: 1.3em
 			font-size:1em
 			height: calc(100% - 50px)
+			height: -webkit-calc(100% - 50px)
+			margin-top:20px
 			img
 				width: 100%
 				height: auto
+				padding: 0px 100px
 		#log-wrapper
 			height: 95%
 			overflow-y: scroll
-			overflow-x: none
+			overflow-x: hidden
 			padding-right: 30px
 	#blackshade
 		height:100%
@@ -346,13 +370,13 @@
 				cursor:pointer
 
 	#country
+		font-size: 2em
+		margin-top: 60px
 		text-transform: uppercase
-		font-size: 1.5em
 		color: #999
 		position: absolute
 		width: 250px
 		right: 75px
-		margin-top: 110px
 		text-align: right
 		-webkit-transition:all 0.2s ease-in-out;
 		-moz-transition:all 0.2s ease-in-out;
@@ -371,22 +395,22 @@
 			cursor:pointer
 	.sidenav-top
 		width:100%
-		height:30px
+		height:50px
 		top:0
 		border-bottom:solid 1px white
 	.sidenav-bottom
 		width:100%
-		height:30px
+		height:50px
 		bottom:0
 		border-top:solid 1px white
 	.sidenav-left
-		width:30px
+		width:50px
 		height:100%
 		left:0
 		border-right:solid 1px white
 	.sidenav-right
 		height:100%
-		width:30px
+		width:50px
 		right:0
 		border-left:solid 1px white
 	.arrow
@@ -395,135 +419,97 @@
 		position: absolute
 		opacity: 0.8
 		&.arrow-up-down
-			border-left: 15px solid transparent
-			border-right: 15px solid transparent
+			border-left: 20px solid transparent
+			border-right: 20px solid transparent
 			right:50%
 			margin-right:-10px
 		&.arrow-left-right
-			border-top: 15px solid transparent
-			border-bottom: 15px solid transparent
+			border-top: 20px solid transparent
+			border-bottom: 20px solid transparent
 			top:50%
 			margin-top:-10px
 		&.arrow-up		
-			border-bottom: 15px solid #fff
-			margin-top: 5px
+			border-bottom: 20px solid #fff
+			margin-top: 15px
 		&.arrow-down
-			border-top: 15px solid #fff
+			border-top: 20px solid #fff
 			bottom:0
-			margin-bottom: 5px
+			margin-bottom: 15px
 		&.arrow-right
-			border-left: 15px solid #fff
+			border-left: 20px solid #fff
 			right:0
-			margin-right: 5px
+			margin-right: 15px
 		&.arrow-left 
-			border-right:15px solid #fff
+			border-right:20px solid #fff
 			left:0
-			margin-left: 5px
+			margin-left: 15px
 
 
-@media (min-width:320px)
-	#launch-screen
-		p
-			font-size: 1.5em
-			width: 300px
-			margin-top: 50px
-			margin-left: -150px
-			text-align:center
-		h3
-			margin-top: 130px
+@media (max-width:320px)
+
 	#container
 		.log-details
 			padding: 0px
 			.log-title
 				font-size: 1.7em
 
-@media (min-width:480px)
+@media (max-width:480px)
+	#launch-screen
+		h1
+			font-size: 3em
+			margin-top: -85px
+			margin-left: -135px
+		p
+			font-size: 1.1em
+
+		h3
+			margin-top: 130px
 	#container 
+		#overlay
+			#overlay-content
+				#search
+					button
+						font-size: 1.5em
+		#minimap
+			width:calc(100% - 60px)
+			width:-webkit-calc(100% - 60px)
+			top: 30px
+			left: 30px
 		.log-details
+			padding: 0px
 			.log-content
 				margin-top: -5px
-	#launch-screen
-		h1
-			font-size: 4em
-			margin-top: -100px
-			left: 50%
-			margin-left: -175px
-
-
-@media (min-width:760px)
-	#launch-screen
-		h1
-			font-size:2em
-	#minimap
-		width: calc(100% - 100px)
-		top: 50px
-		left: 50px
-	#container
-		.log-details
-			padding: 30px 30px 30px 50px
-			.log-content
-				margin-top:20px
-				img
-					padding: 0px 100px
-			.log-title
-				font-size:2.2em
-		#overlay-content
-			p
-				margin-left:auto
-				margin-right:auto
-			#search	
-				ul
-					height: 200px
-				button
-					font-size:2em
-
-		#country
-			font-size: 2em
-			margin-top: 60px
 		.sidenav-top
-			height:50px
+			height:30px
 		.sidenav-bottom
-			height:50px
+			height:30px
 		.sidenav-left
-			width:50px
+			width:30px
 		.sidenav-right
-			width:50px
+			width:30px
 		.arrow
 			&.arrow-up-down
-				border-left: 20px solid transparent
-				border-right: 20px solid transparent
-				right:50%
-				margin-right:-10px
+				border-left: 15px solid transparent
+				border-right: 15px solid transparent
+				margin-right:-5px
 			&.arrow-left-right
-				border-top: 20px solid transparent
-				border-bottom: 20px solid transparent
-				top:50%
-				margin-top:-10px
+				border-top: 15px solid transparent
+				border-bottom: 15px solid transparent
+				margin-top:-5px
 			&.arrow-up		
-				border-bottom: 20px solid #fff
-				top: 0
-				margin-top: 15px
+				border-bottom: 15px solid #fff
+				margin-top: 5px
 			&.arrow-down
-				border-top: 20px solid #fff
-				bottom:0
-				margin-bottom: 15px
+				border-top: 15px solid #fff
+				margin-bottom: 5px
 			&.arrow-right
-				border-left: 20px solid #fff
-				right:0
-				margin-right: 15px
+				border-left: 15px solid #fff
+				margin-right: 5px
 			&.arrow-left 
-				border-right:20px solid #fff
-				left:0
-				margin-left: 15px
+				border-right:15px solid #fff
+				margin-left: 5px
 
-@media (min-height:1000px)
-	.background
-		&.background-0
-			background: url('/static/img/2000calmlake.jpg')
-		&.background-1
-			background: url('/static/img/2000eveningsky.jpg')
-		&.background-2
-			background: url('/static/img/2000roughwaves.jpg')
-		&.background-3
-			background: url('/static/img/2000snowymountain.jpg')
-	
+
+
+
+
