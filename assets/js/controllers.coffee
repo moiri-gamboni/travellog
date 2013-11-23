@@ -130,6 +130,18 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
   $scope.deactivateOverlay = (view) ->
     $rootScope.overlayIsActive = false
 
+  $scope.changeShowing = (view) ->
+    if !$("#loading").hasClass("fadein")
+      $rootScope.loadingposition = "big center"
+      $rootScope.showing = view
+      $rootScope.overlayIsActive = true
+      console.log "going"
+      console.log $rootScope.loggedIn
+      console.log $rootScope.filesLoaded
+      if $rootScope.loggedIn and not $rootScope.filesLoaded
+        $rootScope.pullFiles()
+        console.log "working"
+
 
   Map.initMap()
 
@@ -140,39 +152,31 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     #if user is signed_in
   #$scope.map = Map
   $rootScope.showing = 'loading'
-  $scope.loggedIn = false
-  $scope.myfilesa = {"title":"empty"}
+  $rootScope.loggedIn = false
+  $scope.myfiles = []
   $scope.selectedFile = null
   $scope.addMapSelected = false
   $scope.loading = false
+  $rootScope.filesLoaded = false
   $scope.loadingMessage = ""
   $scope.completeUrl = ""
   $scope.successMessage = ""
 
-  callback = (passedScope)=>
-    return (event, resp)=>
-      console.log "finishing login"
-      User = resp
-      console.log User
-      passedScope.$apply ()->
-        passedScope.loggedIn = true
-      passedScope.loading = true
-      passedScope.loadingMessage = "Loading your drive (this could take a while)"
-      # if $rootScope.overlayIsActive
-      #   fadeLoading(false)
-      retrieveAllFiles((resp) ->
-        passedScope.$apply(() ->
-          passedScope.myfiles = resp
-        )
-        $scope.$apply(() ->
-          $scope.loading = false
-          # if $rootScope.overlayIsActive
-          #   fadeLoading(true)
-        )
-        angular.element("html").scope().$broadcast('update-load');
-      )
-      startAddMap()
-  $rootScope.$on('loggedIn', callback($scope))
+  $rootScope.$on('loggedIn', (event, resp) ->
+    console.log "finishing login"
+    User = resp
+    console.log User
+    $rootScope.$apply ()->
+      $rootScope.loggedIn = true
+    $scope.loading = true
+    $scope.$apply(() ->
+      $scope.loadingMessage = "Loading your drive (this could take a while)"
+      console.log "loading message updated"
+      console.log $scope.loadingMessage
+    )
+    if $rootScope.overlayIsActive
+      $rootScope.pullFiles()
+  )
   $rootScope.$on('addMapSelected', () ->
     $scope.$apply ()->
       $scope.addMapSelected = true
@@ -186,11 +190,21 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
   $scope.selectFile = (file) ->
     $scope.selectedFile = file
 
-  $scope.changeShowing = (view) ->
-    if !$("#loading").hasClass("fadein")
-      $rootScope.loadingposition = "big center"
-      $rootScope.showing = view
-      $rootScope.overlayIsActive = true
+  $rootScope.pullFiles = () ->
+    console.log "starting to pull data"
+    $rootScope.filesLoaded = true
+    retrieveAllFiles((resp) ->
+      console.log "got response"
+      $scope.$apply(() ->
+        $scope.myfiles = resp
+        $scope.loading = false
+      )
+      angular.element("html").scope().$broadcast('update-load');
+    )
+    startAddMap()
+
+
+
 
   $scope.$watch( () ->
     return $scope.loading
@@ -213,7 +227,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
         if $rootScope.overlayIsActive
           fadeLoading(true)
         returnVal = 'complete'
-      else if $scope.loggedIn
+      else if $rootScope.loggedIn
         if $rootScope.overlayIsActive
           fadeLoading(true)
         setTimeout( ()->
@@ -225,7 +239,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
         if $rootScope.overlayIsActive
           fadeLoading(true)
     angular.element("html").scope().$broadcast('update-load');
-
+    console.log returnVal
     return returnVal
 
   $scope.canSubmit = () ->
@@ -268,16 +282,14 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
             $scope.completeUrl = ""
             $scope.successMessage = data.error
         ).error (data, status, headers, config) ->
+          return
       )
     )
 
 
-
-
   $scope.startLogin = () ->
-    if not $scope.loggedIn
+    if not $rootScope.loggedIn
       $scope.loading = true
       $scope.loadingMessage = "Logging you in"
-
 ])
 

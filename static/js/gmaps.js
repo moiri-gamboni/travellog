@@ -204,7 +204,8 @@ function placeMarkerMiniMap(log_object) {
   idMarkerMap[log_object.id] = marker;
   google.maps.event.addListener(marker, 'click', switchMiniMarker);
 }
-
-google.maps.event.addDomListener(window, 'load', initialize);
+$(function() {
+  initialize()
+});
 
 

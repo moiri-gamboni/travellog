@@ -144,48 +144,53 @@
       $scope.deactivateOverlay = function(view) {
         return $rootScope.overlayIsActive = false;
       };
+      $scope.changeShowing = function(view) {
+        if (!$("#loading").hasClass("fadein")) {
+          $rootScope.loadingposition = "big center";
+          $rootScope.showing = view;
+          $rootScope.overlayIsActive = true;
+          console.log("going");
+          console.log($rootScope.loggedIn);
+          console.log($rootScope.filesLoaded);
+          if ($rootScope.loggedIn && !$rootScope.filesLoaded) {
+            $rootScope.pullFiles();
+            return console.log("working");
+          }
+        }
+      };
       return Map.initMap();
     }
   ]);
 
   ctrl.controller("MyFilesController", [
     '$http', '$scope', '$rootScope', 'User', function($http, $scope, $rootScope, User) {
-      var callback,
-        _this = this;
       $rootScope.showing = 'loading';
-      $scope.loggedIn = false;
-      $scope.myfilesa = {
-        "title": "empty"
-      };
+      $rootScope.loggedIn = false;
+      $scope.myfiles = [];
       $scope.selectedFile = null;
       $scope.addMapSelected = false;
       $scope.loading = false;
+      $rootScope.filesLoaded = false;
       $scope.loadingMessage = "";
       $scope.completeUrl = "";
       $scope.successMessage = "";
-      callback = function(passedScope) {
-        return function(event, resp) {
-          console.log("finishing login");
-          User = resp;
-          console.log(User);
-          passedScope.$apply(function() {
-            return passedScope.loggedIn = true;
-          });
-          passedScope.loading = true;
-          passedScope.loadingMessage = "Loading your drive (this could take a while)";
-          retrieveAllFiles(function(resp) {
-            passedScope.$apply(function() {
-              return passedScope.myfiles = resp;
-            });
-            $scope.$apply(function() {
-              return $scope.loading = false;
-            });
-            return angular.element("html").scope().$broadcast('update-load');
-          });
-          return startAddMap();
-        };
-      };
-      $rootScope.$on('loggedIn', callback($scope));
+      $rootScope.$on('loggedIn', function(event, resp) {
+        console.log("finishing login");
+        User = resp;
+        console.log(User);
+        $rootScope.$apply(function() {
+          return $rootScope.loggedIn = true;
+        });
+        $scope.loading = true;
+        $scope.$apply(function() {
+          $scope.loadingMessage = "Loading your drive (this could take a while)";
+          console.log("loading message updated");
+          return console.log($scope.loadingMessage);
+        });
+        if ($rootScope.overlayIsActive) {
+          return $rootScope.pullFiles();
+        }
+      });
       $rootScope.$on('addMapSelected', function() {
         return $scope.$apply(function() {
           return $scope.addMapSelected = true;
@@ -200,12 +205,18 @@
       $scope.selectFile = function(file) {
         return $scope.selectedFile = file;
       };
-      $scope.changeShowing = function(view) {
-        if (!$("#loading").hasClass("fadein")) {
-          $rootScope.loadingposition = "big center";
-          $rootScope.showing = view;
-          return $rootScope.overlayIsActive = true;
-        }
+      $rootScope.pullFiles = function() {
+        console.log("starting to pull data");
+        $rootScope.filesLoaded = true;
+        retrieveAllFiles(function(resp) {
+          console.log("got response");
+          $scope.$apply(function() {
+            $scope.myfiles = resp;
+            return $scope.loading = false;
+          });
+          return angular.element("html").scope().$broadcast('update-load');
+        });
+        return startAddMap();
       };
       $scope.$watch(function() {
         return $scope.loading;
@@ -232,7 +243,7 @@
               fadeLoading(true);
             }
             returnVal = 'complete';
-          } else if ($scope.loggedIn) {
+          } else if ($rootScope.loggedIn) {
             if ($rootScope.overlayIsActive) {
               fadeLoading(true);
             }
@@ -248,6 +259,7 @@
           }
         }
         angular.element("html").scope().$broadcast('update-load');
+        console.log(returnVal);
         return returnVal;
       };
       $scope.canSubmit = function() {
@@ -298,7 +310,7 @@
         });
       };
       return $scope.startLogin = function() {
-        if (!$scope.loggedIn) {
+        if (!$rootScope.loggedIn) {
           $scope.loading = true;
           return $scope.loadingMessage = "Logging you in";
         }
