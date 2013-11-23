@@ -13,7 +13,7 @@ def randLng():
   return (180*(random.random() - 0.5) * 2)
 
 data["country"] = "USA"
-for ids in ["1bMUS1TNaLZtJ8khEpa1RdutsLTJoCh6p5aGUlwwzLRM", 
+for ids in ["1bMUS1TNaLZtJ8khEpa1RdutsLTJoCh6p5aGUlwwzLRM",
     "1BhomhZkJthbQtO0aMUEVIF43jRf3OVo51jSqijjWAXs"]:
   data["gdriveId"] = ids
   data["lat"] = randLat()
@@ -31,7 +31,7 @@ for ids in ["1nLlul_8Oh2RmwvkPEIS1_flDkIAhk9pT_SQqKlLNh_8",
   data["lng"] = randLng()
   r = requests.post("http://localhost:8080/logs", data=json.dumps(data))
   print r.text
-       
+
 data["country"] = "UAE"
 for ids in ["1XPUPhLyL3akl7tQ0ODHFxo2kUmd4U05Q9ROvGY3qmow"]:
   data["gdriveId"] = ids
@@ -41,7 +41,7 @@ for ids in ["1XPUPhLyL3akl7tQ0ODHFxo2kUmd4U05Q9ROvGY3qmow"]:
   print r.text
 
 data["country"] = "Oman"
-for ids in ["1_1vivrYBkxBf2DAVI5dkI3A-uCnDNZFHWq3_cQTxyOs", 
+for ids in ["1_1vivrYBkxBf2DAVI5dkI3A-uCnDNZFHWq3_cQTxyOs",
   "1sJn_dPHmOIXsuahOFP6mGGJR071dRNC7ZOTvPwe-Gu4",
   "1nuIyAbdjZ08yget-ykEdLuWndjWPP6CA6-_ougJl8VA",
   "1Gq9iT-yb6GFJN7BrBapZr7Ep0ZL2SdP8wtxJm_GRmm0",

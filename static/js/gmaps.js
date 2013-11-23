@@ -63,6 +63,7 @@ function initialize() {
   };
   miniMap = new google.maps.Map(document.getElementById("map-canvas"),
     mapOptions);
+  angular.element("html").scope().$broadcast('map-ready');
 }
 
 addMapMarker = null;
@@ -145,9 +146,8 @@ function startAddMap() {
 function seedMap() {
   function dropCallback(resp, i) {
     return function() {
-      console.log(resp.logs[i]);
       placeMarkerMiniMap(resp.logs[i]);
-    }; 
+    };
   }
   $.get("/logs", function(resp) {
     for (var i=0; i < resp.logs.length; i++) {
@@ -180,9 +180,6 @@ function changeLocation(markerId) {
   } else {
     currentMiniMarker.setAnimation(google.maps.Animation.BOUNCE);
   }
-  // push the new url
-  history.pushState(currentMiniMarker.title, null,
-    "/log/" + currentMiniMarker.title);
   // focus the map to the new marker
   miniMap.panTo(currentMiniMarker.position);
   if (miniMap.getZoom() == 1) {
@@ -190,18 +187,13 @@ function changeLocation(markerId) {
   }
 }
 
-// bind the state changes to change locations
-window.onpopstate = function() {
-  changeLocation(history.state);
-};
 
 function switchMiniMarker() {
-  changeLocation(this.title);
+  angular.element("html").scope().$broadcast('switch-marker', this.title);
 }
 
 
 function placeMarkerMiniMap(log_object) {
-  console.log(log_object);
   var marker = new google.maps.Marker({
     position: new google.maps.LatLng(log_object.lat, log_object.lng),
       animation: google.maps.Animation.DROP,
@@ -212,7 +204,8 @@ function placeMarkerMiniMap(log_object) {
   idMarkerMap[log_object.id] = marker;
   google.maps.event.addListener(marker, 'click', switchMiniMarker);
 }
-                      
-google.maps.event.addDomListener(window, 'load', initialize);
+$(function() {
+  initialize()
+});
 
 

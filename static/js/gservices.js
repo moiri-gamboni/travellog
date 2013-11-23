@@ -5,25 +5,30 @@ var scopes = "https://www.googleapis.com/auth/plus.me"+
   " https://www.googleapis.com/auth/userinfo.profile";
 function handleClientLoad() {
   // Step 2: Reference the API key
+  console.log('Checking client load');
   gapi.client.setApiKey(apiKey);
   window.setTimeout(checkAuth,1);
 }
 
 function checkAuth() {
+  console.log('checking auth');
   gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, handleAuthResult);
 }
 
 function handleAuthResult(authResult) {
+  console.log('Handling result');
   var successMessage = $("#loggedIn");
   var authorizeButton = $("#authorize-button");
+  console.log(authResult)
   if (authResult && !authResult.error) {
     getUserInfo();
-  } else {
-    authorizeButton.on("click", handleAuthClick);
   }
 }
 
+$("#authorize-button").on("click", handleAuthClick);
+
 function handleAuthClick(event) {
+  console.log('handling auth click');
   // Step 3: get authorization to use private data
   gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, handleAuthResult);
   return false;
@@ -31,6 +36,7 @@ function handleAuthClick(event) {
 
 // Load the API and make an API call.  Display the results on the screen.
 function getUserInfo() {
+  console.log('get user info');
   // Step 4: Load the Google+ API
   gapi.client.load('plus', 'v1', function() {
     // Step 5: Assemble the API request
@@ -38,22 +44,24 @@ function getUserInfo() {
       'userId': 'me'
     });
     // Step 6: Execute the API request
+    console.log("user info being gotten")
     request.execute(function(resp) {
       // if the person has no google plus id
       if (resp.code == 404) {
         gapi.client.load('oauth2', 'v2', function() {
           var request = gapi.client.oauth2.userinfo.get();
-          request.execute(function(resp) {
-            $("#name").html(resp.name);
+          request.execute(function(resp) {;
             setTimeout(function() {
+              console.log("no google plus found");
               angular.element("html").scope().$broadcast('loggedIn', resp);
             }, 1000);
           });
         });
       } else {
         // else retrieve their information from the g+ info
-        $("#name").html(resp.displayName);
+        console.log("google plus found");
         setTimeout(function() {
+              console.log("broadcasting")
               angular.element("html").scope().$broadcast('loggedIn', resp);
             }, 1000);
       }
@@ -62,12 +70,11 @@ function getUserInfo() {
   });
   // load the drive client
   gapi.client.load('drive', 'v2');
-  gapi.client.load('person', 'v1');
 }
 
 // renders the google plus badge in the loader
-function renderBadge(id) {
-  div_id = $(".launch .log-author").html('<div class="g-person"' +
+function renderBadge(id, div) {
+  div_id = $(div + " .log-author").html('<div class="g-person"' +
     'data-width="273" data-href="https://plus.google.com/' + id +
     '" data-layout="landscape" data-showcoverphoto="false"></div>').attr("id");
   gapi.person.go(div_id);
@@ -82,6 +89,7 @@ function retrieveAllFiles(callback) {
   var retrievePageOfFiles = function(request, result) {
     request.execute(function(resp) {
       result = result.concat(resp.items);
+      angular.element("html").scope().$broadcast('partialFilesLoaded', result);
       var nextPageToken = resp.nextPageToken;
       if (nextPageToken) {
         request = gapi.client.drive.files.list({
@@ -101,17 +109,18 @@ function addToTravellog(fileId, callback) {
   var body = {
     "value": "stories@travellog.io",
     "type": "user",
-    "role": "owner"
+    "role": "reader"
   };
   var request = gapi.client.drive.permissions.insert({
     "fileId": fileId,
     "resource": body
   });
-  request.execute(callback);
-
+  if (callback && typeof(callback) === "function") {
+    request.execute(callback);
+  }
 }
 
-function makePublic(fileId) {
+function makePublic(fileId, callback) {
   var body = {
     "value": "",
     "type": "anyone",
@@ -121,6 +130,16 @@ function makePublic(fileId) {
     "fileId": fileId,
     "resource": body
   });
-  request.execute(callback);
+  if (callback && typeof(callback) === "function") {
+    request.execute(callback);
+  }
 
 }
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-45976740-1', 'travellog.io');
+  ga('send', 'pageview');

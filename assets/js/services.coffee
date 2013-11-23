@@ -9,10 +9,10 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
       latLogs: []
       lngLogs: []
       current: null
+      loadingLogs: 0
 
     getCurrentLog: () ->
       if factory.data.current? and factory.data.lngLogs? and factory.data.lngLogs[factory.data.current[0]]?
-        console.log(factory.data.current)
         return factory.data.logs[factory.data.lngLogs[factory.data.current[0]].id]
       else
         return null
@@ -35,19 +35,40 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
 
     getLog: (logId, callback) ->
       if not factory.data.logs[logId].body?
+        factory.data.loadingLogs++
+        $rootScope.$broadcast('is-loading-log', true)
         get = $http.get(
           window.location.protocol + "//" + window.location.host + "/logs",
           {params:{id:logId}}
         )
         if callback?
-          get.success(callback)
+          get.success((data, status, headers, config)->
+            factory.data.loadingLogs--
+            callback(data, status, headers, config)
+            if factory.data.loadingLogs == 0
+              $rootScope.$broadcast('is-loading-log', false)
+          ).error((data, status, headers, config)->
+            factory.data.loadingLogs--
+            if factory.data.loadingLogs == 0
+              $rootScope.$broadcast('is-loading-log', false)
+          )
         else
           get.success((data, status, headers, config)->
-            console.log(data)
+            console.log 'success'
+            console.log data
+            factory.data.loadingLogs--
+            if factory.data.loadingLogs == 0
+              $rootScope.$broadcast('is-loading-log', false)
             factory.data.logs[data.log.id].title = data.log.title
             factory.data.logs[data.log.id].profileId = data.log.profileId
-            factory.data.logs[data.log.id].profileId = data.log.profileName
+            factory.data.logs[data.log.id].profileName = data.log.profileName
             factory.data.logs[data.log.id].body = data.log.body
+          ).error((data, status, headers, config)->
+            console.log 'error'
+            console.log data
+            factory.data.loadingLogs--
+            if factory.data.loadingLogs == 0
+              $rootScope.$broadcast('is-loading-log', false)
           )
 
     getClosestLogs: (around) ->
@@ -56,7 +77,6 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
         factory.getLog(factory.data.lngLogs[location[0]].id)
 
     getClosestLocation: (from, direction) ->
-
       tempKey = from.slice()
       change = if direction in ['N', 'E'] then 1 else (-1)
       breakLoop = false
@@ -68,6 +88,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
             tempKey[1] = i
             tempLog = factory.data.latLogs[tempKey[1]]
             tempKey = factory.data.logs[tempLog.id].key
+            return tempKey
             if factory.inRange(from, tempKey, direction, wrapNumber)
               breakLoop = true
               break
@@ -79,6 +100,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
             tempKey[0] = i
             tempLog = factory.data.lngLogs[tempKey[0]]
             tempKey = factory.data.logs[tempLog.id].key
+            return tempKey
             if factory.inRange(from, tempKey, direction, wrapNumber)
               breakLoop = true
               break
@@ -112,6 +134,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
     initMap: () ->
       getLogsCallback = (mapData) ->
         return (data, status, headers, config) ->
+          $rootScope.$broadcast('logs-ready')
           mapData.latLogs = data.logs.slice().sort((b, a) ->
             return b.lat-a.lat
           )
@@ -133,7 +156,6 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
 
           keys = Object.keys(mapData.logs)
           mapData.current = mapData.logs[keys[(Math.random()*keys.length)>>0]].key
-          console.log(factory.data.current)
           id = mapData.lngLogs[factory.data.current[0]].id
           factory.getLog(id,
             (data, status, headers, config)->
@@ -141,12 +163,11 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
               factory.data.logs[data.log.id].profileId = data.log.profileId
               factory.data.logs[data.log.id].profileId = data.log.profileName
               factory.data.logs[data.log.id].body = data.log.body
-              $rootScope.$broadcast('gotFirstLog')
+              $rootScope.$broadcast('first-log-ready')
           )
           factory.getClosestLogs(factory.data.current)
 
       factory.getLogs(getLogsCallback(factory.data))
-
 
   return factory
 

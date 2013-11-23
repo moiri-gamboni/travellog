@@ -13,11 +13,11 @@
           logs: {},
           latLogs: [],
           lngLogs: [],
-          current: null
+          current: null,
+          loadingLogs: 0
         },
         getCurrentLog: function() {
           if ((factory.data.current != null) && (factory.data.lngLogs != null) && (factory.data.lngLogs[factory.data.current[0]] != null)) {
-            console.log(factory.data.current);
             return factory.data.logs[factory.data.lngLogs[factory.data.current[0]].id];
           } else {
             return null;
@@ -42,20 +42,45 @@
         getLog: function(logId, callback) {
           var get;
           if (factory.data.logs[logId].body == null) {
+            factory.data.loadingLogs++;
+            $rootScope.$broadcast('is-loading-log', true);
             get = $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
               params: {
                 id: logId
               }
             });
             if (callback != null) {
-              return get.success(callback);
+              return get.success(function(data, status, headers, config) {
+                factory.data.loadingLogs--;
+                callback(data, status, headers, config);
+                if (factory.data.loadingLogs === 0) {
+                  return $rootScope.$broadcast('is-loading-log', false);
+                }
+              }).error(function(data, status, headers, config) {
+                factory.data.loadingLogs--;
+                if (factory.data.loadingLogs === 0) {
+                  return $rootScope.$broadcast('is-loading-log', false);
+                }
+              });
             } else {
               return get.success(function(data, status, headers, config) {
+                console.log('success');
                 console.log(data);
+                factory.data.loadingLogs--;
+                if (factory.data.loadingLogs === 0) {
+                  $rootScope.$broadcast('is-loading-log', false);
+                }
                 factory.data.logs[data.log.id].title = data.log.title;
                 factory.data.logs[data.log.id].profileId = data.log.profileId;
-                factory.data.logs[data.log.id].profileId = data.log.profileName;
+                factory.data.logs[data.log.id].profileName = data.log.profileName;
                 return factory.data.logs[data.log.id].body = data.log.body;
+              }).error(function(data, status, headers, config) {
+                console.log('error');
+                console.log(data);
+                factory.data.loadingLogs--;
+                if (factory.data.loadingLogs === 0) {
+                  return $rootScope.$broadcast('is-loading-log', false);
+                }
               });
             }
           }
@@ -88,6 +113,7 @@
                 tempKey[1] = i;
                 tempLog = factory.data.latLogs[tempKey[1]];
                 tempKey = factory.data.logs[tempLog.id].key;
+                return tempKey;
                 if (factory.inRange(from, tempKey, direction, wrapNumber)) {
                   breakLoop = true;
                   break;
@@ -100,6 +126,7 @@
                 tempKey[0] = i;
                 tempLog = factory.data.lngLogs[tempKey[0]];
                 tempKey = factory.data.logs[tempLog.id].key;
+                return tempKey;
                 if (factory.inRange(from, tempKey, direction, wrapNumber)) {
                   breakLoop = true;
                   break;
@@ -143,6 +170,7 @@
           getLogsCallback = function(mapData) {
             return function(data, status, headers, config) {
               var i, id, keys, log, _i, _j, _len, _len1, _ref, _ref1;
+              $rootScope.$broadcast('logs-ready');
               mapData.latLogs = data.logs.slice().sort(function(b, a) {
                 return b.lat - a.lat;
               });
@@ -170,14 +198,13 @@
               }
               keys = Object.keys(mapData.logs);
               mapData.current = mapData.logs[keys[(Math.random() * keys.length) >> 0]].key;
-              console.log(factory.data.current);
               id = mapData.lngLogs[factory.data.current[0]].id;
               factory.getLog(id, function(data, status, headers, config) {
                 factory.data.logs[data.log.id].title = data.log.title;
                 factory.data.logs[data.log.id].profileId = data.log.profileId;
                 factory.data.logs[data.log.id].profileId = data.log.profileName;
                 factory.data.logs[data.log.id].body = data.log.body;
-                return $rootScope.$broadcast('gotFirstLog');
+                return $rootScope.$broadcast('first-log-ready');
               });
               return factory.getClosestLogs(factory.data.current);
             };

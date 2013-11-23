@@ -25,13 +25,13 @@
 
 	<div id="launch-screen">
 		<div id="whiteshade"></div>
-		<div id="logo">
+		<div id="logo" ng-click="begin()">
 			<hr class="top-bar">
 			<h1>Travellog</h1>
 			<hr>
 		</div>
-		<p> Document and share your adventures. </p>
-		<h3 id="start-here"> Start Here </h3>
+		<p> Stories that travel </p>
+		<h3 id="start-here" class="fade" ng-click="begin()"> Begin </h3>
 	</div>
 
 	<div id="container" class="hide">
@@ -40,41 +40,46 @@
 		</div>
 		<div id="overlay">
 			<div id="blackblur" ></div>
-			<h2 id="escape">X</h2>
+			<h2 id="escape" ng-click="deactiveOverlay()" class="fade">X</h2>
 			<div id="overlay-content" ng-controller="MyFilesController">
 			<!-- 	<div ng-hide="loggedIn">
 
 		</div> -->
 			<div id="add-map-canvas" ng-class="{show: getShowing() == 'loggedIn'}"></div>
-			
 
-			<div class="message" ng-show="getShowing() == 'loading'">
-				{{loadingMessage}}
+
+			<div class="message" ng-show="getShowing() == 'loading'" class="push-down">
+        <div id="loading-message" ng-bind-html="loadingMessage"></div>
 			</div>
-			<div class="message" ng-show="getShowing() == 'complete'">
-				Congratulations, your travel log has been uploaded and is available at:
-				{{completeUrl}}
+			<div id="complete" class="message" ng-show="getShowing() == 'complete'" class="push-down">
+				{{successMessage}}<br/><br/>
+				<a class="link" href={{completeUrl}}>{{completeUrl}}</a><br/><br/>
+				<button ng-click="submitAgain()" class="fade">Submit Another</button>
 			</div>
-			<div ng-show="getShowing() =='login'"> 
-				login
-				<button id="authorize-button" ng-click="startLogin()">Authorize</button>
+			<div ng-show="getShowing() =='login'" class="push-down">
+				<br/>
+				<br/>
+				<h4> Share Your Story</h4>
+					Share your experiences with the world! We use Google Drive to store our logs, so we just need you to log into your Google account so that we can share your story!
+				<button id="authorize-button" ng-click="startLogin()" class="fade">Start</button>
 
 			</div>
-			<div id="search" ng-show="getShowing() =='loggedIn'">
-				<p>Logged:{{loggedIn}}</p>
-				<button ng-click="upload()" ng-class="{active: canSubmit()}">Submit</button>	
+			<div id="search" ng-show="getShowing() =='loggedIn'" class="message">
+				<span class="white small">1. Search for your story as a Google Document</span><br/>
+				<span class="white small">2. Place your story on the map</span><br>
+				<span id="file-loading-message" class="white" ng-bind-html="numFilesMessage"></span><br>
+				<button ng-click="upload()" ng-class="{active: canSubmit()}">Submit</button>
 				<input ng-model="query" placeholder="search">
 				<ul decorations:"none">
 					<li ng-class="{active: isSelected(file)}" ng-repeat="file in myfiles | filter:query | limitTo:5" ng-click="selectFile(file)">
-						File: {{file.title}}
+						{{file.title}}
 					</li>
 				</ul>
 			</div>
 			<div class="message" ng-show="getShowing() =='help'">
-				This is the about text
-
+				Travellog is a place to explore, learn and share. <br/>It is what you make of it.
 			</div>
-			
+
 		</div>
 	</div>
 	<div id="blackshade" ></div>
@@ -93,7 +98,7 @@
 	<div class="sidenav sidenav-bottom" ng-click="move('S')">
 		<div class="arrow arrow-up-down arrow-down"></div>
 	</div>
-	<div id="nav" ng-controller="MyFilesController">
+	<div id="nav">
 		<img id="add" ng-click="changeShowing('addFile')" src="/static/img/addIcon.png"/>
 		<img id="question" ng-click="changeShowing('help')" src="/static/img/questionIcon.png"/>
 	</div>
@@ -103,6 +108,7 @@
 <script type="text/javascript"
 src="/static/js/jquery.transit.min.js">
 </script>
+<script type="text/javascript" src='/static/js/modernizr.custom.89592.js'></script>
 <script type="text/javascript" src='/static/lib/angular/angular.js'></script>
 <script type="text/javascript" src='/static/lib/angular/angular-sanitize.js'></script>
 <script type="text/javascript" src='/static/js/app.js'></script>

@@ -16,17 +16,17 @@ class LogHandler(webapp2.RequestHandler):
       self.response.write(json.dumps({"status": 200, "logs":\
         models.get_all_logs()}))
     else:
-      # try:
+      try:
         # try fetch the requested id by key
-      self.response.headers['Content-Type'] = "application/json"
-      self.response.write(json.dumps({"status": 200, "log":\
-        models.get_log_by_key(self.request.get("id"))}))
-      # except:
-      #   self.response.headers['Content-Type'] = "application/json"
-      #   self.response.write(json.dumps({"status": 404, "error":\
-      #     "log with id %s not found" %\
-      #     (self.request.get("id"))}))
-      #   return
+        self.response.headers['Content-Type'] = "application/json"
+        self.response.write(json.dumps({"status": 200, "log":\
+          models.get_log_by_key(self.request.get("id"))}))
+      except:
+        self.response.headers['Content-Type'] = "application/json"
+        self.response.write(json.dumps({"status": 404, "error":\
+          "log with id %s not found" %\
+          (self.request.get("id"))}))
+        return
 
   def post(self):
     self.parseJson()
@@ -54,7 +54,9 @@ class LogHandler(webapp2.RequestHandler):
     except:
       self.response.headers['Content-Type'] = "application/json"
       self.response.write(json.dumps({"status": 400, "error":\
-          "Could not process drive document with id %s" %\
+          "Could not process drive document with id %s," +
+          " perhaps it is not a Google Drive Document?" +
+          " (We can't accept Microsoft Office Documents)" %\
           self.params["gdriveId"]}))
       return
     log.put()
