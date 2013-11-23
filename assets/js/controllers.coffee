@@ -121,6 +121,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       $("#container").removeClass("hide")
       fadeLoading(false)
       switchLoading("big center")
+      $("#launch-screen").css({"opacity": 0})
       flow.hasBegun = true
       $timeout(()->
         dropPins()

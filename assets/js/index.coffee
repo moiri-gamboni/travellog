@@ -61,3 +61,4 @@ window.incrementBackground = () ->
 	setTimeout(() ->
 		passive.removeClass("background-" + counter).addClass("background-" + newCounter).attr("data-counter", newCounter)
 	, 2000)
+

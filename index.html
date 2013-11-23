@@ -20,10 +20,10 @@
 		<li id="child-2"></li>
 		<li id="child-3"></li>
 		<li id="child-4"></li>
+		<span>Loading...</span>
 	</ul>
 
 	<div id="launch-screen">
-		<div id="whiteshade"></div>
 		<div id="logo" ng-click="begin()">
 			<hr class="top-bar">
 			<h1>Travellog</h1>
@@ -45,10 +45,8 @@
 
 		</div> -->
 			<div id="add-map-canvas" ng-class="{show: display == 'loggedIn'}"></div>
-
-
 			<div class="message" ng-show="display == 'loading'" class="push-down">
-        <div ng-bind-html="loadingMessage"></div>
+        <div id="loading-message" ng-bind-html="loadingMessage"></div>
 			</div>
 			<div id="complete" class="message" ng-show="display == 'complete'" class="push-down">
 				{{successMessage}}<br/><br/>

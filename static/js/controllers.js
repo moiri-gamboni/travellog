@@ -131,6 +131,9 @@
           $("#container").removeClass("hide");
           fadeLoading(false);
           switchLoading("big center");
+          $("#launch-screen").css({
+            "opacity": 0
+          });
           flow.hasBegun = true;
           return $timeout(function() {
             return dropPins();

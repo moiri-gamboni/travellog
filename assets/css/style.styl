@@ -1,5 +1,5 @@
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
-  display: none !important;
+  display: none !important
 }
 *,
 *:after,
@@ -23,11 +23,19 @@
 	position: absolute
 	z-index: 20
 	height:100px
-	bottom: 50px
+	bottom: 10%
 	left: 50%
 	margin-left: -50px
 	pointer-events: none
-	&.big
+	span
+		font-size: 0.5em
+		font-family: "Roboto", sans-serif
+		color: #aaa
+		position: absolute
+		bottom: -30px
+		left: 50%
+		margin-left: -40px
+	&.large
 		font-size:100px
 		height: 200px
 	&.hide-all
@@ -43,17 +51,19 @@
 		font-size: 30px
 		height: 15px
 	&.top
-		top: 20%
+		top: 14%
 		left: auto
-		right: 150px
+		right: 90px
+
 
 #minimap
+	width: calc(100% - 100px)
+	width: -webkit-calc(100% - 100px)
+	top: 50px
+	left: 50px
 	height: 25%
-	width: calc(100% - 60px)
 	position: absolute
 	z-index: 1
-	top: 30px
-	left: 30px
 	#map-canvas
 		height: 100%
 #add-map-canvas
@@ -70,15 +80,15 @@
 .move-up
 	top: 100px
 .fade
-	opacity: 1;
-	transition: opacity .5s ease-in-out;
-	-moz-transition: opacity .5s ease-in-out;
-	-webkit-transition: opacity .5s ease-in-out;
+	opacity: 1
+	transition: opacity .5s ease-in-out
+	-moz-transition: opacity .5s ease-in-out
+	-webkit-transition: opacity .5s ease-in-out
 .slow-fade
-	opacity: 1;
-	transition: opacity 1.5s ease-in-out;
-	-moz-transition: opacity 1.5s ease-in-out;
-	-webkit-transition: opacity 1.5s ease-in-out;
+	opacity: 1
+	transition: opacity 1.5s ease-in-out
+	-moz-transition: opacity 1.5s ease-in-out
+	-webkit-transition: opacity 1.5s ease-in-out
 .fadeout
 	opacity:0
 .fadein
@@ -89,20 +99,18 @@
 	top:0
 	left:0
 	position:absolute
-	background-size:cover
 	background-position:center
 	background-repeat:no-repeat
+	background-size:cover
 	&.background-0
-		background: url('/static/img/1280calmlake.jpg')
-		background-size:cover
+		background-image: url('/static/img/2000calmlake.jpg')
 	&.background-1
-		background: url('/static/img/1280eveningsky.jpg')
+		background-image: url('/static/img/2000eveningsky.jpg')
 	&.background-2
-		background: url('/static/img/1280roughwaves.jpg')
+		background-image: url('/static/img/2000roughwaves.jpg')
 	&.background-3
-		background: url('/static/img/1280snowymountain.jpg')
+		background-image: url('/static/img/2000snowymountain.jpg')
 		background-repeat:no-repeat
-		background-size:cover
 	&.passive
 		opacity:0
 
@@ -133,41 +141,44 @@
 		width: 170px
 		background: #292929
 		border: transparent
-		top: 48%
+		top: 45%
 		left: 50%
 		position: absolute
 		margin-left: -85px
 		&.top-bar
-			margin-top: -125px
+			margin-top: -120px
 	h1
-		font-size: 3em
+		font-size: 4em
 		position: absolute
+		margin-top: -100px
 		top: 50%
-		margin-top: -80px
 		left: 50%
-		margin-left: -130px
-		font-weight: 100
-		text-transform:uppercase
-		color:#292929
+		margin-left: -175px
+		font-weight: 300
+		width: 300px
+		text-transform: uppercase
 	p
 		font-size: 1.5em
 		position: absolute
 		top: 50%
 		left: 50%
-		margin-left: -270px
-		font-weight:300
+		width: 400px
+		margin-top: 50px
+		margin-left: -200px
 		text-align:center
 		color:#666
+		font-weight:300
 	h3
 		position: absolute
 		font-size: 2em
-		bottom: 50px
-		margin-top: 100px
-		left: calc(50% - 200px)
+		top: 50%
+		margin-top: 150px
+		left: 50%
+		margin-left: -200px
 		font-weight: 300
 		text-transform: uppercase
 		opacity: 0
-		text-align: center;
+		text-align: center
 		width: 400px
 		height: 80px
 	h1:hover, h3:hover
@@ -238,7 +249,7 @@
 			opacity: 0.8
 			&:hover
 				opacity: 1
-			right: 40px
+			right: 15px
 			font-size: 2em
 			cursor: pointer
 		#blackblur
@@ -252,39 +263,57 @@
 		#overlay-content
 			position: absolute
 			top: 0
+			width: -webkit-calc(100% - 100px)
 			width: calc(100% - 100px)
-			height: calc(100% - 130px)
+			height: -webkit-calc(100% - 100px)
+			height: calc(100% - 100px)
 			margin-left: 50px
-			margin-top: 50px
-			opacity:0
+			margin-top: 30px
+
 			&.fadein
 				opacity: 1
 				pointer-events:auto
-			pointer-events:none
-			z-index:1
-			.message
-				font-size: 1.5em;
-				position: absolute;
-				left: 50%;
-				text-align: center;
-				width: 290px;
-				margin-left: -145px;
+				z-index:1
 				.white
 					color: white
 				.small
 					font-size: 0.9em
-				#file-loading-message
-					font-size: 0.7em
-					position: absolute
-					right: 10px
-					top: 50%
 				.link
 					font-size: 0.4em
-				&.push-down
-					top: 25%;
+					color:#aaa
+					word-wrap:break-word
+			#loading-message
+				font-size:1.8em
+				width:250px
+				text-align:center
+				margin-left:-125px
+				position:absolute
+				top:40%
+				left:50%
+
+			.push-down
+				width:480px
+				position:absolute
+				top:25%
+				left:50%
+				margin-left:-240px
+				h4
+					font-size:1.8em
+					margin-bottom:20px
+				#authorize-button
+					top:50%
+					margin-top:180px
+
+
 			#complete
+				font-size: 1.5em
+				width: 300px
+				position: absolute
+				margin-left: -150px
+				left: 50%
+				top: 25%
 				button
-					top: 150%
+					top: 140%
 			button
 				background:transparent
 				border:transparent
@@ -307,31 +336,47 @@
 				position: absolute
 				top: -30px
 			#search
-				margin-top:0px
+				margin-top:45px
 				color:#aaa
-				width: 100%;
-				margin-left: 0;
-				text-align: left;
-				left: 0;
+				width: 100%
+				margin-left: 0
+				text-align: left
+				left: 0
+				span
+					font-size:1em
+					line-height:2.2em
+				#file-loading-message
+					font-size: 1em
+					position: absolute
+					right: 0
+					margin-top: 55px
 				button
-					top: 70%
+					top: 60%
 				.active
   					color:#ed4d4a
   					cursor: pointer
 				input
 					border:none
 					background:transparent
-					font-size:1.5em
+					font-size:1.2em
 					border-bottom:1px solid #aaa
 					outline:none
-					margin-top: 10px
+					margin-top: 50px
 					padding-left: 10px
 					color:#aaa
+					position: absolute
+					left: 0
+					width: 250px
+
+				button
+					font-size:2em
 				ul
+
 					padding-left: 0px
 					overflow: scroll
-					height: 150px
-					width: 300px
+					height: 140px
+					margin-top:55px
+
 					li
 						list-style:none
 						line-height:2em
@@ -347,32 +392,41 @@
 
 	.log-details
 		width: calc(100% - 100px)
+		width: -webkit-calc(100% - 100px)
 		height: calc(80% - 180px)
+		height: -webkit-calc(80% - 180px)
 		padding-bottom: 0px
 		top: calc(25% + 50px)
+		top: -webkit-calc(25% + 50px)
 		z-index: 10
 		position: absolute
 		margin-left: 50px
-		padding: 0px
+		padding: 30px 30px 30px 50px
 		&.launch
 			left:-200%
 		.log-title
 			text-transform: uppercase
-			font-size: 1.8em
 			color: white
+			font-size:2.2em
 		.log-author
 			padding: 10px 0px
 			color:#ed4d4a
 			font-size:1.5em
 			text-transform:uppercase
+			float: right
+			height:133px
+			width:273px
 		.log-content
 			color: white
 			line-height: 1.3em
 			font-size:1em
 			height: calc(100% - 50px)
+			height: -webkit-calc(100% - 50px)
+			margin-top:20px
 			img
 				width: 100%
 				height: auto
+				padding: 0px 100px
 		.log-wrapper
 			height: 95%
 			overflow-y: scroll
@@ -403,18 +457,18 @@
 				cursor:pointer
 
 	#country
+		font-size: 2em
+		margin-top: 60px
 		text-transform: uppercase
-		font-size: 1.5em
 		color: #999
 		position: absolute
 		width: 250px
 		right: 75px
-		margin-top: 110px
 		text-align: right
-		-webkit-transition:all 0.2s ease-in-out;
-		-moz-transition:all 0.2s ease-in-out;
-		-o-transition:all 0.2s ease-in-out;
-		transition:all 0.2s ease-in-out;
+		-webkit-transition:all 0.2s ease-in-out
+		-moz-transition:all 0.2s ease-in-out
+		-o-transition:all 0.2s ease-in-out
+		transition:all 0.2s ease-in-out
 	.sidenav
 		background:rgba(255,255,255,0.4)
 		z-index: 2
@@ -428,22 +482,22 @@
 			cursor:pointer
 	.sidenav-top
 		width:100%
-		height:30px
+		height:50px
 		top:0
 		border-bottom:solid 1px white
 	.sidenav-bottom
 		width:100%
-		height:30px
+		height:50px
 		bottom:0
 		border-top:solid 1px white
 	.sidenav-left
-		width:30px
+		width:50px
 		height:100%
 		left:0
 		border-right:solid 1px white
 	.sidenav-right
 		height:100%
-		width:30px
+		width:50px
 		right:0
 		border-left:solid 1px white
 	.arrow
@@ -452,135 +506,128 @@
 		position: absolute
 		opacity: 0.8
 		&.arrow-up-down
-			border-left: 15px solid transparent
-			border-right: 15px solid transparent
+			border-left: 20px solid transparent
+			border-right: 20px solid transparent
 			right:50%
 			margin-right:-10px
 		&.arrow-left-right
-			border-top: 15px solid transparent
-			border-bottom: 15px solid transparent
+			border-top: 20px solid transparent
+			border-bottom: 20px solid transparent
 			top:50%
 			margin-top:-10px
-		&.arrow-up
-			border-bottom: 15px solid #fff
-			margin-top: 5px
+		&.arrow-up		
+			border-bottom: 20px solid #fff
+			margin-top: 15px
 		&.arrow-down
-			border-top: 15px solid #fff
+			border-top: 20px solid #fff
 			bottom:0
-			margin-bottom: 5px
+			margin-bottom: 15px
 		&.arrow-right
-			border-left: 15px solid #fff
+			border-left: 20px solid #fff
 			right:0
-			margin-right: 5px
-		&.arrow-left
-			border-right:15px solid #fff
+			margin-right: 15px
+		&.arrow-left 
+			border-right:20px solid #fff
 			left:0
-			margin-left: 5px
+			margin-left: 15px
 
-
-@media (min-width:320px)
+@media (max-width:480px)
+	.background
+		&.background-0
+			background-image: url('/static/img/720calmlake.jpg')	
+		&.background-1
+			background-image: url('/static/img/720eveningsky.jpg')
+		&.background-2
+			background-image: url('/static/img/720roughwaves.jpg')
+		&.background-3
+			background-image: url('/static/img/720snowymountain.jpg')
+	#loading
+		bottom:30px
+		&.top
+			top: 39%
+			right: 50px
 	#launch-screen
+		h1
+			font-size: 3em
+			margin-top: -85px
+			margin-left: -135px
 		p
-			font-size: 1.5em
-			width: 300px
-			margin-top: 50px
-			margin-left: -150px
-			text-align:center
-		h3
-			margin-top: 90px
+			font-size: 1.1em
+	#container 
+		#overlay
+			#overlay-content
+				#search
+					color:white
+					margin-top:20px
+					span
+						line-height:1em
+					ul
+						height: 80px
+						overflow-y:auto
+						width:250px
+					button
+						font-size: 1.5em
+					#file-loading-message
+						margin-top:180px
+						left:0
+					input
+						width:200px
+						margin-top:35px
+				.push-down
+					width: 300px
+					margin-left: -150px
+				
+		#minimap
+			width:calc(100% - 60px)
+			width:-webkit-calc(100% - 60px)
+			top: 30px
+			left: 30px
+		.log-details
+			padding: 0px
+			.log-content
+				margin-top: -5px
+		.sidenav-top
+			height:30px
+		.sidenav-bottom
+			height:30px
+		.sidenav-left
+			width:30px
+		.sidenav-right
+			width:30px
+		.arrow
+			&.arrow-up-down
+				border-left: 15px solid transparent
+				border-right: 15px solid transparent
+				margin-right:-5px
+			&.arrow-left-right
+				border-top: 15px solid transparent
+				border-bottom: 15px solid transparent
+				margin-top:-5px
+			&.arrow-up		
+				border-bottom: 15px solid #fff
+				margin-top: 5px
+			&.arrow-down
+				border-top: 15px solid #fff
+				margin-bottom: 5px
+			&.arrow-right
+				border-left: 15px solid #fff
+				margin-right: 5px
+			&.arrow-left 
+				border-right:15px solid #fff
+				margin-left: 5px
+
+@media (max-width:320px)
+	.background
+		&.background-0
+			background-image: url('/static/img/480calmlake.jpg')	
+		&.background-1
+			background-image: url('/static/img/480eveningsky.jpg')
+		&.background-2
+			background-image: url('/static/img/480roughwaves.jpg')
+		&.background-3
+			background-image: url('/static/img/480snowymountain.jpg')
 	#container
 		.log-details
 			padding: 0px
 			.log-title
 				font-size: 1.7em
-
-@media (min-width:480px)
-	#container
-		.log-details
-			.log-content
-				margin-top: -5px
-
-
-
-@media (min-width:760px)
-	#minimap
-		width: calc(100% - 100px)
-		top: 50px
-		left: 50px
-	#container
-		.log-details
-			padding: 30px 30px 30px 50px
-			.log-content
-				margin-top:20px
-				img
-					padding: 0px 100px
-			.log-title
-				font-size:2.2em
-		#overlay-content
-			p
-				margin-left:auto
-				margin-right:auto
-			#search
-				ul
-					height: 200px
-				button
-					font-size:2em
-
-		#country
-			font-size: 2em
-			margin-top: 60px
-		.sidenav-top
-			height:50px
-		.sidenav-bottom
-			height:50px
-		.sidenav-left
-			width:50px
-		.sidenav-right
-			width:50px
-		.arrow
-			&.arrow-up-down
-				border-left: 20px solid transparent
-				border-right: 20px solid transparent
-				right:50%
-				margin-right:-10px
-			&.arrow-left-right
-				border-top: 20px solid transparent
-				border-bottom: 20px solid transparent
-				top:50%
-				margin-top:-10px
-			&.arrow-up
-				border-bottom: 20px solid #fff
-				top: 0
-				margin-top: 15px
-			&.arrow-down
-				border-top: 20px solid #fff
-				bottom:0
-				margin-bottom: 15px
-			&.arrow-right
-				border-left: 20px solid #fff
-				right:0
-				margin-right: 15px
-			&.arrow-left
-				border-right:20px solid #fff
-				left:0
-				margin-left: 15px
-
-@media (min-height: 1000px)
-	.background
-		&.background-0
-			background: url('/static/img/2000calmlake.jpg')
-		&.background-1
-			background: url('/static/img/2000eveningsky.jpg')
-		&.background-2
-			background: url('/static/img/2000roughwaves.jpg')
-		&.background-3
-			background: url('/static/img/2000snowymountain.jpg')
-
-@media (max-height: 550px)
-	.message
-		top: 10%
-	#launch-screen
-		h3
-			bottom: 0px
-	#loading
-		bottom: 10px
