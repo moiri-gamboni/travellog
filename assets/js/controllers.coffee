@@ -202,20 +202,21 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       console.log 'showing log'
       showLog(log.id, null, null, null, true)
       console.log 'moving'
+      move(direction)
       $timeout(()->
-        move(direction)
-        $timeout(()->
-          changeLocation(log.id)
-        , 500
-        )
-      ,200)
+        changeLocation(log.id)
+      , 500
+      )
 
   console.log 'move defined'
 
   $rootScope.$on('switch-marker', (event, logId) ->
+    console.log "switching marker"
     if Map.data.logs[logId].body?
+      console.log "body exists"
       showLog(logId, false, true)
     else
+      console.log "fetching body"
       Map.getLog(logId)
       Map.getClosestLogs(Map.data.logs[logId].key)
       watch = $rootScope.$on('is-loading-log', (event, isLoading) ->
@@ -294,6 +295,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
   $scope.addMapSelected = false
   $scope.loading = false
   $rootScope.filesLoaded = false
+  $scope.startedFileLoad = false
   $scope.loadingMessage = ""
   $scope.completeUrl = ""
   $scope.successMessage = ""
@@ -312,7 +314,9 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
   $rootScope.$on("partialFilesLoaded", (event, newFiles) ->
     $scope.$apply ()->
       $scope.numFilesMessage = newFiles.length + " Files Loaded"
-      $scope.loading = false
+      if not $started.filesLoaded
+        $scope.loading = false
+      $scope.startedFileLoad = true
       switchLoading("small top")
       $scope.myfiles = newFiles
       $rootScope.setShowing()

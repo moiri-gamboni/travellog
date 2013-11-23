@@ -221,20 +221,21 @@
           console.log('showing log');
           showLog(log.id, null, null, null, true);
           console.log('moving');
+          move(direction);
           return $timeout(function() {
-            move(direction);
-            return $timeout(function() {
-              return changeLocation(log.id);
-            }, 500);
-          }, 200);
+            return changeLocation(log.id);
+          }, 500);
         }
       };
       console.log('move defined');
       $rootScope.$on('switch-marker', function(event, logId) {
         var watch;
+        console.log("switching marker");
         if (Map.data.logs[logId].body != null) {
+          console.log("body exists");
           return showLog(logId, false, true);
         } else {
+          console.log("fetching body");
           Map.getLog(logId);
           Map.getClosestLogs(Map.data.logs[logId].key);
           return watch = $rootScope.$on('is-loading-log', function(event, isLoading) {
@@ -310,6 +311,7 @@
       $scope.addMapSelected = false;
       $scope.loading = false;
       $rootScope.filesLoaded = false;
+      $scope.startedFileLoad = false;
       $scope.loadingMessage = "";
       $scope.completeUrl = "";
       $scope.successMessage = "";
@@ -328,7 +330,10 @@
       $rootScope.$on("partialFilesLoaded", function(event, newFiles) {
         return $scope.$apply(function() {
           $scope.numFilesMessage = newFiles.length + " Files Loaded";
-          $scope.loading = false;
+          if (!$started.filesLoaded) {
+            $scope.loading = false;
+          }
+          $scope.startedFileLoad = true;
           switchLoading("small top");
           $scope.myfiles = newFiles;
           return $rootScope.setShowing();

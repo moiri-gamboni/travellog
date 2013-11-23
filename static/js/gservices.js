@@ -67,8 +67,15 @@ function renderBadge(id, div) {
   console.log('render badge')
   div_id = $(div + " .log-author").html('<div class="g-person"' +
     'data-width="273" data-href="https://plus.google.com/' + id +
-    '" data-layout="landscape" data-showcoverphoto="false"></div>').attr("id");
+    '" data-layout="landscape" data-showcoverphoto="false"></div>').css({"opacity": 1})attr("id");
   gapi.person.go(div_id);
+  setTimeout(function() {
+    if (div == ".main") {
+      $(".launch .log-author").css({"opacity": 0});
+    } else {
+      $(".launch .main").css({"opacity": 0});
+    }
+  }, 1000)
 }
 
 /**
