@@ -224,12 +224,14 @@
       };
       $scope.changeShowing = function(view) {
         if (!$("#loading").hasClass("fadein")) {
+          console.log("clicked");
           $rootScope.loadingposition = "big center";
           $rootScope.showing = view;
           $rootScope.overlayIsActive = true;
           if ($rootScope.loggedIn && !$rootScope.filesLoaded) {
-            return $rootScope.pullFiles();
+            $rootScope.pullFiles();
           }
+          return $rootScope.setShowing();
         }
       };
       return Map.initMap();
@@ -237,8 +239,7 @@
   ]);
 
   ctrl.controller("MyFilesController", [
-    '$http', '$scope', '$rootScope', 'User', function($http, $scope, $rootScope, User) {
-      var returnVal;
+    '$http', '$scope', '$rootScope', '$timeout', 'User', function($http, $scope, $rootScope, $timeout, User) {
       $rootScope.showing = 'loading';
       $scope.display = 'loading';
       $rootScope.loggedIn = false;
@@ -254,12 +255,11 @@
       $scope.successMessage = "";
       $rootScope.$on('loggedIn', function(event, resp) {
         User = resp;
-        $rootScope.$apply(function() {
-          return $rootScope.loggedIn = true;
-        });
+        $rootScope.loggedIn = true;
         $scope.loading = true;
+        $rootScope.setShowing();
         $scope.$apply(function() {
-          return $scope.loadingMessage = "Loading your drive (this could take a while)";
+          return $scope.loadingMessage = "Loading your drive";
         });
         if ($rootScope.overlayIsActive) {
           return $rootScope.pullFiles();
@@ -267,11 +267,11 @@
       });
       $rootScope.$on("partialFilesLoaded", function(event, newFiles) {
         return $scope.$apply(function() {
-          $scope.numFilesMessage = "Still loading...<br />" + newFiles.length + " Files Loaded";
+          $scope.numFilesMessage = newFiles.length + " Files Loaded";
           $scope.loading = false;
           switchLoading("small top");
           $scope.myfiles = newFiles;
-          return $;
+          return $rootScope.setShowing();
         });
       });
       $rootScope.$on('addMapSelected', function() {
@@ -280,7 +280,8 @@
         });
       });
       $scope.submitAgain = function() {
-        return $scope.complete = false;
+        $scope.complete = false;
+        return $rootScope.setShowing();
       };
       $scope.isSelected = function(file) {
         return file === $scope.selectedFile;
@@ -303,47 +304,46 @@
         });
         return startAddMap();
       };
-      $scope.getShowing = function() {
+      $rootScope.setShowing = function() {
         var returnVal;
         console.log("running");
         returnVal = "";
         if ($rootScope.showing === "help") {
           if ($rootScope.overlayIsActive) {
             fadeLoading(true);
+            returnVal = $rootScope.showing;
+          }
+        } else if ($rootScope.showing === "addFile") {
+          if ($scope.loading) {
+            if ($rootScope.overlayIsActive) {
+              fadeLoading(false);
+            }
+            returnVal = 'loading';
+          } else if ($scope.complete) {
+            if ($rootScope.overlayIsActive) {
+              fadeLoading(true);
+            }
+            returnVal = 'complete';
+          } else if ($rootScope.loggedIn) {
+            if ($rootScope.overlayIsActive && !$scope.filesLoaded) {
+              fadeLoading(false);
+            } else if ($rootScope.overlayIsActive && $scope.filesLoaded) {
+              fadeLoading(true);
+            }
+            setTimeout(function() {
+              return google.maps.event.trigger(addMap, 'resize');
+            }, 200);
+            returnVal = 'loggedIn';
+          } else {
+            returnVal = 'login';
+            if ($rootScope.overlayIsActive) {
+              fadeLoading(true);
+            }
           }
         }
-        return returnVal = $rootScope.showing;
+        angular.element("html").scope().$broadcast('update-load');
+        return $scope.display = returnVal;
       };
-      if ($rootScope.showing === "addFile") {
-        if ($scope.loading) {
-          if ($rootScope.overlayIsActive) {
-            fadeLoading(false);
-          }
-          returnVal = 'loading';
-        } else if ($scope.complete) {
-          if ($rootScope.overlayIsActive) {
-            fadeLoading(true);
-          }
-          returnVal = 'complete';
-        } else if ($rootScope.loggedIn) {
-          if ($rootScope.overlayIsActive && !$scope.filesLoaded) {
-            fadeLoading(false);
-          } else if ($rootScope.overlayIsActive && $scope.filesLoaded) {
-            fadeLoading(true);
-          }
-          setTimeout(function() {
-            return google.maps.event.trigger(addMap, 'resize');
-          }, 200);
-          returnVal = 'loggedIn';
-        } else {
-          returnVal = 'login';
-          if ($rootScope.overlayIsActive) {
-            fadeLoading(true);
-          }
-        }
-      }
-      angular.element("html").scope().$broadcast('update-load');
-      $scope.display = returnVal;
       $scope.canSubmit = function() {
         return $scope.addMapSelected && ($scope.selectedFile != null);
       };
@@ -371,6 +371,7 @@
         }
         $scope.loadingMessage = "Sharing your story!";
         $scope.loading = true;
+        $rootScope.setShowing();
         return makePublic(payload.gdriveId, function(resp) {
           return addToTravellog(payload.gdriveId, function(resp) {
             return $http({
@@ -380,6 +381,7 @@
             }).success(function(data, status, headers, config) {
               $scope.loading = false;
               $scope.complete = true;
+              $rootScope.setShowing();
               if (data.status === 200) {
                 $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id;
                 return $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:";
@@ -394,7 +396,8 @@
       return $scope.startLogin = function() {
         if (!$rootScope.loggedIn) {
           $scope.loading = true;
-          return $scope.loadingMessage = "Logging you in";
+          $scope.loadingMessage = "Logging you in";
+          return $rootScope.setShowing();
         }
       };
     }
