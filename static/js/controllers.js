@@ -167,15 +167,15 @@
         }
       };
       $rootScope.$on('switch-marker', function(event, logId) {
-        var loadingWatch;
+        var watch;
         if (Map.data.logs[logId].body != null) {
           return showLog(logId, false, true);
         } else {
           Map.getLog(logId);
-          return loadingWatch = $rootScope.$on('is-loading-log', function(event, isLoading) {
+          return watch = $rootScope.$on('is-loading-log', function(event, isLoading) {
             if (!isLoading) {
               showLog(logId, false, true);
-              return loadingWatch();
+              return watch();
             }
           });
         }

@@ -147,10 +147,10 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       showLog(logId, false, true)
     else
       Map.getLog(logId)
-      loadingWatch = $rootScope.$on('is-loading-log', (event, isLoading) ->
+      watch = $rootScope.$on('is-loading-log', (event, isLoading) ->
         if not isLoading
           showLog(logId, false, true)
-          loadingWatch()
+          watch()
       )
   )
 
