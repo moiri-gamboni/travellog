@@ -19,6 +19,7 @@ function handleAuthResult(authResult) {
   console.log('Handling result');
   var successMessage = $("#loggedIn");
   var authorizeButton = $("#authorize-button");
+  console.log(authResult)
   if (authResult && !authResult.error) {
     getUserInfo();
   }

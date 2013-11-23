@@ -1,4 +1,4 @@
-window.loadingDone = false
+window.loadingDone = true
 window.move = (direction) ->
 	windowHeight = $(".main").height();
 	windowWidth = $(".main").width();
@@ -38,12 +38,12 @@ window.changeCountry = (newCountry) ->
 	, 500)
 
 $("#add, #question").click () ->
-	if loadingDone
-		$("#loading").addClass("big center")
+	if !$("#loading").hasClass("fadein")
+		switchLoading('big center')
 		$("#overlay, #overlay-content").addClass("fadein")
 
 $("#escape").click () ->
-	$("#loading").removeClass("big center")
+	switchLoading('small corner')
 	$("#overlay, #overlay-content").removeClass("fadein")
 
 window.incrementBackground = () ->
