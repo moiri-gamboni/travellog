@@ -448,7 +448,7 @@
   width: 100%;
   height: auto;
 }
-#container .log-details #log-wrapper {
+#container .log-details .log-wrapper {
   height: 95%;
   overflow-y: scroll;
   overflow-x: hidden;
