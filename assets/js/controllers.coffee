@@ -205,8 +205,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
           changeLocation(log.id)
         , 500
         )
-
-      ,500)
+      ,200)
 
   console.log 'move defined'
 
