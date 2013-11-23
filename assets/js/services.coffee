@@ -12,6 +12,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
       loadingLogs: 0
 
     getCurrentLog: () ->
+      console.log 'get current log'
       if factory.data.current? and factory.data.lngLogs? and factory.data.lngLogs[factory.data.current[0]]?
         return factory.data.logs[factory.data.lngLogs[factory.data.current[0]].id]
       else
@@ -20,9 +21,13 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
     getLogs: (success) ->
       get = $http.get(
         window.location.protocol + "//" + window.location.host + "/logs"
-      ).success(success)
+      ).success(success).error((data, status, headers, config)->
+        console.log 'getLogs error'
+        console.log data
+      )
 
     move: (direction) ->
+      console.log 'move'
       change = if direction in ['N', 'E'] then +1 else -1
       if direction in ['N', 'S']
         newCurrentLog = factory.data.logs[factory.data.latLogs[mod(factory.data.current[1]+change,factory.data.latLogs.length)].id]
@@ -30,11 +35,14 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
         newCurrentLog = factory.data.logs[factory.data.lngLogs[mod(factory.data.current[0]+change,factory.data.latLogs.length)].id]
       factory.getClosestLogs(newCurrentLog.key)
       factory.data.current = newCurrentLog.key
+      console.log 'move done'
       return newCurrentLog
 
 
     getLog: (logId, callback) ->
+      console.log 'get log'
       if not factory.data.logs[logId].body?
+        console.log 'has no body'
         factory.data.loadingLogs++
         $rootScope.$broadcast('is-loading-log', true)
         get = $http.get(
@@ -43,31 +51,39 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
         )
         if callback?
           get.success((data, status, headers, config)->
+            console.log 'get log success'
             factory.data.loadingLogs--
             callback(data, status, headers, config)
             if factory.data.loadingLogs == 0
               $rootScope.$broadcast('is-loading-log', false)
           ).error((data, status, headers, config)->
+            console.log 'get log error'
+            console.log data
             factory.data.loadingLogs--
             if factory.data.loadingLogs == 0
               $rootScope.$broadcast('is-loading-log', false)
           )
         else
           get.success((data, status, headers, config)->
+            console.log 'get log success'
+            console.log data.log
             factory.data.loadingLogs--
-            if factory.data.loadingLogs == 0
-              $rootScope.$broadcast('is-loading-log', false)
             factory.data.logs[data.log.id].title = data.log.title
             factory.data.logs[data.log.id].profileId = data.log.profileId
             factory.data.logs[data.log.id].profileName = data.log.profileName
             factory.data.logs[data.log.id].body = data.log.body
+            if factory.data.loadingLogs == 0
+              $rootScope.$broadcast('is-loading-log', false)
           ).error((data, status, headers, config)->
+            console.log 'get log error'
+            console.log data
             factory.data.loadingLogs--
             if factory.data.loadingLogs == 0
               $rootScope.$broadcast('is-loading-log', false)
           )
 
     getClosestLogs: (around) ->
+      console.log 'get get closests logs'
       for direction in ['N','E','S','W']
         location = factory.getClosestLocation(around, direction)
         factory.getLog(factory.data.lngLogs[location[0]].id)
@@ -130,10 +146,12 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
     initMap: () ->
       getLogsCallback = (mapData) ->
         return (data, status, headers, config) ->
+          console.log 'get logs success'
           $rootScope.$broadcast('logs-ready')
           mapData.latLogs = data.logs.slice().sort((b, a) ->
             return b.lat-a.lat
           )
+          console.log 'sort lats'
           for log, i in mapData.latLogs
             mapData.logs[log.id] =
               id: log.id
@@ -144,26 +162,33 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
               lat: log.lat
               lng: log.lng
               key: [null, i]
+          console.log 'build logs data'
           mapData.lngLogs = data.logs.slice().sort((b, a) ->
             return b.lng-a.lng
           )
+          console.log 'sort lngs'
           for log, i in mapData.lngLogs
             mapData.logs[log.id].key = [i, mapData.logs[log.id].key[1]]
+          console.log 'rebuild logs data'
 
           keys = Object.keys(mapData.logs)
           mapData.current = mapData.logs[keys[(Math.random()*keys.length)>>0]].key
           id = mapData.lngLogs[factory.data.current[0]].id
           factory.getLog(id,
             (data, status, headers, config)->
+              console.log 'get first log success'
               factory.data.logs[data.log.id].title = data.log.title
               factory.data.logs[data.log.id].profileId = data.log.profileId
               factory.data.logs[data.log.id].profileName = data.log.profileName
               factory.data.logs[data.log.id].body = data.log.body
               $rootScope.$broadcast('first-log-ready')
           )
+          console.log 'map init before closest logs done'
           factory.getClosestLogs(factory.data.current)
+          console.log 'map init after closest logs'
 
       factory.getLogs(getLogsCallback(factory.data))
+      console.log 'map init done'
 
   return factory
 

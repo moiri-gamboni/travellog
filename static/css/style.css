@@ -498,7 +498,7 @@
   height: auto;
   padding: 0px 100px;
 }
-#container .log-details #log-wrapper {
+#container .log-details .log-wrapper {
   height: 95%;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -628,7 +628,7 @@
 }
 @media (max-width:480px) {
   #loading {
-    bottom: 10px;
+    bottom: 30px;
   }
   #launch-screen h1 {
     font-size: 3em;
