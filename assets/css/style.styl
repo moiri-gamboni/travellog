@@ -23,9 +23,10 @@
 	position: absolute
 	z-index: 20
 	height:100px
-	bottom: 120px
+	bottom: 10%
 	left: 50%
 	margin-left: -50px
+	pointer-events: none
 	span
 		font-size: 0.5em
 		font-family: "Roboto", sans-serif
@@ -171,7 +172,7 @@
 		position: absolute
 		font-size: 2em
 		top: 50%
-		margin-top: 100px
+		margin-top: 150px
 		left: 50%
 		margin-left: -200px
 		font-weight: 300
@@ -272,21 +273,15 @@
 			&.fadein
 				opacity: 1
 				pointer-events:auto
-			pointer-events:none
-			z-index:1
-				font-size: 1.5em
-				position: absolute
-				top: 50%
-				left: 50%
-				text-align: center
-				width: 290px
-				margin-left: -145px
+				z-index:1
 				.white
 					color: white
 				.small
 					font-size: 0.9em
 				.link
 					font-size: 0.4em
+					color:#aaa
+					word-wrap:break-word
 			#loading-message
 				font-size:1.8em
 				width:250px
@@ -311,8 +306,14 @@
 
 
 			#complete
+				font-size: 1.5em
+				width: 300px
+				position: absolute
+				margin-left: -150px
+				left: 50%
+				top: 25%
 				button
-					top: 150%
+					top: 140%
 			button
 				background:transparent
 				border:transparent
@@ -560,6 +561,7 @@
 					ul
 						height: 80px
 						overflow-y:auto
+						width:250px
 					button
 						font-size: 1.5em
 					#file-loading-message

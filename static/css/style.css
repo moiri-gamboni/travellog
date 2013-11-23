@@ -32,9 +32,10 @@
   position: absolute;
   z-index: 20;
   height: 100px;
-  bottom: 120px;
+  bottom: 10%;
   left: 50%;
   margin-left: -50px;
+  pointer-events: none;
 }
 #loading span {
   font-size: 0.5em;
@@ -209,7 +210,7 @@
   position: absolute;
   font-size: 2em;
   top: 50%;
-  margin-top: 100px;
+  margin-top: 150px;
   left: 50%;
   margin-left: -200px;
   font-weight: 300;
@@ -320,29 +321,22 @@
   height: calc(100% - 100px);
   margin-left: 50px;
   margin-top: 30px;
-  pointer-events: none;
 }
 #container #overlay #overlay-content.fadein {
   opacity: 1;
   pointer-events: auto;
+  z-index: 1;
 }
-#container #overlay #overlay-content z-index:1 {
-  font-size: 1.5em;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  text-align: center;
-  width: 290px;
-  margin-left: -145px;
-}
-#container #overlay #overlay-content z-index:1 .white {
+#container #overlay #overlay-content.fadein .white {
   color: #fff;
 }
-#container #overlay #overlay-content z-index:1 .small {
+#container #overlay #overlay-content.fadein .small {
   font-size: 0.9em;
 }
-#container #overlay #overlay-content z-index:1 .link {
+#container #overlay #overlay-content.fadein .link {
   font-size: 0.4em;
+  color: #aaa;
+  word-wrap: break-word;
 }
 #container #overlay #overlay-content #loading-message {
   font-size: 1.8em;
@@ -368,8 +362,16 @@
   top: 50%;
   margin-top: 180px;
 }
+#container #overlay #overlay-content #complete {
+  font-size: 1.5em;
+  width: 300px;
+  position: absolute;
+  margin-left: -150px;
+  left: 50%;
+  top: 25%;
+}
 #container #overlay #overlay-content #complete button {
-  top: 150%;
+  top: 140%;
 }
 #container #overlay #overlay-content button {
   background: transparent;
@@ -653,6 +655,7 @@
   #container #overlay #overlay-content #search ul {
     height: 80px;
     overflow-y: auto;
+    width: 250px;
   }
   #container #overlay #overlay-content #search button {
     font-size: 1.5em;
