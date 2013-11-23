@@ -66,6 +66,7 @@
 			<div id="search" ng-show="getShowing() =='loggedIn'" class="message">
 				<span class="white small">1. Search for your story as a Google Document</span><br/>
 				<span class="white small">2. Place your story on the map</span>
+				<span id="file-loading-message" class="white" ng-bind-html="numFilesMessage"></span>
 				<button ng-click="upload()" ng-class="{active: canSubmit()}">Submit</button>
 				<input ng-model="query" placeholder="search">
 				<ul decorations:"none">

@@ -73,8 +73,8 @@ function getUserInfo() {
 }
 
 // renders the google plus badge in the loader
-function renderBadge(id) {
-  div_id = $(".launch .log-author").html('<div class="g-person"' +
+function renderBadge(id, div) {
+  div_id = $(div + " .log-author").html('<div class="g-person"' +
     'data-width="273" data-href="https://plus.google.com/' + id +
     '" data-layout="landscape" data-showcoverphoto="false"></div>').attr("id");
   gapi.person.go(div_id);
@@ -89,6 +89,7 @@ function retrieveAllFiles(callback) {
   var retrievePageOfFiles = function(request, result) {
     request.execute(function(resp) {
       result = result.concat(resp.items);
+      angular.element("html").scope().$broadcast('partialFilesLoaded', result);
       var nextPageToken = resp.nextPageToken;
       if (nextPageToken) {
         request = gapi.client.drive.files.list({

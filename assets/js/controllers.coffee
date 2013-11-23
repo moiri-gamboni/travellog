@@ -206,6 +206,8 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
   $rootScope.showing = 'loading'
   $rootScope.loggedIn = false
   $scope.myfiles = []
+  $scope.numFilesMessage = ""
+  $scope.filesLoaded = false
   $scope.selectedFile = null
   $scope.addMapSelected = false
   $scope.loading = false
@@ -229,6 +231,14 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     if $rootScope.overlayIsActive
       $rootScope.pullFiles()
   )
+  $rootScope.$on("partialFilesLoaded", (event, newFiles) ->
+    $scope.$apply ()->
+      $scope.numFilesMessage = "Still loading...<br />" + newFiles.length + " Files Loaded"
+      $scope.loading = false
+      switchLoading("small top")
+      $scope.myfiles = newFiles
+  )
+
   $rootScope.$on('addMapSelected', () ->
     $scope.$apply ()->
       $scope.addMapSelected = true
@@ -248,15 +258,17 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     retrieveAllFiles((resp) ->
       console.log "got response"
       $scope.$apply(() ->
-        $scope.myfiles = resp
-        $scope.loading = false
+        $scope.filesLoaded = true
+        $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded"
+        fadeLoading(true)
+        $timeout(() ->
+          switchLoading("center big")
+        , 500
+        )
       )
       angular.element("html").scope().$broadcast('update-load');
     )
     startAddMap()
-
-
-
 
   $scope.$watch( () ->
     return $scope.loading
@@ -280,7 +292,9 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
           fadeLoading(true)
         returnVal = 'complete'
       else if $rootScope.loggedIn
-        if $rootScope.overlayIsActive
+        if $rootScope.overlayIsActive and not $scope.filesLoaded
+          fadeLoading(false)
+        else if $rootScope.overlayIsActive and $scope.filesLoaded
           fadeLoading(true)
         setTimeout( ()->
           google.maps.event.trigger(addMap, 'resize')

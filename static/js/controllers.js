@@ -234,6 +234,8 @@
       $rootScope.showing = 'loading';
       $rootScope.loggedIn = false;
       $scope.myfiles = [];
+      $scope.numFilesMessage = "";
+      $scope.filesLoaded = false;
       $scope.selectedFile = null;
       $scope.addMapSelected = false;
       $scope.loading = false;
@@ -258,6 +260,14 @@
           return $rootScope.pullFiles();
         }
       });
+      $rootScope.$on("partialFilesLoaded", function(event, newFiles) {
+        return $scope.$apply(function() {
+          $scope.numFilesMessage = "Still loading...<br />" + newFiles.length + " Files Loaded";
+          $scope.loading = false;
+          switchLoading("small top");
+          return $scope.myfiles = newFiles;
+        });
+      });
       $rootScope.$on('addMapSelected', function() {
         return $scope.$apply(function() {
           return $scope.addMapSelected = true;
@@ -278,8 +288,12 @@
         retrieveAllFiles(function(resp) {
           console.log("got response");
           $scope.$apply(function() {
-            $scope.myfiles = resp;
-            return $scope.loading = false;
+            $scope.filesLoaded = true;
+            $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded";
+            fadeLoading(true);
+            return $timeout(function() {
+              return switchLoading("center big");
+            }, 500);
           });
           return angular.element("html").scope().$broadcast('update-load');
         });
@@ -311,7 +325,9 @@
             }
             returnVal = 'complete';
           } else if ($rootScope.loggedIn) {
-            if ($rootScope.overlayIsActive) {
+            if ($rootScope.overlayIsActive && !$scope.filesLoaded) {
+              fadeLoading(false);
+            } else if ($rootScope.overlayIsActive && $scope.filesLoaded) {
               fadeLoading(true);
             }
             setTimeout(function() {
