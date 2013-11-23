@@ -54,8 +54,6 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
           )
         else
           get.success((data, status, headers, config)->
-            console.log 'success'
-            console.log data
             factory.data.loadingLogs--
             if factory.data.loadingLogs == 0
               $rootScope.$broadcast('is-loading-log', false)
@@ -64,8 +62,6 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
             factory.data.logs[data.log.id].profileName = data.log.profileName
             factory.data.logs[data.log.id].body = data.log.body
           ).error((data, status, headers, config)->
-            console.log 'error'
-            console.log data
             factory.data.loadingLogs--
             if factory.data.loadingLogs == 0
               $rootScope.$broadcast('is-loading-log', false)
@@ -161,7 +157,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
             (data, status, headers, config)->
               factory.data.logs[data.log.id].title = data.log.title
               factory.data.logs[data.log.id].profileId = data.log.profileId
-              factory.data.logs[data.log.id].profileId = data.log.profileName
+              factory.data.logs[data.log.id].profileName = data.log.profileName
               factory.data.logs[data.log.id].body = data.log.body
               $rootScope.$broadcast('first-log-ready')
           )

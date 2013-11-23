@@ -83,7 +83,7 @@
         });
         return angular.element("html").scope().$broadcast("sliding-animation-done");
       }, 1000);
-    }, 100);
+    }, 1);
   };
 
   window.changeCountry = function(newCountry) {

@@ -44,7 +44,7 @@
               Map.getLog($rootScope.urlEntered);
               return flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', function(event, isLoading) {
                 if (!isLoading) {
-                  showLog($rootScope.urlEntered);
+                  showLog($rootScope.urlEntered, true);
                   return flow.urlLogLoadWatch();
                 }
               });
@@ -77,7 +77,7 @@
             Map.getLog($rootScope.urlEntered);
             return flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', function(event, isLoading) {
               if (!isLoading) {
-                showLog($rootScope.urlEntered);
+                showLog($rootScope.urlEntered, true);
                 return flow.urlLogLoadWatch();
               }
             });
@@ -110,46 +110,57 @@
         return loading.addClass(classString);
       };
       $rootScope.$on('sliding-animation-done', function() {
+        console.log('animation done');
         return switchLogs = !switchLogs;
       });
-      showLog = function(logId, manualSwitch, invert, historyChange) {
+      showLog = function(logId, manualSwitch, invert, dontPushState) {
         var log;
         if (logId != null) {
           log = Map.data.logs[logId];
           if ((invert != null) && invert) {
-            if ((historyChange != null) && historyChange) {
-              $scope.$apply(function() {
-                if (!switchLogs) {
-                  return $scope.otherLog = log;
-                } else {
-                  return $scope.log = log;
-                }
-              });
+            if ((typeof historyChange !== "undefined" && historyChange !== null) && historyChange) {
+              if (!switchLogs) {
+                $scope.otherLog = log;
+              } else {
+                $scope.log = log;
+              }
+            }
+            if (log.profileId != null) {
+              if (!switchLogs) {
+                renderBadge(log.profileId, '.launch');
+              } else {
+                renderBadge(log.profileId, '.main');
+              }
             } else {
               if (!switchLogs) {
-                console.log($scope.otherLog.title);
-                $scope.otherLog = log;
-                console.log($scope.otherLog.title);
-                if ($scope.log != null) {
-                  console.log($scope.log.title);
-                }
+                renderBadge(log.profileName, '.launch');
               } else {
-                console.log($scope.log.title);
-                $scope.log = log;
-                console.log($scope.log.title);
-                if ($scope.otherLog != null) {
-                  console.log($scope.otherLog.title);
-                }
+                renderBadge(log.profileName, '.main');
               }
-              $scope.$apply();
             }
+            $scope.$apply();
           } else {
-            history.pushState(log.id, log.title, "/log/" + log.id);
             if (switchLogs) {
               $scope.otherLog = log;
             } else {
               $scope.log = log;
             }
+            if (log.profileId != null) {
+              if (switchLogs) {
+                renderBadge(log.profileId, '.launch');
+              } else {
+                renderBadge(log.profileId, '.main');
+              }
+            } else {
+              if (switchLogs) {
+                renderBadge(log.profileName, '.launch');
+              } else {
+                renderBadge(log.profileName, '.main');
+              }
+            }
+          }
+          if ((dontPushState == null) || !dontPushState) {
+            history.pushState(log.id, log.title, "/log/" + log.id);
           }
           if ((manualSwitch != null) && manualSwitch) {
             switchLogs = !switchLogs;
@@ -216,12 +227,8 @@
           $rootScope.loadingposition = "big center";
           $rootScope.showing = view;
           $rootScope.overlayIsActive = true;
-          console.log("going");
-          console.log($rootScope.loggedIn);
-          console.log($rootScope.filesLoaded);
           if ($rootScope.loggedIn && !$rootScope.filesLoaded) {
-            $rootScope.pullFiles();
-            return console.log("working");
+            return $rootScope.pullFiles();
           }
         }
       };
@@ -244,17 +251,13 @@
       $scope.completeUrl = "";
       $scope.successMessage = "";
       $rootScope.$on('loggedIn', function(event, resp) {
-        console.log("finishing login");
         User = resp;
-        console.log(User);
         $rootScope.$apply(function() {
           return $rootScope.loggedIn = true;
         });
         $scope.loading = true;
         $scope.$apply(function() {
-          $scope.loadingMessage = "Loading your drive (this could take a while)";
-          console.log("loading message updated");
-          return console.log($scope.loadingMessage);
+          return $scope.loadingMessage = "Loading your drive (this could take a while)";
         });
         if ($rootScope.overlayIsActive) {
           return $rootScope.pullFiles();
@@ -283,10 +286,8 @@
         return $scope.selectedFile = file;
       };
       $rootScope.pullFiles = function() {
-        console.log("starting to pull data");
         $rootScope.filesLoaded = true;
         retrieveAllFiles(function(resp) {
-          console.log("got response");
           $scope.$apply(function() {
             $scope.filesLoaded = true;
             $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded";
@@ -342,7 +343,6 @@
           }
         }
         angular.element("html").scope().$broadcast('update-load');
-        console.log(returnVal);
         return returnVal;
       };
       $scope.canSubmit = function() {

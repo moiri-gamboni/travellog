@@ -35,7 +35,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
               Map.getLog($rootScope.urlEntered)
               flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', (event, isLoading) ->
                 if not isLoading
-                  showLog($rootScope.urlEntered)
+                  showLog($rootScope.urlEntered, true)
                   flow.urlLogLoadWatch()
               )
             else
@@ -67,7 +67,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         Map.getLog($rootScope.urlEntered)
         flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', (event, isLoading) ->
           if not isLoading
-            showLog($rootScope.urlEntered)
+            showLog($rootScope.urlEntered, true)
             flow.urlLogLoadWatch()
         )
       else
@@ -97,40 +97,47 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
 
   $rootScope.$on('sliding-animation-done', () ->
+    console.log 'animation done'
     switchLogs = not switchLogs
   )
 
-  showLog = (logId, manualSwitch, invert, historyChange) ->
+  showLog = (logId, manualSwitch, invert, dontPushState) ->
     if logId?
       log = Map.data.logs[logId]
       if invert? and invert
         if historyChange? and historyChange
-          $scope.$apply( ()->
-            if not switchLogs
-              $scope.otherLog = log
-            else
-              $scope.log = log
-          )
+          if not switchLogs
+            $scope.otherLog = log
+          else
+            $scope.log = log
+        if log.profileId?
+          if not switchLogs
+            renderBadge(log.profileId, '.launch')
+          else
+            renderBadge(log.profileId, '.main')
         else
           if not switchLogs
-            console.log $scope.otherLog.title
-            $scope.otherLog = log
-            console.log $scope.otherLog.title
-            if $scope.log?
-              console.log $scope.log.title
+            renderBadge(log.profileName, '.launch')
           else
-            console.log $scope.log.title
-            $scope.log = log
-            console.log $scope.log.title
-            if $scope.otherLog?
-              console.log $scope.otherLog.title
-          $scope.$apply()
+            renderBadge(log.profileName, '.main')
+        $scope.$apply()
       else
-          history.pushState(log.id, log.title, "/log/"+log.id)
+        if switchLogs
+          $scope.otherLog = log
+        else
+          $scope.log = log
+        if log.profileId?
           if switchLogs
-            $scope.otherLog = log
+            renderBadge(log.profileId, '.launch')
           else
-            $scope.log = log
+            renderBadge(log.profileId, '.main')
+        else
+          if switchLogs
+            renderBadge(log.profileName, '.launch')
+          else
+            renderBadge(log.profileName, '.main')
+      if not dontPushState? or not dontPushState
+        history.pushState(log.id, log.title, "/log/"+log.id)
       if manualSwitch? and manualSwitch
         switchLogs = not switchLogs
       Map.data.current = log.key
@@ -187,12 +194,8 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       $rootScope.loadingposition = "big center"
       $rootScope.showing = view
       $rootScope.overlayIsActive = true
-      console.log "going"
-      console.log $rootScope.loggedIn
-      console.log $rootScope.filesLoaded
       if $rootScope.loggedIn and not $rootScope.filesLoaded
         $rootScope.pullFiles()
-        console.log "working"
 
 
   Map.initMap()
@@ -217,16 +220,12 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
   $scope.successMessage = ""
 
   $rootScope.$on('loggedIn', (event, resp) ->
-    console.log "finishing login"
     User = resp
-    console.log User
     $rootScope.$apply ()->
       $rootScope.loggedIn = true
     $scope.loading = true
     $scope.$apply(() ->
       $scope.loadingMessage = "Loading your drive (this could take a while)"
-      console.log "loading message updated"
-      console.log $scope.loadingMessage
     )
     if $rootScope.overlayIsActive
       $rootScope.pullFiles()
@@ -253,10 +252,8 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     $scope.selectedFile = file
 
   $rootScope.pullFiles = () ->
-    console.log "starting to pull data"
     $rootScope.filesLoaded = true
     retrieveAllFiles((resp) ->
-      console.log "got response"
       $scope.$apply(() ->
         $scope.filesLoaded = true
         $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded"
@@ -305,7 +302,6 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
         if $rootScope.overlayIsActive
           fadeLoading(true)
     angular.element("html").scope().$broadcast('update-load');
-    console.log returnVal
     return returnVal
 
   $scope.canSubmit = () ->
