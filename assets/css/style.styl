@@ -1,5 +1,5 @@
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
-  display: none !important;
+  display: none !important
 }
 *,
 *:after,
@@ -50,9 +50,10 @@
 		font-size: 30px
 		height: 15px
 	&.top
-		top: 20%
+		top: 14%
 		left: auto
-		right: 150px
+		right: 90px
+
 
 #minimap
 	width: calc(100% - 100px)
@@ -78,15 +79,15 @@
 .move-up
 	top: 100px
 .fade
-	opacity: 1;
-	transition: opacity .5s ease-in-out;
-	-moz-transition: opacity .5s ease-in-out;
-	-webkit-transition: opacity .5s ease-in-out;
+	opacity: 1
+	transition: opacity .5s ease-in-out
+	-moz-transition: opacity .5s ease-in-out
+	-webkit-transition: opacity .5s ease-in-out
 .slow-fade
-	opacity: 1;
-	transition: opacity 1.5s ease-in-out;
-	-moz-transition: opacity 1.5s ease-in-out;
-	-webkit-transition: opacity 1.5s ease-in-out;
+	opacity: 1
+	transition: opacity 1.5s ease-in-out
+	-moz-transition: opacity 1.5s ease-in-out
+	-webkit-transition: opacity 1.5s ease-in-out
 .fadeout
 	opacity:0
 .fadein
@@ -99,19 +100,16 @@
 	position:absolute
 	background-position:center
 	background-repeat:no-repeat
+	background-size:cover
 	&.background-0
-		background: url('/static/img/2000calmlake.jpg')
-		background-size:cover	
+		background-image: url('/static/img/2000calmlake.jpg')
 	&.background-1
-		background: url('/static/img/2000eveningsky.jpg')
-		background-size:cover
+		background-image: url('/static/img/2000eveningsky.jpg')
 	&.background-2
-		background: url('/static/img/2000roughwaves.jpg')
-		background-size:cover
+		background-image: url('/static/img/2000roughwaves.jpg')
 	&.background-3
-		background: url('/static/img/2000snowymountain.jpg')
+		background-image: url('/static/img/2000snowymountain.jpg')
 		background-repeat:no-repeat
-		background-size:cover
 	&.passive
 		opacity:0
 
@@ -179,7 +177,7 @@
 		font-weight: 300
 		text-transform: uppercase
 		opacity: 0
-		text-align: center;
+		text-align: center
 		width: 400px
 		height: 80px
 	h1:hover, h3:hover
@@ -463,10 +461,10 @@
 		width: 250px
 		right: 75px
 		text-align: right
-		-webkit-transition:all 0.2s ease-in-out;
-		-moz-transition:all 0.2s ease-in-out;
-		-o-transition:all 0.2s ease-in-out;
-		transition:all 0.2s ease-in-out;
+		-webkit-transition:all 0.2s ease-in-out
+		-moz-transition:all 0.2s ease-in-out
+		-o-transition:all 0.2s ease-in-out
+		transition:all 0.2s ease-in-out
 	.sidenav
 		background:rgba(255,255,255,0.4)
 		z-index: 2
@@ -529,18 +527,21 @@
 			left:0
 			margin-left: 15px
 
-
-@media (max-width:320px)
-	#container
-		.log-details
-			padding: 0px
-			.log-title
-				font-size: 1.7em
-					
-
 @media (max-width:480px)
+	.background
+		&.background-0
+			background-image: url('/static/img/720calmlake.jpg')	
+		&.background-1
+			background-image: url('/static/img/720eveningsky.jpg')
+		&.background-2
+			background-image: url('/static/img/720roughwaves.jpg')
+		&.background-3
+			background-image: url('/static/img/720snowymountain.jpg')
 	#loading
 		bottom:30px
+		&.top
+			top: 39%
+			right: 50px
 	#launch-screen
 		h1
 			font-size: 3em
@@ -548,7 +549,6 @@
 			margin-left: -135px
 		p
 			font-size: 1.1em
-
 	#container 
 		#overlay
 			#overlay-content
@@ -558,20 +558,19 @@
 					span
 						line-height:1em
 					ul
-						height: 40px
-						margin-top:90px
-						overflow-y:hidden
+						height: 80px
+						overflow-y:auto
 					button
 						font-size: 1.5em
 					#file-loading-message
-						margin-top:85px
+						margin-top:180px
 						left:0
 					input
 						width:200px
 						margin-top:35px
 				.push-down
-					width: 300px;
-					margin-left: -150px;
+					width: 300px
+					margin-left: -150px
 				
 		#minimap
 			width:calc(100% - 60px)
@@ -611,3 +610,19 @@
 			&.arrow-left 
 				border-right:15px solid #fff
 				margin-left: 5px
+
+@media (max-width:320px)
+	.background
+		&.background-0
+			background-image: url('/static/img/480calmlake.jpg')	
+		&.background-1
+			background-image: url('/static/img/480eveningsky.jpg')
+		&.background-2
+			background-image: url('/static/img/480roughwaves.jpg')
+		&.background-3
+			background-image: url('/static/img/480snowymountain.jpg')
+	#container
+		.log-details
+			padding: 0px
+			.log-title
+				font-size: 1.7em

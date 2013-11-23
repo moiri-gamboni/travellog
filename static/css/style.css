@@ -70,9 +70,9 @@
   height: 15px;
 }
 #loading.top {
-  top: 20%;
+  top: 14%;
   left: auto;
-  right: 150px;
+  right: 90px;
 }
 #minimap {
   width: calc(100% - 100px);
@@ -125,23 +125,20 @@
   position: absolute;
   background-position: center;
   background-repeat: no-repeat;
+  background-size: cover;
 }
 .background.background-0 {
-  background: url("/static/img/2000calmlake.jpg");
-  background-size: cover;
+  background-image: url("/static/img/2000calmlake.jpg");
 }
 .background.background-1 {
-  background: url("/static/img/2000eveningsky.jpg");
-  background-size: cover;
+  background-image: url("/static/img/2000eveningsky.jpg");
 }
 .background.background-2 {
-  background: url("/static/img/2000roughwaves.jpg");
-  background-size: cover;
+  background-image: url("/static/img/2000roughwaves.jpg");
 }
 .background.background-3 {
-  background: url("/static/img/2000snowymountain.jpg");
+  background-image: url("/static/img/2000snowymountain.jpg");
   background-repeat: no-repeat;
-  background-size: cover;
 }
 .background.passive {
   opacity: 0;
@@ -618,17 +615,25 @@
   left: 0;
   margin-left: 15px;
 }
-@media (max-width:320px) {
-  #container .log-details {
-    padding: 0px;
-  }
-  #container .log-details .log-title {
-    font-size: 1.7em;
-  }
-}
 @media (max-width:480px) {
+  .background.background-0 {
+    background-image: url("/static/img/720calmlake.jpg");
+  }
+  .background.background-1 {
+    background-image: url("/static/img/720eveningsky.jpg");
+  }
+  .background.background-2 {
+    background-image: url("/static/img/720roughwaves.jpg");
+  }
+  .background.background-3 {
+    background-image: url("/static/img/720snowymountain.jpg");
+  }
   #loading {
     bottom: 30px;
+  }
+  #loading.top {
+    top: 39%;
+    right: 50px;
   }
   #launch-screen h1 {
     font-size: 3em;
@@ -646,15 +651,14 @@
     line-height: 1em;
   }
   #container #overlay #overlay-content #search ul {
-    height: 40px;
-    margin-top: 90px;
-    overflow-y: hidden;
+    height: 80px;
+    overflow-y: auto;
   }
   #container #overlay #overlay-content #search button {
     font-size: 1.5em;
   }
   #container #overlay #overlay-content #search #file-loading-message {
-    margin-top: 85px;
+    margin-top: 180px;
     left: 0;
   }
   #container #overlay #overlay-content #search input {
@@ -714,5 +718,25 @@
   #container .arrow.arrow-left {
     border-right: 15px solid #fff;
     margin-left: 5px;
+  }
+}
+@media (max-width:320px) {
+  .background.background-0 {
+    background-image: url("/static/img/480calmlake.jpg");
+  }
+  .background.background-1 {
+    background-image: url("/static/img/480eveningsky.jpg");
+  }
+  .background.background-2 {
+    background-image: url("/static/img/480roughwaves.jpg");
+  }
+  .background.background-3 {
+    background-image: url("/static/img/480snowymountain.jpg");
+  }
+  #container .log-details {
+    padding: 0px;
+  }
+  #container .log-details .log-title {
+    font-size: 1.7em;
   }
 }
