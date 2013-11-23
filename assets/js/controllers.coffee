@@ -43,6 +43,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
               console.log 'entered url'
               if not Map.data.logs[$rootScope.urlEntered].body?
                 Map.getLog($rootScope.urlEntered)
+                Map.getClosestLogs(Map.data.logs[$rootScope.urlEntered].key)
                 watch = $rootScope.$on('is-loading-log', (event, isLoading) ->
                   console.log 'url watch'
                   if not isLoading
@@ -89,6 +90,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         console.log 'entered url'
         if not Map.data.logs[$rootScope.urlEntered].body?
           Map.getLog($rootScope.urlEntered)
+          Map.getClosestLogs(Map.data.logs[$rootScope.urlEntered].key)
           watch = $rootScope.$on('is-loading-log', (event, isLoading) ->
             console.log 'url watch'
             if not isLoading
@@ -197,6 +199,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
   $scope.move = (direction) ->
     if Map.data.loadingLogs == 0
       log = Map.move(direction)
+      console.log log
       console.log 'showing log'
       showLog(log.id, null, null, null, true)
       console.log 'moving'
@@ -206,8 +209,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
           changeLocation(log.id)
         , 500
         )
-
-      ,500)
+      ,200)
 
   console.log 'move defined'
 
@@ -216,6 +218,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       showLog(logId, false, true)
     else
       Map.getLog(logId)
+      Map.getClosestLogs(Map.data.logs[logId].key)
       watch = $rootScope.$on('is-loading-log', (event, isLoading) ->
         if not isLoading
           showLog(logId, false, true)

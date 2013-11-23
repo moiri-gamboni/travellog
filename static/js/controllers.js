@@ -52,6 +52,7 @@
               console.log('entered url');
               if (Map.data.logs[$rootScope.urlEntered].body == null) {
                 Map.getLog($rootScope.urlEntered);
+                Map.getClosestLogs(Map.data.logs[$rootScope.urlEntered].key);
                 return watch = $rootScope.$on('is-loading-log', function(event, isLoading) {
                   console.log('url watch');
                   if (!isLoading) {
@@ -98,6 +99,7 @@
             console.log('entered url');
             if (Map.data.logs[$rootScope.urlEntered].body == null) {
               Map.getLog($rootScope.urlEntered);
+              Map.getClosestLogs(Map.data.logs[$rootScope.urlEntered].key);
               return watch = $rootScope.$on('is-loading-log', function(event, isLoading) {
                 console.log('url watch');
                 if (!isLoading) {
@@ -218,6 +220,7 @@
         var log;
         if (Map.data.loadingLogs === 0) {
           log = Map.move(direction);
+          console.log(log);
           console.log('showing log');
           showLog(log.id, null, null, null, true);
           console.log('moving');
@@ -226,7 +229,7 @@
             return $timeout(function() {
               return changeLocation(log.id);
             }, 500);
-          }, 500);
+          }, 200);
         }
       };
       console.log('move defined');
@@ -236,6 +239,7 @@
           return showLog(logId, false, true);
         } else {
           Map.getLog(logId);
+          Map.getClosestLogs(Map.data.logs[logId].key);
           return watch = $rootScope.$on('is-loading-log', function(event, isLoading) {
             if (!isLoading) {
               showLog(logId, false, true);
