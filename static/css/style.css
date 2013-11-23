@@ -139,6 +139,15 @@
   position: absolute;
   font-family: "Roboto", sans-serif;
 }
+#launch-screen #tooOld {
+  position: absolute;
+  text-align: center;
+  top: 50%;
+  width: 100%;
+}
+#launch-screen #tooOld a {
+  color: #000;
+}
 #launch-screen #logo {
   width: 400px;
   height: 120px;

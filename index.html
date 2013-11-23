@@ -48,7 +48,7 @@
 
 
 			<div class="message" ng-show="getShowing() == 'loading'" class="push-down">
-				{{loadingMessage}}
+        <div ng-bind-html="loadingMessage"></div>
 			</div>
 			<div id="complete" class="message" ng-show="getShowing() == 'complete'" class="push-down">
 				{{successMessage}}<br/><br/>
@@ -64,7 +64,8 @@
 
 			</div>
 			<div id="search" ng-show="getShowing() =='loggedIn'" class="message">
-				<span class="white small">Select your story from the drive, and place it on the map. Future changes on Google Drive will sync automatically.</span>
+				<span class="white small">1. Search for your story as a Google Document</span><br/>
+				<span class="white small">2. Place your story on the map</span>
 				<button ng-click="upload()" ng-class="{active: canSubmit()}">Submit</button>
 				<input ng-model="query" placeholder="search">
 				<ul decorations:"none">
@@ -105,6 +106,7 @@
 <script type="text/javascript"
 src="/static/js/jquery.transit.min.js">
 </script>
+<script type="text/javascript" src='/static/js/modernizr.custom.89592.js'></script>
 <script type="text/javascript" src='/static/lib/angular/angular.js'></script>
 <script type="text/javascript" src='/static/lib/angular/angular-sanitize.js'></script>
 <script type="text/javascript" src='/static/js/app.js'></script>

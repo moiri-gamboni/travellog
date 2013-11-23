@@ -1,4 +1,11 @@
 window.loadingDone = true
+
+$(() ->
+	if not Modernizr.csscalc
+		$("#loading").css({"display": "none"})
+		$("#launch-screen").html("<div id='tooOld'>Sorry, your browser is too old to run Travellog. <br />We recommend using <a href='https://www.google.com/intl/en/chrome/browser/'>Google Chrome</a></div>")
+)
+
 window.move = (direction) ->
 	windowHeight = $(".main").height();
 	windowWidth = $(".main").width();
@@ -50,7 +57,7 @@ window.incrementBackground = () ->
 	$(".background").toggleClass("active passive")
 	passive = $(".passive")
 	counter = passive.attr("data-counter")
-	newCounter = (parseInt(counter) + 2 )% 5
+	newCounter = (parseInt(counter) + 2 ) % 4
 	setTimeout(() ->
 		passive.removeClass("background-" + counter).addClass("background-" + newCounter).attr("data-counter", newCounter)
 	, 2000)

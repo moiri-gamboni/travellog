@@ -54,7 +54,9 @@ class LogHandler(webapp2.RequestHandler):
     except:
       self.response.headers['Content-Type'] = "application/json"
       self.response.write(json.dumps({"status": 400, "error":\
-          "Could not process drive document with id %s" %\
+          "Could not process drive document with id %s," +
+          " perhaps it is not a Google Drive Document?" +
+          " (We can't accept Microsoft Office Documents)" %\
           self.params["gdriveId"]}))
       return
     log.put()

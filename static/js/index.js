@@ -2,6 +2,15 @@
 (function() {
   window.loadingDone = true;
 
+  $(function() {
+    if (!Modernizr.csscalc) {
+      $("#loading").css({
+        "display": "none"
+      });
+      return $("#launch-screen").html("<div id='tooOld'>Sorry, your browser is too old to run Travellog. <br />We recommend using <a href='https://www.google.com/intl/en/chrome/browser/'>Google Chrome</a></div>");
+    }
+  });
+
   window.move = function(direction) {
     var launchIn, mainOut, prepare, screenHeight, screenWidth, topDistance, windowHeight, windowWidth;
     windowHeight = $(".main").height();
@@ -101,7 +110,7 @@
     $(".background").toggleClass("active passive");
     passive = $(".passive");
     counter = passive.attr("data-counter");
-    newCounter = (parseInt(counter) + 2) % 5;
+    newCounter = (parseInt(counter) + 2) % 4;
     return setTimeout(function() {
       return passive.removeClass("background-" + counter).addClass("background-" + newCounter).attr("data-counter", newCounter);
     }, 2000);
