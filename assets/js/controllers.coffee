@@ -191,11 +191,14 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
   $scope.changeShowing = (view) ->
     if !$("#loading").hasClass("fadein")
+      console.log "clicked"
       $rootScope.loadingposition = "big center"
       $rootScope.showing = view
       $rootScope.overlayIsActive = true
       if $rootScope.loggedIn and not $rootScope.filesLoaded
         $rootScope.pullFiles()
+      $rootScope.setShowing()
+
 
 
   Map.initMap()
@@ -203,10 +206,11 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
 ])
 
-ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', ($http, $scope, $rootScope, User) ->
+ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout', 'User', ($http, $scope, $rootScope, $timeout, User) ->
     #if user is signed_in
   #$scope.map = Map
   $rootScope.showing = 'loading'
+  $scope.display = 'loading'
   $rootScope.loggedIn = false
   $scope.myfiles = []
   $scope.numFilesMessage = ""
@@ -221,21 +225,22 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
 
   $rootScope.$on('loggedIn', (event, resp) ->
     User = resp
-    $rootScope.$apply ()->
-      $rootScope.loggedIn = true
+    $rootScope.loggedIn = true
     $scope.loading = true
+    $rootScope.setShowing()
     $scope.$apply(() ->
-      $scope.loadingMessage = "Loading your drive (this could take a while)"
+      $scope.loadingMessage = "Loading your drive"
     )
     if $rootScope.overlayIsActive
       $rootScope.pullFiles()
   )
   $rootScope.$on("partialFilesLoaded", (event, newFiles) ->
     $scope.$apply ()->
-      $scope.numFilesMessage = "Still loading...<br />" + newFiles.length + " Files Loaded"
+      $scope.numFilesMessage = newFiles.length + " Files Loaded"
       $scope.loading = false
       switchLoading("small top")
       $scope.myfiles = newFiles
+      $rootScope.setShowing()
   )
 
   $rootScope.$on('addMapSelected', () ->
@@ -244,6 +249,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
   )
   $scope.submitAgain = () ->
     $scope.complete = false
+    $rootScope.setShowing()
 
   $scope.isSelected = (file) ->
     return file == $scope.selectedFile
@@ -267,19 +273,14 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     )
     startAddMap()
 
-  $scope.$watch( () ->
-    return $scope.loading
-  , () ->
-    $scope.getShowing()
-  )
-
-  $scope.getShowing = () ->
+  $rootScope.setShowing = () ->
+    console.log "running"
+    returnVal = ""
     if $rootScope.showing == "help"
       if $rootScope.overlayIsActive
           fadeLoading(true)
-      return $rootScope.showing
-    returnVal = ""
-    if $rootScope.showing == "addFile"
+          returnVal = $rootScope.showing
+    else if $rootScope.showing == "addFile"
       if $scope.loading
         if $rootScope.overlayIsActive
           fadeLoading(false)
@@ -302,7 +303,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
         if $rootScope.overlayIsActive
           fadeLoading(true)
     angular.element("html").scope().$broadcast('update-load');
-    return returnVal
+    $scope.display = returnVal
 
   $scope.canSubmit = () ->
     return $scope.addMapSelected and $scope.selectedFile?
@@ -328,6 +329,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
       payload.profileName = User.name
     $scope.loadingMessage = "Sharing your story!"
     $scope.loading = true
+    $rootScope.setShowing()
     makePublic(payload.gdriveId, (resp) ->
       addToTravellog(payload.gdriveId, (resp) ->
         $http(
@@ -337,6 +339,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
         ).success((data, status, headers, config) ->
          $scope.loading = false
          $scope.complete = true
+         $rootScope.setShowing()
          if data.status == 200
             $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id
             $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:"
@@ -353,5 +356,6 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     if not $rootScope.loggedIn
       $scope.loading = true
       $scope.loadingMessage = "Logging you in"
+      $rootScope.setShowing()
 ])
 

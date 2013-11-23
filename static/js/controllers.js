@@ -224,12 +224,14 @@
       };
       $scope.changeShowing = function(view) {
         if (!$("#loading").hasClass("fadein")) {
+          console.log("clicked");
           $rootScope.loadingposition = "big center";
           $rootScope.showing = view;
           $rootScope.overlayIsActive = true;
           if ($rootScope.loggedIn && !$rootScope.filesLoaded) {
-            return $rootScope.pullFiles();
+            $rootScope.pullFiles();
           }
+          return $rootScope.setShowing();
         }
       };
       return Map.initMap();
@@ -237,8 +239,9 @@
   ]);
 
   ctrl.controller("MyFilesController", [
-    '$http', '$scope', '$rootScope', 'User', function($http, $scope, $rootScope, User) {
+    '$http', '$scope', '$rootScope', '$timeout', 'User', function($http, $scope, $rootScope, $timeout, User) {
       $rootScope.showing = 'loading';
+      $scope.display = 'loading';
       $rootScope.loggedIn = false;
       $scope.myfiles = [];
       $scope.numFilesMessage = "";
@@ -252,12 +255,11 @@
       $scope.successMessage = "";
       $rootScope.$on('loggedIn', function(event, resp) {
         User = resp;
-        $rootScope.$apply(function() {
-          return $rootScope.loggedIn = true;
-        });
+        $rootScope.loggedIn = true;
         $scope.loading = true;
+        $rootScope.setShowing();
         $scope.$apply(function() {
-          return $scope.loadingMessage = "Loading your drive (this could take a while)";
+          return $scope.loadingMessage = "Loading your drive";
         });
         if ($rootScope.overlayIsActive) {
           return $rootScope.pullFiles();
@@ -265,10 +267,11 @@
       });
       $rootScope.$on("partialFilesLoaded", function(event, newFiles) {
         return $scope.$apply(function() {
-          $scope.numFilesMessage = "Still loading...<br />" + newFiles.length + " Files Loaded";
+          $scope.numFilesMessage = newFiles.length + " Files Loaded";
           $scope.loading = false;
           switchLoading("small top");
-          return $scope.myfiles = newFiles;
+          $scope.myfiles = newFiles;
+          return $rootScope.setShowing();
         });
       });
       $rootScope.$on('addMapSelected', function() {
@@ -277,7 +280,8 @@
         });
       });
       $scope.submitAgain = function() {
-        return $scope.complete = false;
+        $scope.complete = false;
+        return $rootScope.setShowing();
       };
       $scope.isSelected = function(file) {
         return file === $scope.selectedFile;
@@ -300,21 +304,16 @@
         });
         return startAddMap();
       };
-      $scope.$watch(function() {
-        return $scope.loading;
-      }, function() {
-        return $scope.getShowing();
-      });
-      $scope.getShowing = function() {
+      $rootScope.setShowing = function() {
         var returnVal;
+        console.log("running");
+        returnVal = "";
         if ($rootScope.showing === "help") {
           if ($rootScope.overlayIsActive) {
             fadeLoading(true);
+            returnVal = $rootScope.showing;
           }
-          return $rootScope.showing;
-        }
-        returnVal = "";
-        if ($rootScope.showing === "addFile") {
+        } else if ($rootScope.showing === "addFile") {
           if ($scope.loading) {
             if ($rootScope.overlayIsActive) {
               fadeLoading(false);
@@ -343,7 +342,7 @@
           }
         }
         angular.element("html").scope().$broadcast('update-load');
-        return returnVal;
+        return $scope.display = returnVal;
       };
       $scope.canSubmit = function() {
         return $scope.addMapSelected && ($scope.selectedFile != null);
@@ -372,6 +371,7 @@
         }
         $scope.loadingMessage = "Sharing your story!";
         $scope.loading = true;
+        $rootScope.setShowing();
         return makePublic(payload.gdriveId, function(resp) {
           return addToTravellog(payload.gdriveId, function(resp) {
             return $http({
@@ -381,6 +381,7 @@
             }).success(function(data, status, headers, config) {
               $scope.loading = false;
               $scope.complete = true;
+              $rootScope.setShowing();
               if (data.status === 200) {
                 $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id;
                 return $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:";
@@ -395,7 +396,8 @@
       return $scope.startLogin = function() {
         if (!$rootScope.loggedIn) {
           $scope.loading = true;
-          return $scope.loadingMessage = "Logging you in";
+          $scope.loadingMessage = "Logging you in";
+          return $rootScope.setShowing();
         }
       };
     }
