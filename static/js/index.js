@@ -81,9 +81,14 @@
         $(".log-details").removeClass("animate").toggleClass("main launch").attr({
           "style": ""
         });
-        return angular.element("html").scope().$broadcast("sliding-animation-done");
+        angular.element("html").scope().$broadcast("sliding-animation-done");
+        return setTimeout(function() {
+          return $(".launch .log-author").css({
+            "opacity": 0
+          });
+        }, 100);
       }, 1000);
-    }, 1);
+    }, 300);
   };
 
   window.changeCountry = function(newCountry) {
@@ -115,5 +120,9 @@
       return passive.removeClass("background-" + counter).addClass("background-" + newCounter).attr("data-counter", newCounter);
     }, 2000);
   };
+
+  setInterval(function() {
+    return incrementBackground();
+  }, 10000);
 
 }).call(this);

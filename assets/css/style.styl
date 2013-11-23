@@ -25,12 +25,12 @@
 	height:100px
 	bottom: 10%
 	left: 50%
-	margin-left: -50px
+	margin-left: -30px
 	pointer-events: none
 	span
 		font-size: 0.5em
 		font-family: "Roboto", sans-serif
-		color: #aaa
+		color: #555
 		position: absolute
 		bottom: -30px
 		left: 50%
@@ -109,7 +109,7 @@
 	&.background-2
 		background-image: url('/static/img/2000roughwaves.jpg')
 	&.background-3
-		background-image: url('/static/img/2000snowymountain.jpg')
+		background-image: url('/static/img/2000moonmountain.jpg')
 		background-repeat:no-repeat
 	&.passive
 		opacity:0
@@ -121,6 +121,7 @@
 	left:0
 	position:absolute
 	font-family: "Roboto", sans-serif
+	background: rgba(255, 255, 255, 0.3)
 	#tooOld
 		position: absolute
 		text-align: center
@@ -409,6 +410,7 @@
 			color: white
 			font-size:2.2em
 		.log-author
+			opacity: 0
 			padding: 10px 0px
 			color:#ed4d4a
 			font-size:1.5em
@@ -540,7 +542,7 @@
 		&.background-2
 			background-image: url('/static/img/720roughwaves.jpg')
 		&.background-3
-			background-image: url('/static/img/720snowymountain.jpg')
+			background-image: url('/static/img/720moonmountain.jpg')
 	#loading
 		bottom:30px
 		&.top
@@ -625,7 +627,7 @@
 		&.background-2
 			background-image: url('/static/img/480roughwaves.jpg')
 		&.background-3
-			background-image: url('/static/img/480snowymountain.jpg')
+			background-image: url('/static/img/480moonmountain.jpg')
 	#container
 		.log-details
 			padding: 0px

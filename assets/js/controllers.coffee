@@ -117,11 +117,10 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
   $scope.begin = () ->
     if flow.canBegin
-      $("#launch-screen, .background").addClass("hide")
+      $("#launch-screen").addClass("fadeout")
       $("#container").removeClass("hide")
       fadeLoading(false)
       switchLoading("big center")
-      $("#launch-screen").css({"opacity": 0})
       flow.hasBegun = true
       $timeout(()->
         dropPins()
@@ -152,14 +151,13 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       log = Map.data.logs[logId]
       if invert? and invert
         console.log 'invert'
-        if historyChange? and historyChange
-          console.log 'history change'
-          if not switchLogs
-            console.log 'not switchlogs -> otherlog'
-            $scope.otherLog = log
-          else
-            console.log 'switchlogs -> log'
-            $scope.log = log
+        console.log 'history change'
+        if not switchLogs
+          console.log 'not switchlogs -> otherlog'
+          $scope.otherLog = log
+        else
+          console.log 'switchlogs -> log'
+          $scope.log = log
         $scope.$apply()
       else
         console.log 'no invert'
@@ -213,16 +211,17 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
   $rootScope.$on('switch-marker', (event, logId) ->
     console.log "switching marker"
+    $(".main" + " .log-author").css({"opacity": 0})
     if Map.data.logs[logId].body?
       console.log "body exists"
-      showLog(logId, false, true)
+      showLog(logId, false, true, false, false, true)
     else
       console.log "fetching body"
       Map.getLog(logId)
       Map.getClosestLogs(Map.data.logs[logId].key)
       watch = $rootScope.$on('is-loading-log', (event, isLoading) ->
         if not isLoading
-          showLog(logId, false, true)
+          showLog(logId, false, true, false, false, true)
           watch()
       )
   )
@@ -315,7 +314,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
   $rootScope.$on("partialFilesLoaded", (event, newFiles) ->
     $scope.$apply ()->
       $scope.numFilesMessage = newFiles.length + " Files Loaded"
-      if not $started.filesLoaded
+      if not $scope.filesLoaded
         $scope.loading = false
       $scope.startedFileLoad = true
       switchLoading("small top")
@@ -397,6 +396,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
   $scope.upload = () ->
     if not $scope.canSubmit()
       return
+    switchLoading("big center")
     payload =
       gdriveId: $scope.selectedFile.id
       lat: addMapMarker.position.lat()

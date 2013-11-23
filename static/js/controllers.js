@@ -127,13 +127,10 @@
       console.log('unlock begin defined');
       $scope.begin = function() {
         if (flow.canBegin) {
-          $("#launch-screen, .background").addClass("hide");
+          $("#launch-screen").addClass("fadeout");
           $("#container").removeClass("hide");
           fadeLoading(false);
           switchLoading("big center");
-          $("#launch-screen").css({
-            "opacity": 0
-          });
           flow.hasBegun = true;
           return $timeout(function() {
             return dropPins();
@@ -162,15 +159,13 @@
           log = Map.data.logs[logId];
           if ((invert != null) && invert) {
             console.log('invert');
-            if ((typeof historyChange !== "undefined" && historyChange !== null) && historyChange) {
-              console.log('history change');
-              if (!switchLogs) {
-                console.log('not switchlogs -> otherlog');
-                $scope.otherLog = log;
-              } else {
-                console.log('switchlogs -> log');
-                $scope.log = log;
-              }
+            console.log('history change');
+            if (!switchLogs) {
+              console.log('not switchlogs -> otherlog');
+              $scope.otherLog = log;
+            } else {
+              console.log('switchlogs -> log');
+              $scope.log = log;
             }
             $scope.$apply();
           } else {
@@ -234,16 +229,19 @@
       $rootScope.$on('switch-marker', function(event, logId) {
         var watch;
         console.log("switching marker");
+        $(".main" + " .log-author").css({
+          "opacity": 0
+        });
         if (Map.data.logs[logId].body != null) {
           console.log("body exists");
-          return showLog(logId, false, true);
+          return showLog(logId, false, true, false, false, true);
         } else {
           console.log("fetching body");
           Map.getLog(logId);
           Map.getClosestLogs(Map.data.logs[logId].key);
           return watch = $rootScope.$on('is-loading-log', function(event, isLoading) {
             if (!isLoading) {
-              showLog(logId, false, true);
+              showLog(logId, false, true, false, false, true);
               return watch();
             }
           });
@@ -333,7 +331,7 @@
       $rootScope.$on("partialFilesLoaded", function(event, newFiles) {
         return $scope.$apply(function() {
           $scope.numFilesMessage = newFiles.length + " Files Loaded";
-          if (!$started.filesLoaded) {
+          if (!$scope.filesLoaded) {
             $scope.loading = false;
           }
           $scope.startedFileLoad = true;
@@ -426,6 +424,7 @@
         if (!$scope.canSubmit()) {
           return;
         }
+        switchLoading("big center");
         payload = {
           gdriveId: $scope.selectedFile.id,
           lat: addMapMarker.position.lat(),
