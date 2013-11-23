@@ -444,7 +444,7 @@
   padding-left: 0px;
   overflow: scroll;
   height: 140px;
-  margin-top: 90px;
+  margin-top: 55px;
 }
 #container #overlay #overlay-content #search ul li {
   list-style: none;
@@ -639,6 +639,7 @@
     font-size: 1.1em;
   }
   #container #overlay #overlay-content #search {
+    color: #fff;
     margin-top: 20px;
   }
   #container #overlay #overlay-content #search span {
@@ -646,6 +647,8 @@
   }
   #container #overlay #overlay-content #search ul {
     height: 40px;
+    margin-top: 90px;
+    overflow-y: hidden;
   }
   #container #overlay #overlay-content #search button {
     font-size: 1.5em;
