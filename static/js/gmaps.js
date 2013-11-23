@@ -189,7 +189,7 @@ function changeLocation(markerId) {
 
 
 function switchMiniMarker() {
-  changeLocation(this.title);
+  angular.element("html").scope().$broadcast('switch-marker', this.title);
 }
 
 

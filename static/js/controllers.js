@@ -112,18 +112,37 @@
       $rootScope.$on('sliding-animation-done', function() {
         return switchLogs = !switchLogs;
       });
-      showLog = function(logId, manualSwitch, historyChange) {
+      showLog = function(logId, manualSwitch, invert, historyChange) {
         var log;
         if (logId != null) {
           log = Map.data.logs[logId];
-          if ((historyChange != null) && historyChange) {
-            $scope.$apply(function() {
+          if ((invert != null) && invert) {
+            if ((historyChange != null) && historyChange) {
+              $scope.$apply(function() {
+                if (!switchLogs) {
+                  return $scope.otherLog = log;
+                } else {
+                  return $scope.log = log;
+                }
+              });
+            } else {
               if (!switchLogs) {
-                return $scope.otherLog = log;
+                console.log($scope.otherLog.title);
+                $scope.otherLog = log;
+                console.log($scope.otherLog.title);
+                if ($scope.log != null) {
+                  console.log($scope.log.title);
+                }
               } else {
-                return $scope.log = log;
+                console.log($scope.log.title);
+                $scope.log = log;
+                console.log($scope.log.title);
+                if ($scope.otherLog != null) {
+                  console.log($scope.otherLog.title);
+                }
               }
-            });
+              $scope.$apply();
+            }
           } else {
             history.pushState(log.id, log.title, "/log/" + log.id);
             if (switchLogs) {
@@ -147,6 +166,20 @@
           return move(direction);
         }
       };
+      $rootScope.$on('switch-marker', function(event, logId) {
+        var loadingWatch;
+        if (Map.data.logs[logId].body != null) {
+          return showLog(logId, false, true);
+        } else {
+          Map.getLog(logId);
+          return loadingWatch = $rootScope.$on('is-loading-log', function(event, isLoading) {
+            if (!isLoading) {
+              showLog(logId, false, true);
+              return loadingWatch();
+            }
+          });
+        }
+      });
       loadingWatch = function() {
         if (Map.data.loadingLogs === 0) {
           fadeLoading(true);
@@ -172,7 +205,7 @@
       };
       window.onpopstate = function(event) {
         if (event.state != null) {
-          return showLog(event.state, false, true);
+          return showLog(event.state, false, true, true);
         }
       };
       $scope.deactivateOverlay = function(view) {

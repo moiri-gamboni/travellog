@@ -45,11 +45,17 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
           get.success((data, status, headers, config)->
             factory.data.loadingLogs--
             callback(data, status, headers, config)
+            if factory.data.loadingLogs == 0
+              $rootScope.$broadcast('is-loading-log', false)
           ).error((data, status, headers, config)->
             factory.data.loadingLogs--
+            if factory.data.loadingLogs == 0
+              $rootScope.$broadcast('is-loading-log', false)
           )
         else
           get.success((data, status, headers, config)->
+            console.log 'success'
+            console.log data
             factory.data.loadingLogs--
             if factory.data.loadingLogs == 0
               $rootScope.$broadcast('is-loading-log', false)
@@ -58,6 +64,8 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
             factory.data.logs[data.log.id].profileName = data.log.profileName
             factory.data.logs[data.log.id].body = data.log.body
           ).error((data, status, headers, config)->
+            console.log 'error'
+            console.log data
             factory.data.loadingLogs--
             if factory.data.loadingLogs == 0
               $rootScope.$broadcast('is-loading-log', false)

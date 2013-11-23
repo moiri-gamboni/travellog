@@ -100,16 +100,31 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     switchLogs = not switchLogs
   )
 
-  showLog = (logId, manualSwitch, historyChange) ->
+  showLog = (logId, manualSwitch, invert, historyChange) ->
     if logId?
       log = Map.data.logs[logId]
-      if historyChange? and historyChange
-        $scope.$apply( ()->
+      if invert? and invert
+        if historyChange? and historyChange
+          $scope.$apply( ()->
             if not switchLogs
               $scope.otherLog = log
             else
               $scope.log = log
           )
+        else
+          if not switchLogs
+            console.log $scope.otherLog.title
+            $scope.otherLog = log
+            console.log $scope.otherLog.title
+            if $scope.log?
+              console.log $scope.log.title
+          else
+            console.log $scope.log.title
+            $scope.log = log
+            console.log $scope.log.title
+            if $scope.otherLog?
+              console.log $scope.otherLog.title
+          $scope.$apply()
       else
           history.pushState(log.id, log.title, "/log/"+log.id)
           if switchLogs
@@ -126,6 +141,18 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       log = Map.move(direction)
       showLog(log.id)
       move(direction)
+
+  $rootScope.$on('switch-marker', (event, logId) ->
+    if Map.data.logs[logId].body?
+      showLog(logId, false, true)
+    else
+      Map.getLog(logId)
+      loadingWatch = $rootScope.$on('is-loading-log', (event, isLoading) ->
+        if not isLoading
+          showLog(logId, false, true)
+          loadingWatch()
+      )
+  )
 
   loadingWatch = () ->
     if Map.data.loadingLogs == 0
@@ -149,7 +176,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
   window.onpopstate = (event) ->
     if event.state?
-      showLog(event.state, false, true)
+      showLog(event.state, false, true, true)
 
 
   $scope.deactivateOverlay = (view) ->

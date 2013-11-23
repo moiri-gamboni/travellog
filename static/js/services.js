@@ -52,12 +52,20 @@
             if (callback != null) {
               return get.success(function(data, status, headers, config) {
                 factory.data.loadingLogs--;
-                return callback(data, status, headers, config);
+                callback(data, status, headers, config);
+                if (factory.data.loadingLogs === 0) {
+                  return $rootScope.$broadcast('is-loading-log', false);
+                }
               }).error(function(data, status, headers, config) {
-                return factory.data.loadingLogs--;
+                factory.data.loadingLogs--;
+                if (factory.data.loadingLogs === 0) {
+                  return $rootScope.$broadcast('is-loading-log', false);
+                }
               });
             } else {
               return get.success(function(data, status, headers, config) {
+                console.log('success');
+                console.log(data);
                 factory.data.loadingLogs--;
                 if (factory.data.loadingLogs === 0) {
                   $rootScope.$broadcast('is-loading-log', false);
@@ -67,6 +75,8 @@
                 factory.data.logs[data.log.id].profileName = data.log.profileName;
                 return factory.data.logs[data.log.id].body = data.log.body;
               }).error(function(data, status, headers, config) {
+                console.log('error');
+                console.log(data);
                 factory.data.loadingLogs--;
                 if (factory.data.loadingLogs === 0) {
                   return $rootScope.$broadcast('is-loading-log', false);
