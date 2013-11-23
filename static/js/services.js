@@ -64,8 +64,6 @@
               });
             } else {
               return get.success(function(data, status, headers, config) {
-                console.log('success');
-                console.log(data);
                 factory.data.loadingLogs--;
                 if (factory.data.loadingLogs === 0) {
                   $rootScope.$broadcast('is-loading-log', false);
@@ -75,8 +73,6 @@
                 factory.data.logs[data.log.id].profileName = data.log.profileName;
                 return factory.data.logs[data.log.id].body = data.log.body;
               }).error(function(data, status, headers, config) {
-                console.log('error');
-                console.log(data);
                 factory.data.loadingLogs--;
                 if (factory.data.loadingLogs === 0) {
                   return $rootScope.$broadcast('is-loading-log', false);
@@ -202,7 +198,7 @@
               factory.getLog(id, function(data, status, headers, config) {
                 factory.data.logs[data.log.id].title = data.log.title;
                 factory.data.logs[data.log.id].profileId = data.log.profileId;
-                factory.data.logs[data.log.id].profileId = data.log.profileName;
+                factory.data.logs[data.log.id].profileName = data.log.profileName;
                 factory.data.logs[data.log.id].body = data.log.body;
                 return $rootScope.$broadcast('first-log-ready');
               });

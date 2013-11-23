@@ -35,7 +35,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
               Map.getLog($rootScope.urlEntered)
               flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', (event, isLoading) ->
                 if not isLoading
-                  showLog($rootScope.urlEntered)
+                  showLog($rootScope.urlEntered, true)
                   flow.urlLogLoadWatch()
               )
             else
@@ -67,7 +67,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         Map.getLog($rootScope.urlEntered)
         flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', (event, isLoading) ->
           if not isLoading
-            showLog($rootScope.urlEntered)
+            showLog($rootScope.urlEntered, true)
             flow.urlLogLoadWatch()
         )
       else
@@ -85,6 +85,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       $("#container").removeClass("hide")
       fadeLoading(false)
       switchLoading("big center")
+      $("#launch-screen").css({"opacity": 0})
       flow.hasBegun = true
       $timeout(()->
         dropPins()
@@ -97,40 +98,47 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
 
   $rootScope.$on('sliding-animation-done', () ->
+    console.log 'animation done'
     switchLogs = not switchLogs
   )
 
-  showLog = (logId, manualSwitch, invert, historyChange) ->
+  showLog = (logId, manualSwitch, invert, dontPushState) ->
     if logId?
       log = Map.data.logs[logId]
       if invert? and invert
         if historyChange? and historyChange
-          $scope.$apply( ()->
-            if not switchLogs
-              $scope.otherLog = log
-            else
-              $scope.log = log
-          )
+          if not switchLogs
+            $scope.otherLog = log
+          else
+            $scope.log = log
+        if log.profileId?
+          if not switchLogs
+            renderBadge(log.profileId, '.launch')
+          else
+            renderBadge(log.profileId, '.main')
         else
           if not switchLogs
-            console.log $scope.otherLog.title
-            $scope.otherLog = log
-            console.log $scope.otherLog.title
-            if $scope.log?
-              console.log $scope.log.title
+            renderBadge(log.profileName, '.launch')
           else
-            console.log $scope.log.title
-            $scope.log = log
-            console.log $scope.log.title
-            if $scope.otherLog?
-              console.log $scope.otherLog.title
-          $scope.$apply()
+            renderBadge(log.profileName, '.main')
+        $scope.$apply()
       else
-          history.pushState(log.id, log.title, "/log/"+log.id)
+        if switchLogs
+          $scope.otherLog = log
+        else
+          $scope.log = log
+        if log.profileId?
           if switchLogs
-            $scope.otherLog = log
+            renderBadge(log.profileId, '.launch')
           else
-            $scope.log = log
+            renderBadge(log.profileId, '.main')
+        else
+          if switchLogs
+            renderBadge(log.profileName, '.launch')
+          else
+            renderBadge(log.profileName, '.main')
+      if not dontPushState? or not dontPushState
+        history.pushState(log.id, log.title, "/log/"+log.id)
       if manualSwitch? and manualSwitch
         switchLogs = not switchLogs
       Map.data.current = log.key
@@ -184,15 +192,14 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
   $scope.changeShowing = (view) ->
     if !$("#loading").hasClass("fadein")
+      console.log "clicked"
       $rootScope.loadingposition = "big center"
       $rootScope.showing = view
       $rootScope.overlayIsActive = true
-      console.log "going"
-      console.log $rootScope.loggedIn
-      console.log $rootScope.filesLoaded
       if $rootScope.loggedIn and not $rootScope.filesLoaded
         $rootScope.pullFiles()
-        console.log "working"
+      $rootScope.setShowing()
+
 
 
   Map.initMap()
@@ -200,10 +207,11 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
 ])
 
-ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', ($http, $scope, $rootScope, User) ->
+ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout', 'User', ($http, $scope, $rootScope, $timeout, User) ->
     #if user is signed_in
   #$scope.map = Map
   $rootScope.showing = 'loading'
+  $scope.display = 'loading'
   $rootScope.loggedIn = false
   $scope.myfiles = []
   $scope.numFilesMessage = ""
@@ -217,26 +225,23 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
   $scope.successMessage = ""
 
   $rootScope.$on('loggedIn', (event, resp) ->
-    console.log "finishing login"
     User = resp
-    console.log User
-    $rootScope.$apply ()->
-      $rootScope.loggedIn = true
+    $rootScope.loggedIn = true
     $scope.loading = true
+    $rootScope.setShowing()
     $scope.$apply(() ->
-      $scope.loadingMessage = "Loading your drive (this could take a while)"
-      console.log "loading message updated"
-      console.log $scope.loadingMessage
+      $scope.loadingMessage = "Loading your drive"
     )
     if $rootScope.overlayIsActive
       $rootScope.pullFiles()
   )
   $rootScope.$on("partialFilesLoaded", (event, newFiles) ->
     $scope.$apply ()->
-      $scope.numFilesMessage = "Still loading...<br />" + newFiles.length + " Files Loaded"
+      $scope.numFilesMessage = newFiles.length + " Files Loaded"
       $scope.loading = false
       switchLoading("small top")
       $scope.myfiles = newFiles
+      $rootScope.setShowing()
   )
 
   $rootScope.$on('addMapSelected', () ->
@@ -245,6 +250,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
   )
   $scope.submitAgain = () ->
     $scope.complete = false
+    $rootScope.setShowing()
 
   $scope.isSelected = (file) ->
     return file == $scope.selectedFile
@@ -253,10 +259,8 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     $scope.selectedFile = file
 
   $rootScope.pullFiles = () ->
-    console.log "starting to pull data"
     $rootScope.filesLoaded = true
     retrieveAllFiles((resp) ->
-      console.log "got response"
       $scope.$apply(() ->
         $scope.filesLoaded = true
         $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded"
@@ -270,19 +274,14 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     )
     startAddMap()
 
-  $scope.$watch( () ->
-    return $scope.loading
-  , () ->
-    $scope.getShowing()
-  )
-
-  $scope.getShowing = () ->
+  $rootScope.setShowing = () ->
+    console.log "running"
+    returnVal = ""
     if $rootScope.showing == "help"
       if $rootScope.overlayIsActive
           fadeLoading(true)
-      return $rootScope.showing
-    returnVal = ""
-    if $rootScope.showing == "addFile"
+          returnVal = $rootScope.showing
+    else if $rootScope.showing == "addFile"
       if $scope.loading
         if $rootScope.overlayIsActive
           fadeLoading(false)
@@ -305,8 +304,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
         if $rootScope.overlayIsActive
           fadeLoading(true)
     angular.element("html").scope().$broadcast('update-load');
-    console.log returnVal
-    return returnVal
+    $scope.display = returnVal
 
   $scope.canSubmit = () ->
     return $scope.addMapSelected and $scope.selectedFile?
@@ -332,6 +330,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
       payload.profileName = User.name
     $scope.loadingMessage = "Sharing your story!"
     $scope.loading = true
+    $rootScope.setShowing()
     makePublic(payload.gdriveId, (resp) ->
       addToTravellog(payload.gdriveId, (resp) ->
         $http(
@@ -341,6 +340,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
         ).success((data, status, headers, config) ->
          $scope.loading = false
          $scope.complete = true
+         $rootScope.setShowing()
          if data.status == 200
             $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id
             $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:"
@@ -357,5 +357,6 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     if not $rootScope.loggedIn
       $scope.loading = true
       $scope.loadingMessage = "Logging you in"
+      $rootScope.setShowing()
 ])
 

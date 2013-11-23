@@ -123,7 +123,6 @@
   top: 0;
   left: 0;
   position: absolute;
-  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -133,9 +132,11 @@
 }
 .background.background-1 {
   background: url("/static/img/2000eveningsky.jpg");
+  background-size: cover;
 }
 .background.background-2 {
   background: url("/static/img/2000roughwaves.jpg");
+  background-size: cover;
 }
 .background.background-3 {
   background: url("/static/img/2000snowymountain.jpg");
@@ -240,7 +241,6 @@
   width: 100%;
   top: 0;
   left: 0;
-  background: url("/static/img/boat.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -349,11 +349,12 @@
 }
 #container #overlay #overlay-content #loading-message {
   font-size: 1.8em;
-  width: 480px;
+  width: 250px;
+  text-align: center;
+  margin-left: -125px;
   position: absolute;
-  top: 25%;
+  top: 40%;
   left: 50%;
-  margin-left: -240px;
 }
 #container #overlay #overlay-content .push-down {
   width: 480px;
@@ -408,12 +409,13 @@
 }
 #container #overlay #overlay-content #search span {
   font-size: 1em;
+  line-height: 2.2em;
 }
 #container #overlay #overlay-content #search #file-loading-message {
   font-size: 1em;
   position: absolute;
   right: 0;
-  margin-top: 25px;
+  margin-top: 55px;
 }
 #container #overlay #overlay-content #search button {
   top: 60%;
@@ -428,7 +430,7 @@
   font-size: 1.2em;
   border-bottom: 1px solid #aaa;
   outline: none;
-  margin-top: 10px;
+  margin-top: 50px;
   padding-left: 10px;
   color: #aaa;
   position: absolute;
@@ -441,8 +443,8 @@
 #container #overlay #overlay-content #search ul {
   padding-left: 0px;
   overflow: scroll;
-  height: 200px;
-  width: 0px;
+  height: 140px;
+  margin-top: 90px;
 }
 #container #overlay #overlay-content #search ul li {
   list-style: none;
@@ -625,6 +627,9 @@
   }
 }
 @media (max-width:480px) {
+  #loading {
+    bottom: 10px;
+  }
   #launch-screen h1 {
     font-size: 3em;
     margin-top: -85px;
@@ -633,21 +638,27 @@
   #launch-screen p {
     font-size: 1.1em;
   }
+  #container #overlay #overlay-content #search {
+    margin-top: 20px;
+  }
+  #container #overlay #overlay-content #search span {
+    line-height: 1em;
+  }
+  #container #overlay #overlay-content #search ul {
+    height: 40px;
+  }
   #container #overlay #overlay-content #search button {
     font-size: 1.5em;
   }
   #container #overlay #overlay-content #search #file-loading-message {
-    margin-top: 75px;
+    margin-top: 85px;
     left: 0;
   }
   #container #overlay #overlay-content #search input {
     width: 200px;
+    margin-top: 35px;
   }
   #container #overlay #overlay-content .push-down {
-    width: 300px;
-    margin-left: -150px;
-  }
-  #container #overlay #overlay-content #loading-message {
     width: 300px;
     margin-left: -150px;
   }

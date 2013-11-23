@@ -44,7 +44,7 @@
               Map.getLog($rootScope.urlEntered);
               return flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', function(event, isLoading) {
                 if (!isLoading) {
-                  showLog($rootScope.urlEntered);
+                  showLog($rootScope.urlEntered, true);
                   return flow.urlLogLoadWatch();
                 }
               });
@@ -77,7 +77,7 @@
             Map.getLog($rootScope.urlEntered);
             return flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', function(event, isLoading) {
               if (!isLoading) {
-                showLog($rootScope.urlEntered);
+                showLog($rootScope.urlEntered, true);
                 return flow.urlLogLoadWatch();
               }
             });
@@ -97,6 +97,9 @@
           $("#container").removeClass("hide");
           fadeLoading(false);
           switchLoading("big center");
+          $("#launch-screen").css({
+            "opacity": 0
+          });
           flow.hasBegun = true;
           return $timeout(function() {
             return dropPins();
@@ -110,46 +113,57 @@
         return loading.addClass(classString);
       };
       $rootScope.$on('sliding-animation-done', function() {
+        console.log('animation done');
         return switchLogs = !switchLogs;
       });
-      showLog = function(logId, manualSwitch, invert, historyChange) {
+      showLog = function(logId, manualSwitch, invert, dontPushState) {
         var log;
         if (logId != null) {
           log = Map.data.logs[logId];
           if ((invert != null) && invert) {
-            if ((historyChange != null) && historyChange) {
-              $scope.$apply(function() {
-                if (!switchLogs) {
-                  return $scope.otherLog = log;
-                } else {
-                  return $scope.log = log;
-                }
-              });
+            if ((typeof historyChange !== "undefined" && historyChange !== null) && historyChange) {
+              if (!switchLogs) {
+                $scope.otherLog = log;
+              } else {
+                $scope.log = log;
+              }
+            }
+            if (log.profileId != null) {
+              if (!switchLogs) {
+                renderBadge(log.profileId, '.launch');
+              } else {
+                renderBadge(log.profileId, '.main');
+              }
             } else {
               if (!switchLogs) {
-                console.log($scope.otherLog.title);
-                $scope.otherLog = log;
-                console.log($scope.otherLog.title);
-                if ($scope.log != null) {
-                  console.log($scope.log.title);
-                }
+                renderBadge(log.profileName, '.launch');
               } else {
-                console.log($scope.log.title);
-                $scope.log = log;
-                console.log($scope.log.title);
-                if ($scope.otherLog != null) {
-                  console.log($scope.otherLog.title);
-                }
+                renderBadge(log.profileName, '.main');
               }
-              $scope.$apply();
             }
+            $scope.$apply();
           } else {
-            history.pushState(log.id, log.title, "/log/" + log.id);
             if (switchLogs) {
               $scope.otherLog = log;
             } else {
               $scope.log = log;
             }
+            if (log.profileId != null) {
+              if (switchLogs) {
+                renderBadge(log.profileId, '.launch');
+              } else {
+                renderBadge(log.profileId, '.main');
+              }
+            } else {
+              if (switchLogs) {
+                renderBadge(log.profileName, '.launch');
+              } else {
+                renderBadge(log.profileName, '.main');
+              }
+            }
+          }
+          if ((dontPushState == null) || !dontPushState) {
+            history.pushState(log.id, log.title, "/log/" + log.id);
           }
           if ((manualSwitch != null) && manualSwitch) {
             switchLogs = !switchLogs;
@@ -213,16 +227,14 @@
       };
       $scope.changeShowing = function(view) {
         if (!$("#loading").hasClass("fadein")) {
+          console.log("clicked");
           $rootScope.loadingposition = "big center";
           $rootScope.showing = view;
           $rootScope.overlayIsActive = true;
-          console.log("going");
-          console.log($rootScope.loggedIn);
-          console.log($rootScope.filesLoaded);
           if ($rootScope.loggedIn && !$rootScope.filesLoaded) {
             $rootScope.pullFiles();
-            return console.log("working");
           }
+          return $rootScope.setShowing();
         }
       };
       return Map.initMap();
@@ -230,8 +242,9 @@
   ]);
 
   ctrl.controller("MyFilesController", [
-    '$http', '$scope', '$rootScope', 'User', function($http, $scope, $rootScope, User) {
+    '$http', '$scope', '$rootScope', '$timeout', 'User', function($http, $scope, $rootScope, $timeout, User) {
       $rootScope.showing = 'loading';
+      $scope.display = 'loading';
       $rootScope.loggedIn = false;
       $scope.myfiles = [];
       $scope.numFilesMessage = "";
@@ -244,17 +257,12 @@
       $scope.completeUrl = "";
       $scope.successMessage = "";
       $rootScope.$on('loggedIn', function(event, resp) {
-        console.log("finishing login");
         User = resp;
-        console.log(User);
-        $rootScope.$apply(function() {
-          return $rootScope.loggedIn = true;
-        });
+        $rootScope.loggedIn = true;
         $scope.loading = true;
+        $rootScope.setShowing();
         $scope.$apply(function() {
-          $scope.loadingMessage = "Loading your drive (this could take a while)";
-          console.log("loading message updated");
-          return console.log($scope.loadingMessage);
+          return $scope.loadingMessage = "Loading your drive";
         });
         if ($rootScope.overlayIsActive) {
           return $rootScope.pullFiles();
@@ -262,10 +270,11 @@
       });
       $rootScope.$on("partialFilesLoaded", function(event, newFiles) {
         return $scope.$apply(function() {
-          $scope.numFilesMessage = "Still loading...<br />" + newFiles.length + " Files Loaded";
+          $scope.numFilesMessage = newFiles.length + " Files Loaded";
           $scope.loading = false;
           switchLoading("small top");
-          return $scope.myfiles = newFiles;
+          $scope.myfiles = newFiles;
+          return $rootScope.setShowing();
         });
       });
       $rootScope.$on('addMapSelected', function() {
@@ -274,7 +283,8 @@
         });
       });
       $scope.submitAgain = function() {
-        return $scope.complete = false;
+        $scope.complete = false;
+        return $rootScope.setShowing();
       };
       $scope.isSelected = function(file) {
         return file === $scope.selectedFile;
@@ -283,10 +293,8 @@
         return $scope.selectedFile = file;
       };
       $rootScope.pullFiles = function() {
-        console.log("starting to pull data");
         $rootScope.filesLoaded = true;
         retrieveAllFiles(function(resp) {
-          console.log("got response");
           $scope.$apply(function() {
             $scope.filesLoaded = true;
             $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded";
@@ -299,21 +307,16 @@
         });
         return startAddMap();
       };
-      $scope.$watch(function() {
-        return $scope.loading;
-      }, function() {
-        return $scope.getShowing();
-      });
-      $scope.getShowing = function() {
+      $rootScope.setShowing = function() {
         var returnVal;
+        console.log("running");
+        returnVal = "";
         if ($rootScope.showing === "help") {
           if ($rootScope.overlayIsActive) {
             fadeLoading(true);
+            returnVal = $rootScope.showing;
           }
-          return $rootScope.showing;
-        }
-        returnVal = "";
-        if ($rootScope.showing === "addFile") {
+        } else if ($rootScope.showing === "addFile") {
           if ($scope.loading) {
             if ($rootScope.overlayIsActive) {
               fadeLoading(false);
@@ -342,8 +345,7 @@
           }
         }
         angular.element("html").scope().$broadcast('update-load');
-        console.log(returnVal);
-        return returnVal;
+        return $scope.display = returnVal;
       };
       $scope.canSubmit = function() {
         return $scope.addMapSelected && ($scope.selectedFile != null);
@@ -372,6 +374,7 @@
         }
         $scope.loadingMessage = "Sharing your story!";
         $scope.loading = true;
+        $rootScope.setShowing();
         return makePublic(payload.gdriveId, function(resp) {
           return addToTravellog(payload.gdriveId, function(resp) {
             return $http({
@@ -381,6 +384,7 @@
             }).success(function(data, status, headers, config) {
               $scope.loading = false;
               $scope.complete = true;
+              $rootScope.setShowing();
               if (data.status === 200) {
                 $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id;
                 return $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:";
@@ -395,7 +399,8 @@
       return $scope.startLogin = function() {
         if (!$rootScope.loggedIn) {
           $scope.loading = true;
-          return $scope.loadingMessage = "Logging you in";
+          $scope.loadingMessage = "Logging you in";
+          return $rootScope.setShowing();
         }
       };
     }

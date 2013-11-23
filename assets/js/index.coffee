@@ -36,7 +36,7 @@ window.move = (direction) ->
 			$(".log-details").removeClass("animate").toggleClass("main launch").attr({"style": ""})
 			angular.element("html").scope().$broadcast("sliding-animation-done")
 		, 1000)
-	, 100)
+	, 1)
 
 window.changeCountry = (newCountry) ->
 	$("#country").addClass("fadeout")
@@ -61,3 +61,4 @@ window.incrementBackground = () ->
 	setTimeout(() ->
 		passive.removeClass("background-" + counter).addClass("background-" + newCounter).attr("data-counter", newCounter)
 	, 2000)
+

@@ -97,7 +97,6 @@
 	top:0
 	left:0
 	position:absolute
-	background-size:cover
 	background-position:center
 	background-repeat:no-repeat
 	&.background-0
@@ -105,8 +104,10 @@
 		background-size:cover	
 	&.background-1
 		background: url('/static/img/2000eveningsky.jpg')
+		background-size:cover
 	&.background-2
 		background: url('/static/img/2000roughwaves.jpg')
+		background-size:cover
 	&.background-3
 		background: url('/static/img/2000snowymountain.jpg')
 		background-repeat:no-repeat
@@ -197,7 +198,6 @@
 	width:100%
 	top:0
 	left:0
-	background: url('/static/img/boat.jpg')
 	background-position:center
 	background-repeat:no-repeat
 	background-size:cover
@@ -291,11 +291,12 @@
 					font-size: 0.4em
 			#loading-message
 				font-size:1.8em
-				width:480px
+				width:250px
+				text-align:center
+				margin-left:-125px
 				position:absolute
-				top:25%
+				top:40%
 				left:50%
-				margin-left:-240px
 
 			.push-down
 				width:480px
@@ -344,11 +345,12 @@
 				left: 0
 				span
 					font-size:1em
+					line-height:2.2em
 				#file-loading-message
 					font-size: 1em
 					position: absolute
 					right: 0
-					margin-top: 25px
+					margin-top: 55px
 				button
 					top: 60%
 				.active
@@ -360,7 +362,7 @@
 					font-size:1.2em
 					border-bottom:1px solid #aaa
 					outline:none
-					margin-top: 10px
+					margin-top: 50px
 					padding-left: 10px
 					color:#aaa
 					position: absolute
@@ -373,8 +375,8 @@
 
 					padding-left: 0px
 					overflow: scroll
-					height: 200px
-					width: 00px
+					height: 140px
+					margin-top:90px
 
 					li
 						list-style:none
@@ -534,8 +536,11 @@
 			padding: 0px
 			.log-title
 				font-size: 1.7em
+					
 
 @media (max-width:480px)
+	#loading
+		bottom:10px
 	#launch-screen
 		h1
 			font-size: 3em
@@ -548,19 +553,23 @@
 		#overlay
 			#overlay-content
 				#search
+					margin-top:20px
+					span
+						line-height:1em
+					ul
+						height: 40px
 					button
 						font-size: 1.5em
 					#file-loading-message
-						margin-top:75px
+						margin-top:85px
 						left:0
 					input
 						width:200px
+						margin-top:35px
 				.push-down
 					width: 300px;
 					margin-left: -150px;
-				#loading-message
-					width:300px
-					margin-left:-150px
+				
 		#minimap
 			width:calc(100% - 60px)
 			width:-webkit-calc(100% - 60px)
