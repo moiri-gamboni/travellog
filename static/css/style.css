@@ -483,6 +483,9 @@
   color: #ed4d4a;
   font-size: 1.5em;
   text-transform: uppercase;
+  float: right;
+  height: 133px;
+  width: 273px;
 }
 #container .log-details .log-content {
   color: #fff;
