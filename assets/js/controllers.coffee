@@ -117,9 +117,9 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
             renderBadge(log.profileId, '.main')
         else
           if not switchLogs
-            renderBadge(log.profileName, '.launch')
+            $(".launch .log-author").html(log.profileName)
           else
-            renderBadge(log.profileName, '.main')
+            $(".main .log-author").html(log.profileName)
         $scope.$apply()
       else
         if switchLogs
@@ -133,9 +133,9 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
             renderBadge(log.profileId, '.main')
         else
           if switchLogs
-            renderBadge(log.profileName, '.launch')
+            $(".launch .log-author").html(log.profileName)
           else
-            renderBadge(log.profileName, '.main')
+            $(".main .log-author").html(log.profileName)
       if not dontPushState? or not dontPushState
         history.pushState(log.id, log.title, "/log/"+log.id)
       if manualSwitch? and manualSwitch

@@ -133,9 +133,9 @@
               }
             } else {
               if (!switchLogs) {
-                renderBadge(log.profileName, '.launch');
+                $(".launch .log-author").html(log.profileName);
               } else {
-                renderBadge(log.profileName, '.main');
+                $(".main .log-author").html(log.profileName);
               }
             }
             $scope.$apply();
@@ -153,9 +153,9 @@
               }
             } else {
               if (switchLogs) {
-                renderBadge(log.profileName, '.launch');
+                $(".launch .log-author").html(log.profileName);
               } else {
-                renderBadge(log.profileName, '.main');
+                $(".main .log-author").html(log.profileName);
               }
             }
           }

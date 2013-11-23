@@ -74,7 +74,6 @@ function getUserInfo() {
 
 // renders the google plus badge in the loader
 function renderBadge(id, div) {
-  console.log(div);
   div_id = $(div + " .log-author").html('<div class="g-person"' +
     'data-width="273" data-href="https://plus.google.com/' + id +
     '" data-layout="landscape" data-showcoverphoto="false"></div>').attr("id");
