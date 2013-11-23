@@ -63,6 +63,8 @@
 }
 #loading.top {
   top: 20%;
+  left: auto;
+  right: 150px;
 }
 #minimap {
   height: 25%;
@@ -332,7 +334,7 @@
 #container #overlay #overlay-content .message #file-loading-message {
   font-size: 0.7em;
   position: absolute;
-  right: 0;
+  right: 10px;
   top: 50%;
 }
 #container #overlay #overlay-content .message .link {
