@@ -60,7 +60,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
           ).error((data, status, headers, config)->
             factory.data.loadingLogs--
             if factory.data.loadingLogs == 0
-              window.isLogsLoading = false
+              $rootScope.$broadcast('is-loading-log', false)
           )
 
     getClosestLogs: (around) ->

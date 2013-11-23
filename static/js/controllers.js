@@ -7,7 +7,7 @@
 
   ctrl.controller("mainCtrl", [
     '$http', '$scope', '$rootScope', '$timeout', 'Map', function($http, $scope, $rootScope, $timeout, Map) {
-      var dropPins, fadeLoading, flow, loadingWatch, showLog, switchLoading, switchLogs, unblockBegin;
+      var dropPins, flow, loadingWatch, showLog, switchLogs, unblockBegin;
       switchLogs = false;
       flow = {
         isMapReady: false,
@@ -38,8 +38,7 @@
             $(".main.fade").addClass("fadein");
             loadingWatch();
             switchLoading("small corner");
-            showLog();
-            return switchLogs = !switchLogs;
+            return showLog(Map.getCurrentLog().id, true);
           }
         }, 200 * Object.keys(Map.data.logs).length);
       };
@@ -62,8 +61,7 @@
           $(".main.fade").addClass("fadein");
           loadingWatch();
           switchLoading("small corner");
-          showLog();
-          return switchLogs = !switchLogs;
+          return showLog(Map.getCurrentLog().id, true);
         }
       });
       unblockBegin = function() {
@@ -83,7 +81,7 @@
           }, 500);
         }
       };
-      switchLoading = function(classString) {
+      window.switchLoading = function(classString) {
         var loading;
         loading = $("#loading");
         loading.removeClass("small big center corner");
@@ -93,27 +91,39 @@
         console.log('sliding-animation-done');
         return switchLogs = !switchLogs;
       });
-      showLog = function(logId) {
+      showLog = function(logId, manualSwitch, historyChange) {
+        var log;
         if (logId != null) {
-          if (switchLogs) {
-            $scope.otherLog = Map.data.logs[logId];
+          log = Map.data.logs[logId];
+          if ((historyChange != null) && historyChange) {
+            $scope.$apply(function() {
+              if (!switchLogs) {
+                return $scope.otherLog = log;
+              } else {
+                return $scope.log = log;
+              }
+            });
           } else {
-            $scope.log = Map.data.logs[logId];
+            console.log(log);
+            history.pushState(log.id, log.title, "/log/" + log.id);
+            if (switchLogs) {
+              $scope.otherLog = log;
+            } else {
+              $scope.log = log;
+            }
           }
-        } else {
-          if (switchLogs) {
-            $scope.otherLog = Map.getCurrentLog();
-            logId = $scope.otherLog.id;
-          } else {
-            $scope.log = Map.getCurrentLog();
-            logId = $scope.log.id;
+          if ((manualSwitch != null) && manualSwitch) {
+            switchLogs = !switchLogs;
           }
+          Map.data.current = log.key;
+          return changeLocation(logId);
         }
-        return changeLocation(logId);
       };
       $scope.move = function(direction) {
+        var log;
         if (Map.data.loadingLogs === 0) {
-          showLog(Map.move(direction).id);
+          log = Map.move(direction);
+          showLog(log.id);
           return move(direction);
         }
       };
@@ -131,13 +141,20 @@
           }
         });
       };
-      fadeLoading = function(fadeOut) {
+      window.fadeLoading = function(fadeOut) {
         if (fadeOut) {
           $("#loading").addClass("fadeout");
           return $("#loading").removeClass("fadein");
         } else {
           $("#loading").removeClass("fadeout");
           return $("#loading").addClass("fadein");
+        }
+      };
+      window.onpopstate = function(event) {
+        console.log(event);
+        if (event.state != null) {
+          console.log("triggering showlog");
+          return showLog(event.state, false, true);
         }
       };
       return Map.initMap();

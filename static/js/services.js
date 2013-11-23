@@ -69,7 +69,7 @@
               }).error(function(data, status, headers, config) {
                 factory.data.loadingLogs--;
                 if (factory.data.loadingLogs === 0) {
-                  return window.isLogsLoading = false;
+                  return $rootScope.$broadcast('is-loading-log', false);
                 }
               });
             }
