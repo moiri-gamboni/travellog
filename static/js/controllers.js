@@ -16,7 +16,8 @@
         areLogsReady: false,
         hasBegun: false,
         arePinsDropped: false,
-        canBegin: false
+        canBegin: false,
+        urlLogLoadWatch: null
       };
       dropPins = function() {
         var dropPin, i, log, logId, _ref;
@@ -39,8 +40,17 @@
             $(".main.fade").addClass("fadein");
             loadingWatch();
             switchLoading("small corner");
-            showLog();
-            return switchLogs = !switchLogs;
+            if ($rootScope.urlEntered != null) {
+              Map.getLog($rootScope.urlEntered);
+              return flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', function(event, isLoading) {
+                if (!isLoading) {
+                  showLog($rootScope.urlEntered);
+                  return flow.urlLogLoadWatch();
+                }
+              });
+            } else {
+              return showLog(Map.getCurrentLog().id, true);
+            }
           }
         }, 200 * Object.keys(Map.data.logs).length);
       };
@@ -63,8 +73,17 @@
           $(".main.fade").addClass("fadein");
           loadingWatch();
           switchLoading("small corner");
-          showLog();
-          return switchLogs = !switchLogs;
+          if ($rootScope.urlEntered != null) {
+            Map.getLog($rootScope.urlEntered);
+            return flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', function(event, isLoading) {
+              if (!isLoading) {
+                showLog($rootScope.urlEntered);
+                return flow.urlLogLoadWatch();
+              }
+            });
+          } else {
+            return showLog(Map.getCurrentLog().id, true);
+          }
         }
       });
       unblockBegin = function() {
@@ -91,30 +110,40 @@
         return loading.addClass(classString);
       };
       $rootScope.$on('sliding-animation-done', function() {
-        console.log('sliding-animation-done');
         return switchLogs = !switchLogs;
       });
-      showLog = function(logId) {
+      showLog = function(logId, manualSwitch, historyChange) {
+        var log;
         if (logId != null) {
-          if (switchLogs) {
-            $scope.otherLog = Map.data.logs[logId];
+          log = Map.data.logs[logId];
+          if ((historyChange != null) && historyChange) {
+            $scope.$apply(function() {
+              if (!switchLogs) {
+                return $scope.otherLog = log;
+              } else {
+                return $scope.log = log;
+              }
+            });
           } else {
-            $scope.log = Map.data.logs[logId];
+            history.pushState(log.id, log.title, "/log/" + log.id);
+            if (switchLogs) {
+              $scope.otherLog = log;
+            } else {
+              $scope.log = log;
+            }
           }
-        } else {
-          if (switchLogs) {
-            $scope.otherLog = Map.getCurrentLog();
-            logId = $scope.otherLog.id;
-          } else {
-            $scope.log = Map.getCurrentLog();
-            logId = $scope.log.id;
+          if ((manualSwitch != null) && manualSwitch) {
+            switchLogs = !switchLogs;
           }
+          Map.data.current = log.key;
+          return changeLocation(logId);
         }
-        return changeLocation(logId);
       };
       $scope.move = function(direction) {
+        var log;
         if (Map.data.loadingLogs === 0) {
-          showLog(Map.move(direction).id);
+          log = Map.move(direction);
+          showLog(log.id);
           return move(direction);
         }
       };
@@ -139,6 +168,11 @@
         } else {
           $("#loading").removeClass("fadeout");
           return $("#loading").addClass("fadein");
+        }
+      };
+      window.onpopstate = function(event) {
+        if (event.state != null) {
+          return showLog(event.state, false, true);
         }
       };
       $scope.deactivateOverlay = function(view) {

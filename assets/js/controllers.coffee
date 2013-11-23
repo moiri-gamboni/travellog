@@ -12,6 +12,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     hasBegun: false
     arePinsDropped: false
     canBegin: false
+    urlLogLoadWatch: null
 
   dropPins = () ->
     dropPin = (log) ->
@@ -30,8 +31,15 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
             $(".main.fade").addClass("fadein")
             loadingWatch()
             switchLoading("small corner")
-            showLog()
-            switchLogs = not switchLogs
+            if $rootScope.urlEntered?
+              Map.getLog($rootScope.urlEntered)
+              flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', (event, isLoading) ->
+                if not isLoading
+                  showLog($rootScope.urlEntered)
+                  flow.urlLogLoadWatch()
+              )
+            else
+              showLog(Map.getCurrentLog().id, true)
         ,
         200*Object.keys(Map.data.logs).length
       )
@@ -55,8 +63,15 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       $(".main.fade").addClass("fadein")
       loadingWatch()
       switchLoading("small corner")
-      showLog()
-      switchLogs = not switchLogs
+      if $rootScope.urlEntered?
+        Map.getLog($rootScope.urlEntered)
+        flow.urlLogLoadWatch = $rootScope.$on('is-loading-log', (event, isLoading) ->
+          if not isLoading
+            showLog($rootScope.urlEntered)
+            flow.urlLogLoadWatch()
+        )
+      else
+        showLog(Map.getCurrentLog().id, true)
   )
 
   unblockBegin = ()->
@@ -82,28 +97,34 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
 
   $rootScope.$on('sliding-animation-done', () ->
-    console.log 'sliding-animation-done'
     switchLogs = not switchLogs
   )
 
-  showLog = (logId) ->
+  showLog = (logId, manualSwitch, historyChange) ->
     if logId?
-      if switchLogs
-        $scope.otherLog = Map.data.logs[logId]
+      log = Map.data.logs[logId]
+      if historyChange? and historyChange
+        $scope.$apply( ()->
+            if not switchLogs
+              $scope.otherLog = log
+            else
+              $scope.log = log
+          )
       else
-        $scope.log = Map.data.logs[logId]
-    else
-      if switchLogs
-        $scope.otherLog = Map.getCurrentLog()
-        logId = $scope.otherLog.id
-      else
-        $scope.log = Map.getCurrentLog()
-        logId = $scope.log.id
-    changeLocation(logId)
+          history.pushState(log.id, log.title, "/log/"+log.id)
+          if switchLogs
+            $scope.otherLog = log
+          else
+            $scope.log = log
+      if manualSwitch? and manualSwitch
+        switchLogs = not switchLogs
+      Map.data.current = log.key
+      changeLocation(logId)
 
   $scope.move = (direction) ->
     if Map.data.loadingLogs == 0
-      showLog(Map.move(direction).id)
+      log = Map.move(direction)
+      showLog(log.id)
       move(direction)
 
   loadingWatch = () ->
@@ -125,6 +146,10 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     else
       $("#loading").removeClass("fadeout")
       $("#loading").addClass("fadein")
+
+  window.onpopstate = (event) ->
+    if event.state?
+      showLog(event.state, false, true)
 
 
   $scope.deactivateOverlay = (view) ->

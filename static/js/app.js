@@ -5,4 +5,12 @@
 
   module = angular.module("mainModule", ["ngSanitize", "mainModule.services", "mainModule.controllers", "mainModule.directives"]);
 
+  module.run(function($rootScope) {
+    var logId;
+    logId = window.location.pathname.slice(5);
+    if (logId !== "") {
+      return $rootScope.urlEntered = logId;
+    }
+  });
+
 }).call(this);
