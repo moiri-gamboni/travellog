@@ -203,10 +203,10 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
 ])
 
-ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', ($http, $scope, $rootScope, User) ->
     #if user is signed_in
   #$scope.map = Map
   $rootScope.showing = 'loading'
+  $scope.display = 'loading'
   $rootScope.loggedIn = false
   $scope.myfiles = []
   $scope.numFilesMessage = ""
@@ -236,6 +236,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
       $scope.loading = false
       switchLoading("small top")
       $scope.myfiles = newFiles
+      $
   )
 
   $rootScope.$on('addMapSelected', () ->
@@ -267,19 +268,16 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
     )
     startAddMap()
 
-  $scope.$watch( () ->
-    return $scope.loading
-  , () ->
-    $scope.getShowing()
-  )
+  setInterval($scope.getShowing,100)
 
   $scope.getShowing = () ->
+    console.log "running"
+    returnVal = ""
     if $rootScope.showing == "help"
       if $rootScope.overlayIsActive
           fadeLoading(true)
-      return $rootScope.showing
-    returnVal = ""
-    if $rootScope.showing == "addFile"
+          returnVal = $rootScope.showing
+    else if $rootScope.showing == "addFile"
       if $scope.loading
         if $rootScope.overlayIsActive
           fadeLoading(false)
@@ -302,7 +300,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', 'User', (
         if $rootScope.overlayIsActive
           fadeLoading(true)
     angular.element("html").scope().$broadcast('update-load');
-    return returnVal
+    $scope.display = returnVal
 
   $scope.canSubmit = () ->
     return $scope.addMapSelected and $scope.selectedFile?

@@ -238,7 +238,9 @@
 
   ctrl.controller("MyFilesController", [
     '$http', '$scope', '$rootScope', 'User', function($http, $scope, $rootScope, User) {
+      var returnVal;
       $rootScope.showing = 'loading';
+      $scope.display = 'loading';
       $rootScope.loggedIn = false;
       $scope.myfiles = [];
       $scope.numFilesMessage = "";
@@ -268,7 +270,8 @@
           $scope.numFilesMessage = "Still loading...<br />" + newFiles.length + " Files Loaded";
           $scope.loading = false;
           switchLoading("small top");
-          return $scope.myfiles = newFiles;
+          $scope.myfiles = newFiles;
+          return $;
         });
       });
       $rootScope.$on('addMapSelected', function() {
@@ -300,51 +303,47 @@
         });
         return startAddMap();
       };
-      $scope.$watch(function() {
-        return $scope.loading;
-      }, function() {
-        return $scope.getShowing();
-      });
       $scope.getShowing = function() {
         var returnVal;
+        console.log("running");
+        returnVal = "";
         if ($rootScope.showing === "help") {
           if ($rootScope.overlayIsActive) {
             fadeLoading(true);
           }
-          return $rootScope.showing;
         }
-        returnVal = "";
-        if ($rootScope.showing === "addFile") {
-          if ($scope.loading) {
-            if ($rootScope.overlayIsActive) {
-              fadeLoading(false);
-            }
-            returnVal = 'loading';
-          } else if ($scope.complete) {
-            if ($rootScope.overlayIsActive) {
-              fadeLoading(true);
-            }
-            returnVal = 'complete';
-          } else if ($rootScope.loggedIn) {
-            if ($rootScope.overlayIsActive && !$scope.filesLoaded) {
-              fadeLoading(false);
-            } else if ($rootScope.overlayIsActive && $scope.filesLoaded) {
-              fadeLoading(true);
-            }
-            setTimeout(function() {
-              return google.maps.event.trigger(addMap, 'resize');
-            }, 200);
-            returnVal = 'loggedIn';
-          } else {
-            returnVal = 'login';
-            if ($rootScope.overlayIsActive) {
-              fadeLoading(true);
-            }
+        return returnVal = $rootScope.showing;
+      };
+      if ($rootScope.showing === "addFile") {
+        if ($scope.loading) {
+          if ($rootScope.overlayIsActive) {
+            fadeLoading(false);
+          }
+          returnVal = 'loading';
+        } else if ($scope.complete) {
+          if ($rootScope.overlayIsActive) {
+            fadeLoading(true);
+          }
+          returnVal = 'complete';
+        } else if ($rootScope.loggedIn) {
+          if ($rootScope.overlayIsActive && !$scope.filesLoaded) {
+            fadeLoading(false);
+          } else if ($rootScope.overlayIsActive && $scope.filesLoaded) {
+            fadeLoading(true);
+          }
+          setTimeout(function() {
+            return google.maps.event.trigger(addMap, 'resize');
+          }, 200);
+          returnVal = 'loggedIn';
+        } else {
+          returnVal = 'login';
+          if ($rootScope.overlayIsActive) {
+            fadeLoading(true);
           }
         }
-        angular.element("html").scope().$broadcast('update-load');
-        return returnVal;
-      };
+      }
+      angular.element("html").scope().$broadcast('update-load');
+      $scope.display = returnVal;
       $scope.canSubmit = function() {
         return $scope.addMapSelected && ($scope.selectedFile != null);
       };
