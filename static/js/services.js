@@ -17,6 +17,7 @@
           loadingLogs: 0
         },
         getCurrentLog: function() {
+          console.log('get current log');
           if ((factory.data.current != null) && (factory.data.lngLogs != null) && (factory.data.lngLogs[factory.data.current[0]] != null)) {
             return factory.data.logs[factory.data.lngLogs[factory.data.current[0]].id];
           } else {
@@ -25,10 +26,14 @@
         },
         getLogs: function(success) {
           var get;
-          return get = $http.get(window.location.protocol + "//" + window.location.host + "/logs").success(success);
+          return get = $http.get(window.location.protocol + "//" + window.location.host + "/logs").success(success).error(function(data, status, headers, config) {
+            console.log('getLogs error');
+            return console.log(data);
+          });
         },
         move: function(direction) {
           var change, newCurrentLog;
+          console.log('move');
           change = direction === 'N' || direction === 'E' ? +1 : -1;
           if (direction === 'N' || direction === 'S') {
             newCurrentLog = factory.data.logs[factory.data.latLogs[mod(factory.data.current[1] + change, factory.data.latLogs.length)].id];
@@ -37,11 +42,14 @@
           }
           factory.getClosestLogs(newCurrentLog.key);
           factory.data.current = newCurrentLog.key;
+          console.log('move done');
           return newCurrentLog;
         },
         getLog: function(logId, callback) {
           var get;
+          console.log('get log');
           if (factory.data.logs[logId].body == null) {
+            console.log('has no body');
             factory.data.loadingLogs++;
             $rootScope.$broadcast('is-loading-log', true);
             get = $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
@@ -51,12 +59,15 @@
             });
             if (callback != null) {
               return get.success(function(data, status, headers, config) {
+                console.log('get log success');
                 factory.data.loadingLogs--;
                 callback(data, status, headers, config);
                 if (factory.data.loadingLogs === 0) {
                   return $rootScope.$broadcast('is-loading-log', false);
                 }
               }).error(function(data, status, headers, config) {
+                console.log('get log error');
+                console.log(data);
                 factory.data.loadingLogs--;
                 if (factory.data.loadingLogs === 0) {
                   return $rootScope.$broadcast('is-loading-log', false);
@@ -64,15 +75,19 @@
               });
             } else {
               return get.success(function(data, status, headers, config) {
+                console.log('get log success');
+                console.log(data.log);
                 factory.data.loadingLogs--;
-                if (factory.data.loadingLogs === 0) {
-                  $rootScope.$broadcast('is-loading-log', false);
-                }
                 factory.data.logs[data.log.id].title = data.log.title;
                 factory.data.logs[data.log.id].profileId = data.log.profileId;
                 factory.data.logs[data.log.id].profileName = data.log.profileName;
-                return factory.data.logs[data.log.id].body = data.log.body;
+                factory.data.logs[data.log.id].body = data.log.body;
+                if (factory.data.loadingLogs === 0) {
+                  return $rootScope.$broadcast('is-loading-log', false);
+                }
               }).error(function(data, status, headers, config) {
+                console.log('get log error');
+                console.log(data);
                 factory.data.loadingLogs--;
                 if (factory.data.loadingLogs === 0) {
                   return $rootScope.$broadcast('is-loading-log', false);
@@ -83,6 +98,7 @@
         },
         getClosestLogs: function(around) {
           var direction, location, _i, _len, _ref, _results;
+          console.log('get get closests logs');
           _ref = ['N', 'E', 'S', 'W'];
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -166,10 +182,12 @@
           getLogsCallback = function(mapData) {
             return function(data, status, headers, config) {
               var i, id, keys, log, _i, _j, _len, _len1, _ref, _ref1;
+              console.log('get logs success');
               $rootScope.$broadcast('logs-ready');
               mapData.latLogs = data.logs.slice().sort(function(b, a) {
                 return b.lat - a.lat;
               });
+              console.log('sort lats');
               _ref = mapData.latLogs;
               for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
                 log = _ref[i];
@@ -184,28 +202,35 @@
                   key: [null, i]
                 };
               }
+              console.log('build logs data');
               mapData.lngLogs = data.logs.slice().sort(function(b, a) {
                 return b.lng - a.lng;
               });
+              console.log('sort lngs');
               _ref1 = mapData.lngLogs;
               for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
                 log = _ref1[i];
                 mapData.logs[log.id].key = [i, mapData.logs[log.id].key[1]];
               }
+              console.log('rebuild logs data');
               keys = Object.keys(mapData.logs);
               mapData.current = mapData.logs[keys[(Math.random() * keys.length) >> 0]].key;
               id = mapData.lngLogs[factory.data.current[0]].id;
               factory.getLog(id, function(data, status, headers, config) {
+                console.log('get first log success');
                 factory.data.logs[data.log.id].title = data.log.title;
                 factory.data.logs[data.log.id].profileId = data.log.profileId;
                 factory.data.logs[data.log.id].profileName = data.log.profileName;
                 factory.data.logs[data.log.id].body = data.log.body;
                 return $rootScope.$broadcast('first-log-ready');
               });
-              return factory.getClosestLogs(factory.data.current);
+              console.log('map init before closest logs done');
+              factory.getClosestLogs(factory.data.current);
+              return console.log('map init after closest logs');
             };
           };
-          return factory.getLogs(getLogsCallback(factory.data));
+          factory.getLogs(getLogsCallback(factory.data));
+          return console.log('map init done');
         }
       };
       return factory;
