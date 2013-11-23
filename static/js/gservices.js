@@ -84,7 +84,13 @@ function renderBadge(id, div) {
 function retrieveAllFiles(callback) {
   var retrievePageOfFiles = function(request, result) {
     request.execute(function(resp) {
-      result = result.concat(resp.items);
+      fileFilter = []
+      resp.items.map(function(x) {
+        if (x.mimeType == "application/vnd.google-apps.document") {
+          fileFilter.push(x);
+        }
+      }); 
+      result = result.concat(fileFilter);
       angular.element("html").scope().$broadcast('partialFilesLoaded', result);
       var nextPageToken = resp.nextPageToken;
       if (nextPageToken) {
