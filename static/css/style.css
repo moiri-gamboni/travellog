@@ -507,10 +507,10 @@
 #container .log-details .log-content img {
   width: auto;
   height: auto;
-  padding: 0% 20%;
   margin: 0 auto;
   display: block;
   max-height: 150%;
+  max-width: 100%;
 }
 #container .log-details .log-wrapper {
   height: 95%;
