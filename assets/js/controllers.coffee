@@ -317,10 +317,10 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
   $rootScope.$on("partialFilesLoaded", (event, newFiles) ->
     $scope.$apply ()->
       $scope.numFilesMessage = newFiles.length + " Files Loaded"
-      if not $scope.filesLoaded
+      if not $scope.startedFileLoad
         $scope.loading = false
+        switchLoading("small top")
       $scope.startedFileLoad = true
-      switchLoading("small top")
       $scope.myfiles = newFiles
       $rootScope.setShowing()
   )

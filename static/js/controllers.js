@@ -334,11 +334,11 @@
       $rootScope.$on("partialFilesLoaded", function(event, newFiles) {
         return $scope.$apply(function() {
           $scope.numFilesMessage = newFiles.length + " Files Loaded";
-          if (!$scope.filesLoaded) {
+          if (!$scope.startedFileLoad) {
             $scope.loading = false;
+            switchLoading("small top");
           }
           $scope.startedFileLoad = true;
-          switchLoading("small top");
           $scope.myfiles = newFiles;
           return $rootScope.setShowing();
         });
