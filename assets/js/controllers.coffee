@@ -54,7 +54,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
               else
                 showLog($rootScope.urlEntered, true)
             else
-              showLog(Map.getCurrentLog().id, true)
+              showLog(Map.getCurrentLog().id, true, null, null, null, true)
         ,
         200*Object.keys(Map.data.logs).length
       )
@@ -101,7 +101,8 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         else
           showLog($rootScope.urlEntered, true)
       else
-        showLog(Map.getCurrentLog().id, true)
+        console.log "no url entered"
+        showLog(Map.getCurrentLog().id, true, null, null, null, true)
     else
       console.log 'pins not dropped yet'
   )
@@ -170,8 +171,10 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       if log.profileId?
         console.log 'profileid'
         if renderBadgeInMain? and renderBadgeInMain
+          console.log "rendering badge in main"
           renderBadge(log.profileId, '.main')
         else
+          console.log "rendering badge in launch"
           renderBadge(log.profileId, '.launch')
       else
         console.log 'no profileid'

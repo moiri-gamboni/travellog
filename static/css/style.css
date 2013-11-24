@@ -479,11 +479,13 @@
 #container .log-details .log-title {
   text-transform: uppercase;
   color: #fff;
+  font-weight: 300;
   font-size: 2.2em;
 }
 #container .log-details .log-author {
   opacity: 0;
-  padding: 10px 0px;
+  padding-top: 10px;
+  margin-left: 20px;
   color: #ed4d4a;
   font-size: 1.5em;
   text-transform: uppercase;
@@ -495,6 +497,7 @@
   color: #fff;
   line-height: 1.3em;
   font-size: 1em;
+  font-family: 'Alegreya', serif;
   height: calc(100% - 50px);
   height: -webkit-calc(100% - 50px);
   margin-top: 20px;

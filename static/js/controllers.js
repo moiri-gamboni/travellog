@@ -65,7 +65,7 @@
                 return showLog($rootScope.urlEntered, true);
               }
             } else {
-              return showLog(Map.getCurrentLog().id, true);
+              return showLog(Map.getCurrentLog().id, true, null, null, null, true);
             }
           }
         }, 200 * Object.keys(Map.data.logs).length);
@@ -112,7 +112,8 @@
               return showLog($rootScope.urlEntered, true);
             }
           } else {
-            return showLog(Map.getCurrentLog().id, true);
+            console.log("no url entered");
+            return showLog(Map.getCurrentLog().id, true, null, null, null, true);
           }
         } else {
           return console.log('pins not dropped yet');
@@ -181,8 +182,10 @@
           if (log.profileId != null) {
             console.log('profileid');
             if ((renderBadgeInMain != null) && renderBadgeInMain) {
+              console.log("rendering badge in main");
               renderBadge(log.profileId, '.main');
             } else {
+              console.log("rendering badge in launch");
               renderBadge(log.profileId, '.launch');
             }
           } else {
