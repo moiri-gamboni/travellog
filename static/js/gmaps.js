@@ -1,6 +1,12 @@
+$(function() {
+  initialize();
+});
+
 idMarkerMap = {};
+var geocoder;
 
 function initialize() {
+  geocoder = new google.maps.Geocoder();
   var mapOptions = {
     center: new google.maps.LatLng(20, 0),
     zoom: 1,
@@ -204,8 +210,23 @@ function placeMarkerMiniMap(log_object) {
   idMarkerMap[log_object.id] = marker;
   google.maps.event.addListener(marker, 'click', switchMiniMarker);
 }
-$(function() {
-  initialize()
-});
 
-
+// reverse geocoder modified from code example
+function codeLatLng(latlng, callback) {
+  geocoder.geocode({'latLng': latlng}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      if (results[1]) {
+        console.log("Results are:");
+        var formatted_address = results[1].formatted_address;
+        var countryName = results[1].address_components[results[1].address_components.length - 1].long_name;
+        console.log(formatted_address);
+        console.log(countryName);
+        typeof callback === 'function' && callback(formatted_address, countryName);
+      } else {
+        console.log('No results found');
+      }
+    } else {
+      console.log('Geocoder failed due to: ' + status);
+    }
+  });
+}

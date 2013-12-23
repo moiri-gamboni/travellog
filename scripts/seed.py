@@ -6,11 +6,24 @@ data = {
   "profileId": "107803280249128570180"
 };
 
+lastLat = 0
+lastLng = 0
+
 def randLat():
-  return (90*(random.random() - 0.5) * 2)
+  global lastLat
+  if not lastLat:
+    lastLat = 4
+  else:
+    lastLat += 0.01
+  return lastLat
 
 def randLng():
-  return (180*(random.random() - 0.5) * 2)
+  global lastLng
+  if not lastLng:
+    lastLng = -74
+  else:
+    lastLng += 0.01
+    return lastLng
 
 data["country"] = "USA"
 for ids in ["1bMUS1TNaLZtJ8khEpa1RdutsLTJoCh6p5aGUlwwzLRM",

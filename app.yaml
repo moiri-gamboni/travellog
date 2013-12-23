@@ -16,7 +16,7 @@ handlers:
   static_files: index.html
   upload: index.html
 
-- url: /log/.*
+- url: /log/[^/]*$
   static_files: index.html
   upload: index.html
 

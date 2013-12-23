@@ -7,7 +7,7 @@ import gdrive
 import dateutil.parser
 
 class LogHandler(webapp2.RequestHandler):
-  post_params = ["gdriveId", "lat", "lng"]
+  post_params = ["gdriveId", "lat", "lng", "country"]
 
   def get(self):
     # return all logs if id is not in the argument
@@ -29,15 +29,26 @@ class LogHandler(webapp2.RequestHandler):
         return
 
   def post(self):
-    self.parseJson()
+    self.params = json.loads(self.request.body)
     for param in self.post_params:
       if param not in self.params.keys():
         self.response.headers['Content-Type'] = "application/json"
         self.response.write(json.dumps({"status": 400, "error":\
             "You must have a %s parameter" % param}))
         return
+
+    # create a country if it is mising
+    if not get_country_object_by_key(self.params["country"]):
+      if ("countryLat" not in self.params) or ("countryLng" not in self.params):
+          self.response.write(json.dumps({"status": 400,\
+            "error": "You must pass countryLat and countryLng for new countries"}))
+          return
+      else:
+        create_country(self.params["country"], self.params["countryLat"], self.params["countryLng"])
+
     # construct the child
     log = models.create_log(self.params["gdriveId"], self.params["lat"], self.params["lng"])
+
     # grab either a profileId or profileName depending on what was passed in
     if "profileId" in self.params.keys():
       log.profileId = self.params["profileId"]
@@ -62,9 +73,6 @@ class LogHandler(webapp2.RequestHandler):
     log.put()
     self.response.headers['Content-Type'] = "application/json"
     self.response.write(json.dumps({"status": 200}))
-
-  def parseJson(self):
-    self.params = json.loads(self.request.body)
 
 class DriveHandler(webapp2.RequestHandler):
   def get(self):
@@ -105,3 +113,30 @@ class DriveSyncHandler(webapp2.RequestHandler):
     self.response.write(json.dumps({"status": 200, "updated": updated}))
     return
 
+class LogIdHandler(webapp2.RequestHandler):
+  def get(self, logId):
+    self.response.write(json.dumps({"status": 200, "log":\
+      models.get_log_by_key(logId)}))
+
+  def post(self, logId):
+    self.params = json.loads(self.request.body)
+    log = models.get_log_object_by_key(logId)
+
+    if not log:
+      self.response.write(json.dumps({"status": 404, "error": "Log with id %s not found" % logId}))
+
+    for param in self.params:
+      if param in models.logFields:
+        setattr(log, param, self.params[param])
+
+    if "country" in self.params and not models.get_country_object_by_key(self.params["country"]):
+      if ("countryLat" not in self.params) or ("countryLng" not in self.params):
+          self.response.write(json.dumps({"status": 400,\
+            "error": "You must pass countryLat and countryLng for new countries"}))
+          return
+      else:
+        models.create_country(self.params["country"], self.params["countryLat"], self.params["countryLng"])
+
+    log.put()
+    self.response.write(json.dumps({"status": 200, "log":\
+      models.get_log_by_key(logId)}))
