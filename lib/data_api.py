@@ -38,13 +38,13 @@ class LogHandler(webapp2.RequestHandler):
         return
 
     # create a country if it is mising
-    if not get_country_object_by_key(self.params["country"]):
+    if not models.get_country_object_by_key(self.params["country"]):
       if ("countryLat" not in self.params) or ("countryLng" not in self.params):
           self.response.write(json.dumps({"status": 400,\
             "error": "You must pass countryLat and countryLng for new countries"}))
           return
       else:
-        create_country(self.params["country"], self.params["countryLat"], self.params["countryLng"])
+        models.create_country(self.params["country"], self.params["countryLat"], self.params["countryLng"])
 
     # construct the child
     log = models.create_log(self.params["gdriveId"], self.params["lat"], self.params["lng"])
@@ -73,6 +73,15 @@ class LogHandler(webapp2.RequestHandler):
     log.put()
     self.response.headers['Content-Type'] = "application/json"
     self.response.write(json.dumps({"status": 200}))
+
+class CountryHandler(webapp2.RequestHandler):
+
+  def get(self):
+    # return all countries
+    if "id" not in self.request.arguments():
+      self.response.headers['Content-Type'] = "application/json"
+      self.response.write(json.dumps({"status": 200, "logs":\
+        models.get_all_countries()}))
 
 class DriveHandler(webapp2.RequestHandler):
   def get(self):
@@ -140,3 +149,4 @@ class LogIdHandler(webapp2.RequestHandler):
     log.put()
     self.response.write(json.dumps({"status": 200, "log":\
       models.get_log_by_key(logId)}))
+

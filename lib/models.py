@@ -57,6 +57,11 @@ def create_log(gdriveId, lat, lng):
 def get_country_object_by_key(country_name):
   return ndb.Key(Country, country_name).get()
 
+def get_all_countries():
+  countries = Country.query().fetch(200);
+  return map(lambda x: {"id": x.key.id(), "lat": x.lat, "lng": x.lng},\
+      countries)
+
 def create_country(country_name, lat, lng):
   country = Country(id=country_name, lat=lat, lng=lng)
   country.put()

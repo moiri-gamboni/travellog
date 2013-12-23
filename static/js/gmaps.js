@@ -212,7 +212,7 @@ function placeMarkerMiniMap(log_object) {
 }
 
 // reverse geocoder modified from code example
-function codeLatLng(latlng, callback) {
+function reverseGeocode(latlng, callback) {
   geocoder.geocode({'latLng': latlng}, function(results, status) {
     if (status == google.maps.GeocoderStatus.OK) {
       if (results[1]) {
@@ -230,3 +230,18 @@ function codeLatLng(latlng, callback) {
     }
   });
 }
+
+function geocode(countryName, callback) {
+  geocoder.geocode( { 'address': countryName}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      map.setCenter(results[0].geometry.location);
+      var marker = new google.maps.Marker({
+          map: map,
+          position: results[0].geometry.location
+      });
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
+    }
+  });
+}
+

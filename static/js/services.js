@@ -11,6 +11,7 @@
       factory = {
         data: {
           logs: {},
+          countries: {},
           latLogs: [],
           lngLogs: [],
           current: null,
@@ -181,6 +182,9 @@
               return false;
             }
           }
+        },
+        updateAllLogs: function() {
+          return 1 + 1;
         },
         initMap: function() {
           var getLogsCallback;

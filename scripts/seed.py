@@ -9,28 +9,20 @@ data = {
 lastLat = 0
 lastLng = 0
 
-def randLat():
-  global lastLat
-  if not lastLat:
-    lastLat = 4
-  else:
-    lastLat += 0.01
-  return lastLat
+def randLat(seed):
+  return seed + random.randint(-1, 1)
 
-def randLng():
-  global lastLng
-  if not lastLng:
-    lastLng = -74
-  else:
-    lastLng += 0.01
-    return lastLng
+def randLng(seed):
+  return seed + random.randint(-1, 1)
 
 data["country"] = "USA"
 for ids in ["1bMUS1TNaLZtJ8khEpa1RdutsLTJoCh6p5aGUlwwzLRM",
     "1BhomhZkJthbQtO0aMUEVIF43jRf3OVo51jSqijjWAXs"]:
   data["gdriveId"] = ids
-  data["lat"] = randLat()
-  data["lng"] = randLng()
+  data["lat"] = randLat(40)
+  data["lng"] = randLng(-100)
+  data["countryLat"] = 40
+  data["countryLng"] = -100
   r = requests.post("http://localhost:8080/logs", data=json.dumps(data))
   print r.text
 
@@ -40,16 +32,20 @@ for ids in ["1nLlul_8Oh2RmwvkPEIS1_flDkIAhk9pT_SQqKlLNh_8",
   "1mHCvrR1e4zxOIcUFLHatGRCMTOBnnzcr3VZkKOSgSwM",
   "1ExA0H6Kx-cL-g2j1TyuhC3xwBpagGnIgdsY0xfV31gw"]:
   data["gdriveId"] = ids
-  data["lat"] = randLat()
-  data["lng"] = randLng()
+  data["lat"] = randLat(35)
+  data["lng"] = randLng(103)
+  data["countryLat"] = 35
+  data["countryLng"] = 103
   r = requests.post("http://localhost:8080/logs", data=json.dumps(data))
   print r.text
 
 data["country"] = "UAE"
 for ids in ["1XPUPhLyL3akl7tQ0ODHFxo2kUmd4U05Q9ROvGY3qmow"]:
   data["gdriveId"] = ids
-  data["lat"] = randLat()
-  data["lng"] = randLng()
+  data["lat"] = randLat(23)
+  data["lng"] = randLng(54)
+  data["countryLat"] = 23
+  data["countryLng"] = 54
   r = requests.post("http://localhost:8080/logs", data=json.dumps(data))
   print r.text
 
@@ -61,8 +57,10 @@ for ids in ["1_1vivrYBkxBf2DAVI5dkI3A-uCnDNZFHWq3_cQTxyOs",
   "1cvZwDh0nIujTSNroTXofmR0oce3vK2Z9MnBQxELivWs",
   "1Ja-j3r1Yg9G5zTXCGzzNuQNVYeo4jBL3NKipTjOZWI8"]:
   data["gdriveId"] = ids
-  data["lat"] = randLat()
-  data["lng"] = randLng()
+  data["lat"] = randLat(20)
+  data["lng"] = randLng(54)
+  data["countryLat"] = 20
+  data["countryLng"] = 54
   r = requests.post("http://localhost:8080/logs", data=json.dumps(data))
   print r.text
 
@@ -71,8 +69,10 @@ for ids in ["1mSUcNM7gInwrN1IwvLSJyOb3WQuRHrSTV6nLj34GUkI",
           "1vuOYKLnNY8sQTk0AcedgNtH4r_kGeMTRLBI05_yQzT0",
           "141bF1qpAsfijCn0pL7XUFcgip3y8RGMHlre-prO34WI"]:
   data["gdriveId"] = ids
-  data["lat"] = randLat()
-  data["lng"] = randLng()
+  data["lat"] = randLat(-42)
+  data["lng"] = randLng(174)
+  data["countryLat"] = -42
+  data["countryLng"] = 174
   r = requests.post("http://localhost:8080/logs", data=json.dumps(data))
   print r.text
 

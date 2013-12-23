@@ -6,6 +6,7 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
   factory =
     data:
       logs: {}
+      countries: {}
       latLogs: []
       lngLogs: []
       current: null
@@ -146,6 +147,10 @@ srv.factory('Map', ['$http', '$rootScope', ($http, $rootScope) ->
             return to.lng <= from.lng
         else
           return false
+
+    # one off map function to update all logs
+    updateAllLogs: () ->
+      1 + 1
 
     initMap: () ->
       getLogsCallback = (mapData) ->
