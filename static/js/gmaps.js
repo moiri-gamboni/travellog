@@ -1,7 +1,3 @@
-$(function() {
-  initialize();
-});
-
 idMarkerMap = {};
 var geocoder;
 

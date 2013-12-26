@@ -1,11 +1,11 @@
 "use strict"
 ctrl = angular.module("mainModule.controllers", [])
 
-ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map', ($http, $scope, $rootScope, $timeout, Map) ->
+ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogService', 'MapService', ($http, $scope, $rootScope, $timeout, LogService, MapService) ->
   $rootScope.overlayIsActive = false
   switchLogs = false
   flow =
-    isMapReady: false
+    isLogServiceReady: false
     isFirstLogReady: false
     areLogsReady: false
     hasBegun: false
@@ -19,10 +19,10 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     console.log 'drop pins'
     dropPin = (log) ->
       return ()->
-        placeMarkerMiniMap(log)
+        MapService.placeMarkerMiniMap(log)
 
     i = 0
-    for logId, log of Map.logs
+    for logId, log of LogService.logs
       $timeout(dropPin(log),200*i)
       i++
     $timeout(
@@ -37,9 +37,9 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
             switchLoading("small corner")
             if $rootScope.urlEntered?
               console.log 'entered url'
-              if not Map.logs[$rootScope.urlEntered].body?
-                Map.getLog($rootScope.urlEntered)
-                Map.getClosestLogs(Map.logs[$rootScope.urlEntered].key)
+              if not LogService.logs[$rootScope.urlEntered].body?
+                LogService.getLog($rootScope.urlEntered)
+                LogService.getClosestLogs(LogService.logs[$rootScope.urlEntered].key)
                 watch = $rootScope.$on('getting-logs', (event, totalLogs) ->
                   console.log 'url watch'
                   if totalLogs is 0
@@ -50,13 +50,13 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
               else
                 showLog($rootScope.urlEntered, true)
             else
-              showLog(Map.getCurrentLog().id, true, null, null, null, true)
+              showLog(LogService.getCurrentLog().id, true, null, null, null, true)
         ,
-        200*Object.keys(Map.logs).length
+        200*Object.keys(LogService.logs).length
       )
 
   $rootScope.$on('map-ready', () ->
-    flow.isMapReady = true
+    flow.isLogServiceReady = true
     if flow.areLogsReady
       unblockBegin()
   )
@@ -92,7 +92,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     console.log 'showlog'
     if logId?
       console.log 'log id'
-      log = Map.logs[logId]
+      log = LogService.logs[logId]
       if invert? and invert
         console.log 'invert'
         console.log 'history change'
@@ -131,36 +131,39 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       if manualSwitch? and manualSwitch
         console.log 'manual switch'
         switchLogs = not switchLogs
-      Map.current = log.key
+      LogService.current = log.key
       if not notChangeMarker? or not notChangeMarker
-        changeLocation(logId)
+        console.log log.id
+        MapService.changeLocation(logId)
       console.log 'finish showing log'
     else
       console.log 'no logid'
 
   $scope.move = (direction) ->
-    if Map.loadingLogs == 0
-      log = Map.move(direction)
+    if LogService.loadingLogs == 0
+      LogService.move(direction)
+      log = LogService.getCurrentLog()
       console.log log
       console.log 'showing log'
       showLog(log.id, null, null, null, true)
       console.log 'moving'
       move(direction)
       $timeout(()->
-        changeLocation(log.id)
+        console.log log.id
+        MapService.changeLocation(log.id)
       , 500
       )
 
   $rootScope.$on('switch-marker', (event, logId) ->
     console.log "switching marker"
     $(".main" + " .log-author").css({"opacity": 0})
-    if Map.logs[logId].body?
+    if LogService.logs[logId].body?
       console.log "body exists"
       showLog(logId, false, true, false, false, true)
     else
       console.log "fetching body"
-      Map.getLog(logId)
-      Map.getClosestLogs(Map.logs[logId].key)
+      LogService.getLog(logId)
+      LogService.getClosestLogs(LogService.logs[logId].key)
       watch = $rootScope.$on('getting-logs', (event, isLoading) ->
         if not isLoading
           showLog(logId, false, true, false, false, true)
@@ -169,7 +172,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
   )
 
   loadingWatch = () ->
-    if Map.loadingLogs == 0
+    if LogService.loadingLogs == 0
       fadeLoading(true)
     else
       fadeLoading(false)
@@ -204,14 +207,16 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         $rootScope.pullFiles()
       $rootScope.setShowing()
 
-  Map.initMap().then((logs) ->
+  MapService.init()
+
+  LogService.init().then((logs) ->
     $rootScope.logs = logs
   ,null
   ,(progress) ->
     switch progress
       when 0
         flow.areLogsReady = true
-        if flow.isMapReady
+        if flow.isLogServiceReady
           unblockBegin()
       when 1
         console.log 'first log ready'
@@ -224,9 +229,9 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
           switchLoading("small corner")
           if $rootScope.urlEntered?
             console.log 'entered url'
-            if not Map.logs[$rootScope.urlEntered].body?
-              Map.getLog($rootScope.urlEntered)
-              Map.getClosestLogs(Map.logs[$rootScope.urlEntered].key)
+            if not LogService.logs[$rootScope.urlEntered].body?
+              LogService.getLog($rootScope.urlEntered)
+              LogService.getClosestLogs(LogService.logs[$rootScope.urlEntered].key)
               watch = $rootScope.$on('getting-logs', (event, isLoading) ->
                 console.log 'url watch'
                 if not isLoading
@@ -238,7 +243,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
               showLog($rootScope.urlEntered, true)
           else
             console.log "no url entered"
-            showLog(Map.getCurrentLog().id, true, null, null, null, true)
+            showLog(LogService.getCurrentLog().id, true, null, null, null, true)
         else
           console.log 'pins not dropped yet'
       when 2
@@ -249,7 +254,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
 
 ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout', 'User', ($http, $scope, $rootScope, $timeout, User) ->
     #if user is signed_in
-  #$scope.map = Map
+  #$scope.map = LogService
   $rootScope.showing = 'loading'
   $scope.display = 'loading'
   $rootScope.loggedIn = false
@@ -257,7 +262,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
   $scope.numFilesMessage = ""
   $scope.filesLoaded = false
   $scope.selectedFile = null
-  $scope.addMapSelected = false
+  $scope.addLogServiceSelected = false
   $scope.loading = false
   $rootScope.filesLoaded = false
   $scope.startedFileLoad = false
@@ -287,9 +292,9 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
       $rootScope.setShowing()
   )
 
-  $rootScope.$on('addMapSelected', () ->
+  $rootScope.$on('addLogServiceSelected', () ->
     $scope.$apply ()->
-      $scope.addMapSelected = true
+      $scope.addLogServiceSelected = true
   )
   $scope.submitAgain = () ->
     $scope.complete = false
@@ -315,7 +320,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
       )
       angular.element("html").scope().$broadcast('update-load');
     )
-    startAddMap()
+    startAddLogService()
 
   $rootScope.setShowing = () ->
     returnVal = ""
@@ -338,7 +343,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
         else if $rootScope.overlayIsActive and $scope.filesLoaded
           fadeLoading(true)
         setTimeout( ()->
-          google.maps.event.trigger(addMap, 'resize')
+          google.maps.event.trigger(addLogService, 'resize')
         , 200)
         returnVal = 'loggedIn'
       else
@@ -349,7 +354,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
     $scope.display = returnVal
 
   $scope.canSubmit = () ->
-    return $scope.addMapSelected and $scope.selectedFile?
+    return $scope.addLogServiceSelected and $scope.selectedFile?
 
   $scope.activateOverlay = (view) ->
     $rootScope.overlayIsActive = true
@@ -364,8 +369,8 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
     switchLoading("big center")
     payload =
       gdriveId: $scope.selectedFile.id
-      lat: addMapMarker.position.lat()
-      lng: addMapMarker.position.lng()
+      lat: addLogServiceMarker.position.lat()
+      lng: addLogServiceMarker.position.lng()
 
     if User.isPlusUser?
       payload.profileId = User.id

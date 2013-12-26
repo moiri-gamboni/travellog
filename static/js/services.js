@@ -79,7 +79,7 @@
     }
   ]);
 
-  srv.factory('Map', [
+  srv.factory('LogService', [
     '$q', '$http', '$rootScope', 'Resources', function($q, $http, $rootScope, Resources) {
       var factory, res;
       res = Resources;
@@ -217,7 +217,7 @@
             }
           }
         },
-        initMap: function(logId) {
+        init: function(logId) {
           var deferred;
           deferred = $q.defer();
           res.getLogs().success(function(data) {
@@ -273,5 +273,303 @@
   ]);
 
   srv.factory('User', [function() {}]);
+
+  srv.factory('MapService', [
+    function() {
+      var factory;
+      factory = {
+        idMarkerMap: {},
+        geocoder: null,
+        addMapMarker: null,
+        miniMap: null,
+        icons: {
+          current: "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png",
+          visited: "http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png",
+          unvisited: "http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png"
+        },
+        currentMiniMarker: null,
+        init: function() {
+          var mapOptions;
+          this.geocoder = new google.maps.Geocoder();
+          mapOptions = {
+            center: new google.maps.LatLng(20, 0),
+            zoom: 1,
+            styles: [
+              {
+                featureType: "administrative",
+                stylers: [
+                  {
+                    visibility: "off"
+                  }
+                ]
+              }, {
+                featureType: "transit",
+                stylers: [
+                  {
+                    color: "#000027"
+                  }, {
+                    visibility: "off"
+                  }
+                ]
+              }, {
+                featureType: "road",
+                stylers: [
+                  {
+                    visibility: "off"
+                  }
+                ]
+              }, {
+                featureType: "poi",
+                stylers: [
+                  {
+                    visibility: "off"
+                  }
+                ]
+              }, {
+                featureType: "administrative.locality",
+                elementType: "labels.text.stroke",
+                stylers: [
+                  {
+                    visibility: "on"
+                  }, {
+                    color: "#bfc5bf"
+                  }
+                ]
+              }, {
+                featureType: "administrative.country",
+                elementType: "labels.text.stroke",
+                stylers: [
+                  {
+                    visibility: "on"
+                  }, {
+                    color: "#ffffff"
+                  }
+                ]
+              }, {
+                featureType: "administrative.province",
+                elementType: "labels.text.fill",
+                stylers: [
+                  {
+                    visibility: "on"
+                  }, {
+                    color: "#d3d1d1"
+                  }
+                ]
+              }, {
+                featureType: "water",
+                stylers: [
+                  {
+                    color: "#1c1c1c"
+                  }
+                ]
+              }, {
+                featureType: "landscape",
+                stylers: [
+                  {
+                    visibility: "on"
+                  }, {
+                    color: "#808080"
+                  }
+                ]
+              }
+            ]
+          };
+          this.miniMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+          return angular.element("html").scope().$broadcast("map-ready");
+        },
+        startAddMap: function() {
+          var addMap, mapOptions;
+          mapOptions = {
+            center: new google.maps.LatLng(0, 0),
+            zoom: 1,
+            styles: [
+              {
+                featureType: "administrative",
+                stylers: [
+                  {
+                    visibility: "off"
+                  }
+                ]
+              }, {
+                featureType: "transit",
+                stylers: [
+                  {
+                    color: "#000027"
+                  }, {
+                    visibility: "off"
+                  }
+                ]
+              }, {
+                featureType: "road",
+                stylers: [
+                  {
+                    visibility: "off"
+                  }
+                ]
+              }, {
+                featureType: "poi",
+                stylers: [
+                  {
+                    visibility: "off"
+                  }
+                ]
+              }, {
+                featureType: "administrative.locality",
+                elementType: "labels.text.stroke",
+                stylers: [
+                  {
+                    visibility: "on"
+                  }, {
+                    color: "#bfc5bf"
+                  }
+                ]
+              }, {
+                featureType: "administrative.country",
+                elementType: "labels.text.stroke",
+                stylers: [
+                  {
+                    visibility: "on"
+                  }, {
+                    color: "#ffffff"
+                  }
+                ]
+              }, {
+                featureType: "administrative.province",
+                elementType: "labels.text.fill",
+                stylers: [
+                  {
+                    visibility: "on"
+                  }, {
+                    color: "#d3d1d1"
+                  }
+                ]
+              }, {
+                featureType: "water",
+                stylers: [
+                  {
+                    color: "#1c1c1c"
+                  }
+                ]
+              }, {
+                featureType: "landscape",
+                stylers: [
+                  {
+                    visibility: "on"
+                  }, {
+                    color: "#808080"
+                  }
+                ]
+              }
+            ]
+          };
+          addMap = new google.maps.Map(document.getElementById("add-map-canvas"), mapOptions);
+          return google.maps.event.addListener(addMap, "click", function(event) {
+            angular.element("html").scope().$broadcast("addMapSelected");
+            if (this.addMapMarker != null) {
+              return this.addMapMarker.setPosition(event.latLng);
+            } else {
+              return this.addMapMarker = new google.maps.Marker({
+                position: event.latLng,
+                animation: google.maps.Animation.BOUNCE,
+                map: addMap
+              });
+            }
+          });
+        },
+        seedMap: function() {
+          var dropCallback;
+          dropCallback = function(resp, i) {
+            return function() {
+              return placeMarkerMiniMap(resp.logs[i]);
+            };
+          };
+          return $.get("/logs", function(resp) {
+            var i, _results;
+            i = 0;
+            _results = [];
+            while (i < resp.logs.length) {
+              setTimeout(dropCallback(resp, i), i * 200);
+              _results.push(i++);
+            }
+            return _results;
+          });
+        },
+        changeLocation: function(markerId) {
+          var newMarker;
+          console.log(this.idMarkerMap);
+          console.log(this.idMarkerMap[markerId]);
+          newMarker = this.idMarkerMap[markerId];
+          if (this.currentMiniMarker) {
+            this.currentMiniMarker.setAnimation(null);
+            this.currentMiniMarker.setIcon(this.icons.visited);
+          }
+          this.currentMiniMarker = newMarker;
+          this.currentMiniMarker.setIcon(this.icons.current);
+          if (this.currentMiniMarker.getAnimation() !== null) {
+            this.currentMiniMarker.setAnimation(null);
+          } else {
+            this.currentMiniMarker.setAnimation(google.maps.Animation.BOUNCE);
+          }
+          this.miniMap.panTo(this.currentMiniMarker.position);
+          if (this.miniMap.getZoom() === 1) {
+            return this.miniMap.setZoom(2);
+          }
+        },
+        switchMiniMarker: function() {
+          return angular.element("html").scope().$broadcast("switch-marker", this.title);
+        },
+        placeMarkerMiniMap: function(log_object) {
+          var marker;
+          marker = new google.maps.Marker({
+            position: new google.maps.LatLng(log_object.lat, log_object.lng),
+            animation: google.maps.Animation.DROP,
+            map: this.miniMap,
+            title: log_object.id,
+            icon: this.icons.unvisited
+          });
+          this.idMarkerMap[log_object.id] = marker;
+          return google.maps.event.addListener(marker, "click", switchMiniMarker);
+        },
+        reverseGeocode: function(latlng, callback) {
+          return this.geocoder.geocode({
+            latLng: latlng
+          }, function(results, status) {
+            var countryName, formatted_address;
+            if (status === google.maps.GeocoderStatus.OK) {
+              if (results[1]) {
+                console.log("Results are:");
+                formatted_address = results[1].formatted_address;
+                countryName = results[1].address_components[results[1].address_components.length - 1].long_name;
+                console.log(formatted_address);
+                console.log(countryName);
+                return typeof callback === "function" && callback(formatted_address, countryName);
+              } else {
+                return console.log("No results found");
+              }
+            } else {
+              return console.log("Geocoder failed due to: " + status);
+            }
+          });
+        },
+        geocode: function(countryName, callback) {
+          return this.geocoder.geocode({
+            address: countryName
+          }, function(results, status) {
+            var marker;
+            if (status === google.maps.GeocoderStatus.OK) {
+              map.setCenter(results[0].geometry.location);
+              return marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location
+              });
+            } else {
+              return alert("Geocode was not successful for the following reason: " + status);
+            }
+          });
+        }
+      };
+      return factory;
+    }
+  ]);
 
 }).call(this);

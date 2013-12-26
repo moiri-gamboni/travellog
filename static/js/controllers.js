@@ -6,12 +6,12 @@
   ctrl = angular.module("mainModule.controllers", []);
 
   ctrl.controller("mainCtrl", [
-    '$http', '$scope', '$rootScope', '$timeout', 'Map', function($http, $scope, $rootScope, $timeout, Map) {
+    '$http', '$scope', '$rootScope', '$timeout', 'LogService', 'MapService', function($http, $scope, $rootScope, $timeout, LogService, MapService) {
       var dropPins, flow, loadingWatch, showLog, switchLogs, unblockBegin;
       $rootScope.overlayIsActive = false;
       switchLogs = false;
       flow = {
-        isMapReady: false,
+        isLogServiceReady: false,
         isFirstLogReady: false,
         areLogsReady: false,
         hasBegun: false,
@@ -26,11 +26,11 @@
         console.log('drop pins');
         dropPin = function(log) {
           return function() {
-            return placeMarkerMiniMap(log);
+            return MapService.placeMarkerMiniMap(log);
           };
         };
         i = 0;
-        _ref = Map.logs;
+        _ref = LogService.logs;
         for (logId in _ref) {
           log = _ref[logId];
           $timeout(dropPin(log), 200 * i);
@@ -48,9 +48,9 @@
             switchLoading("small corner");
             if ($rootScope.urlEntered != null) {
               console.log('entered url');
-              if (Map.logs[$rootScope.urlEntered].body == null) {
-                Map.getLog($rootScope.urlEntered);
-                Map.getClosestLogs(Map.logs[$rootScope.urlEntered].key);
+              if (LogService.logs[$rootScope.urlEntered].body == null) {
+                LogService.getLog($rootScope.urlEntered);
+                LogService.getClosestLogs(LogService.logs[$rootScope.urlEntered].key);
                 return watch = $rootScope.$on('getting-logs', function(event, totalLogs) {
                   console.log('url watch');
                   if (totalLogs === 0) {
@@ -63,13 +63,13 @@
                 return showLog($rootScope.urlEntered, true);
               }
             } else {
-              return showLog(Map.getCurrentLog().id, true, null, null, null, true);
+              return showLog(LogService.getCurrentLog().id, true, null, null, null, true);
             }
           }
-        }, 200 * Object.keys(Map.logs).length);
+        }, 200 * Object.keys(LogService.logs).length);
       };
       $rootScope.$on('map-ready', function() {
-        flow.isMapReady = true;
+        flow.isLogServiceReady = true;
         if (flow.areLogsReady) {
           return unblockBegin();
         }
@@ -107,7 +107,7 @@
         console.log('showlog');
         if (logId != null) {
           console.log('log id');
-          log = Map.logs[logId];
+          log = LogService.logs[logId];
           if ((invert != null) && invert) {
             console.log('invert');
             console.log('history change');
@@ -154,9 +154,10 @@
             console.log('manual switch');
             switchLogs = !switchLogs;
           }
-          Map.current = log.key;
+          LogService.current = log.key;
           if ((notChangeMarker == null) || !notChangeMarker) {
-            changeLocation(logId);
+            console.log(log.id);
+            MapService.changeLocation(logId);
           }
           return console.log('finish showing log');
         } else {
@@ -165,15 +166,17 @@
       };
       $scope.move = function(direction) {
         var log;
-        if (Map.loadingLogs === 0) {
-          log = Map.move(direction);
+        if (LogService.loadingLogs === 0) {
+          LogService.move(direction);
+          log = LogService.getCurrentLog();
           console.log(log);
           console.log('showing log');
           showLog(log.id, null, null, null, true);
           console.log('moving');
           move(direction);
           return $timeout(function() {
-            return changeLocation(log.id);
+            console.log(log.id);
+            return MapService.changeLocation(log.id);
           }, 500);
         }
       };
@@ -183,13 +186,13 @@
         $(".main" + " .log-author").css({
           "opacity": 0
         });
-        if (Map.logs[logId].body != null) {
+        if (LogService.logs[logId].body != null) {
           console.log("body exists");
           return showLog(logId, false, true, false, false, true);
         } else {
           console.log("fetching body");
-          Map.getLog(logId);
-          Map.getClosestLogs(Map.logs[logId].key);
+          LogService.getLog(logId);
+          LogService.getClosestLogs(LogService.logs[logId].key);
           return watch = $rootScope.$on('getting-logs', function(event, isLoading) {
             if (!isLoading) {
               showLog(logId, false, true, false, false, true);
@@ -199,7 +202,7 @@
         }
       });
       loadingWatch = function() {
-        if (Map.loadingLogs === 0) {
+        if (LogService.loadingLogs === 0) {
           fadeLoading(true);
         } else {
           fadeLoading(false);
@@ -240,14 +243,15 @@
           return $rootScope.setShowing();
         }
       };
-      return Map.initMap().then(function(logs) {
+      MapService.init();
+      return LogService.init().then(function(logs) {
         return $rootScope.logs = logs;
       }, null, function(progress) {
         var watch;
         switch (progress) {
           case 0:
             flow.areLogsReady = true;
-            if (flow.isMapReady) {
+            if (flow.isLogServiceReady) {
               return unblockBegin();
             }
             break;
@@ -262,9 +266,9 @@
               switchLoading("small corner");
               if ($rootScope.urlEntered != null) {
                 console.log('entered url');
-                if (Map.logs[$rootScope.urlEntered].body == null) {
-                  Map.getLog($rootScope.urlEntered);
-                  Map.getClosestLogs(Map.logs[$rootScope.urlEntered].key);
+                if (LogService.logs[$rootScope.urlEntered].body == null) {
+                  LogService.getLog($rootScope.urlEntered);
+                  LogService.getClosestLogs(LogService.logs[$rootScope.urlEntered].key);
                   return watch = $rootScope.$on('getting-logs', function(event, isLoading) {
                     console.log('url watch');
                     if (!isLoading) {
@@ -278,7 +282,7 @@
                 }
               } else {
                 console.log("no url entered");
-                return showLog(Map.getCurrentLog().id, true, null, null, null, true);
+                return showLog(LogService.getCurrentLog().id, true, null, null, null, true);
               }
             } else {
               return console.log('pins not dropped yet');
@@ -300,7 +304,7 @@
       $scope.numFilesMessage = "";
       $scope.filesLoaded = false;
       $scope.selectedFile = null;
-      $scope.addMapSelected = false;
+      $scope.addLogServiceSelected = false;
       $scope.loading = false;
       $rootScope.filesLoaded = false;
       $scope.startedFileLoad = false;
@@ -331,9 +335,9 @@
           return $rootScope.setShowing();
         });
       });
-      $rootScope.$on('addMapSelected', function() {
+      $rootScope.$on('addLogServiceSelected', function() {
         return $scope.$apply(function() {
-          return $scope.addMapSelected = true;
+          return $scope.addLogServiceSelected = true;
         });
       });
       $scope.submitAgain = function() {
@@ -359,7 +363,7 @@
           });
           return angular.element("html").scope().$broadcast('update-load');
         });
-        return startAddMap();
+        return startAddLogService();
       };
       $rootScope.setShowing = function() {
         var returnVal;
@@ -387,7 +391,7 @@
               fadeLoading(true);
             }
             setTimeout(function() {
-              return google.maps.event.trigger(addMap, 'resize');
+              return google.maps.event.trigger(addLogService, 'resize');
             }, 200);
             returnVal = 'loggedIn';
           } else {
@@ -401,7 +405,7 @@
         return $scope.display = returnVal;
       };
       $scope.canSubmit = function() {
-        return $scope.addMapSelected && ($scope.selectedFile != null);
+        return $scope.addLogServiceSelected && ($scope.selectedFile != null);
       };
       $scope.activateOverlay = function(view) {
         $rootScope.overlayIsActive = true;
@@ -418,8 +422,8 @@
         switchLoading("big center");
         payload = {
           gdriveId: $scope.selectedFile.id,
-          lat: addMapMarker.position.lat(),
-          lng: addMapMarker.position.lng()
+          lat: addLogServiceMarker.position.lat(),
+          lng: addLogServiceMarker.position.lng()
         };
         if (User.isPlusUser != null) {
           payload.profileId = User.id;
