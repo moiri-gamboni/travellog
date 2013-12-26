@@ -23,7 +23,6 @@
       $scope.otherLog = null;
       dropPins = function() {
         var dropPin, i, log, logId, _ref;
-        console.log('drop pins');
         dropPin = function(log) {
           return function() {
             return MapService.placeMarkerMiniMap(log);
@@ -37,34 +36,13 @@
           i++;
         }
         return $timeout(function() {
-          var watch;
-          console.log('drop pins timeout');
           flow.arePinsDropped = true;
           if (flow.isFirstLogReady) {
-            console.log('first log is ready from drop pins');
             $(".main.fade").removeClass("fadeout");
             $(".main.fade").addClass("fadein");
             loadingWatch();
             switchLoading("small corner");
-            if ($rootScope.urlEntered != null) {
-              console.log('entered url');
-              if (LogService.logs[$rootScope.urlEntered].body == null) {
-                LogService.getLog($rootScope.urlEntered);
-                LogService.getClosestLogs(LogService.logs[$rootScope.urlEntered].key);
-                return watch = $rootScope.$on('getting-logs', function(event, totalLogs) {
-                  console.log('url watch');
-                  if (totalLogs === 0) {
-                    console.log('stop watch');
-                    showLog($rootScope.urlEntered, true, null, null, null, true);
-                    return watch();
-                  }
-                });
-              } else {
-                return showLog($rootScope.urlEntered, true);
-              }
-            } else {
-              return showLog(LogService.getCurrentLog().id, true, null, null, null, true);
-            }
+            return showLog(LogService.getCurrentLog().id, true, null, null, null, true);
           }
         }, 200 * Object.keys(LogService.logs).length);
       };
@@ -98,48 +76,33 @@
         return loading.addClass(classString);
       };
       $rootScope.$on('sliding-animation-done', function() {
-        console.log('animation done');
-        console.log('\n');
         return switchLogs = !switchLogs;
       });
       showLog = function(logId, manualSwitch, invert, dontPushState, notChangeMarker, renderBadgeInMain) {
         var log;
-        console.log('showlog');
         if (logId != null) {
-          console.log('log id');
           log = LogService.logs[logId];
           if ((invert != null) && invert) {
-            console.log('invert');
-            console.log('history change');
             if (!switchLogs) {
-              console.log('not switchlogs -> otherlog');
               $scope.otherLog = log;
             } else {
-              console.log('switchlogs -> log');
               $scope.log = log;
             }
             $scope.$apply();
           } else {
-            console.log('no invert');
             if (switchLogs) {
-              console.log('switchlogs -> otherlog');
               $scope.otherLog = log;
             } else {
-              console.log('not switchlogs -> log');
               $scope.log = log;
             }
           }
           if (log.profileId != null) {
-            console.log('profileid');
             if ((renderBadgeInMain != null) && renderBadgeInMain) {
-              console.log("rendering badge in main");
               renderBadge(log.profileId, '.main');
             } else {
-              console.log("rendering badge in launch");
               renderBadge(log.profileId, '.launch');
             }
           } else {
-            console.log('no profileid');
             if ((renderBadgeInMain != null) && renderBadgeInMain) {
               $(".main .log-author").html(log.profileName);
             } else {
@@ -147,19 +110,15 @@
             }
           }
           if ((dontPushState == null) || !dontPushState) {
-            console.log('pushstate');
             history.pushState(log.id, log.title, "/log/" + log.id);
           }
           if ((manualSwitch != null) && manualSwitch) {
-            console.log('manual switch');
             switchLogs = !switchLogs;
           }
           LogService.current = log.key;
           if ((notChangeMarker == null) || !notChangeMarker) {
-            console.log(log.id);
-            MapService.changeLocation(logId);
+            return MapService.changeLocation(logId);
           }
-          return console.log('finish showing log');
         } else {
           return console.log('no logid');
         }
@@ -169,28 +128,21 @@
         if (LogService.loadingLogs === 0) {
           LogService.move(direction);
           log = LogService.getCurrentLog();
-          console.log(log);
-          console.log('showing log');
           showLog(log.id, null, null, null, true);
-          console.log('moving');
           move(direction);
           return $timeout(function() {
-            console.log(log.id);
             return MapService.changeLocation(log.id);
           }, 500);
         }
       };
       $rootScope.$on('switch-marker', function(event, logId) {
         var watch;
-        console.log("switching marker");
         $(".main" + " .log-author").css({
           "opacity": 0
         });
         if (LogService.logs[logId].body != null) {
-          console.log("body exists");
           return showLog(logId, false, true, false, false, true);
         } else {
-          console.log("fetching body");
           LogService.getLog(logId);
           LogService.getClosestLogs(LogService.logs[logId].key);
           return watch = $rootScope.$on('getting-logs', function(event, isLoading) {
@@ -244,10 +196,9 @@
         }
       };
       MapService.init();
-      return LogService.init().then(function(logs) {
+      return LogService.init($rootScope.urlEntered).then(function(logs) {
         return $rootScope.logs = logs;
       }, null, function(progress) {
-        var watch;
         switch (progress) {
           case 0:
             flow.areLogsReady = true;
@@ -256,40 +207,19 @@
             }
             break;
           case 1:
-            console.log('first log ready');
             flow.isFirstLogReady = true;
             if (flow.arePinsDropped) {
-              console.log('pins are dropped from first log ready');
               $(".main.fade").removeClass("fadeout");
               $(".main.fade").addClass("fadein");
               loadingWatch();
               switchLoading("small corner");
-              if ($rootScope.urlEntered != null) {
-                console.log('entered url');
-                if (LogService.logs[$rootScope.urlEntered].body == null) {
-                  LogService.getLog($rootScope.urlEntered);
-                  LogService.getClosestLogs(LogService.logs[$rootScope.urlEntered].key);
-                  return watch = $rootScope.$on('getting-logs', function(event, isLoading) {
-                    console.log('url watch');
-                    if (!isLoading) {
-                      console.log('stop url watch');
-                      showLog($rootScope.urlEntered, true, null, null, null, true);
-                      return watch();
-                    }
-                  });
-                } else {
-                  return showLog($rootScope.urlEntered, true);
-                }
-              } else {
-                console.log("no url entered");
-                return showLog(LogService.getCurrentLog().id, true, null, null, null, true);
-              }
+              return showLog(LogService.getCurrentLog().id, true, null, null, null, true);
             } else {
-              return console.log('pins not dropped yet');
+
             }
             break;
           case 2:
-            return console.log('other logs ready');
+            break;
         }
       });
     }

@@ -16,7 +16,6 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
   $scope.otherLog = null
 
   dropPins = () ->
-    console.log 'drop pins'
     dropPin = (log) ->
       return ()->
         MapService.placeMarkerMiniMap(log)
@@ -27,30 +26,13 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
       i++
     $timeout(
         () ->
-          console.log 'drop pins timeout'
           flow.arePinsDropped = true
           if flow.isFirstLogReady
-            console.log 'first log is ready from drop pins'
             $(".main.fade").removeClass("fadeout")
             $(".main.fade").addClass("fadein")
             loadingWatch()
             switchLoading("small corner")
-            if $rootScope.urlEntered?
-              console.log 'entered url'
-              if not LogService.logs[$rootScope.urlEntered].body?
-                LogService.getLog($rootScope.urlEntered)
-                LogService.getClosestLogs(LogService.logs[$rootScope.urlEntered].key)
-                watch = $rootScope.$on('getting-logs', (event, totalLogs) ->
-                  console.log 'url watch'
-                  if totalLogs is 0
-                    console.log 'stop watch'
-                    showLog($rootScope.urlEntered, true, null, null, null, true)
-                    watch()
-                )
-              else
-                showLog($rootScope.urlEntered, true)
-            else
-              showLog(LogService.getCurrentLog().id, true, null, null, null, true)
+            showLog(LogService.getCurrentLog().id, true, null, null, null, true)
         ,
         200*Object.keys(LogService.logs).length
       )
@@ -83,59 +65,40 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
     loading.addClass(classString)
 
   $rootScope.$on('sliding-animation-done', () ->
-    console.log 'animation done'
-    console.log '\n'
     switchLogs = not switchLogs
   )
 
   showLog = (logId, manualSwitch, invert, dontPushState, notChangeMarker, renderBadgeInMain) ->
-    console.log 'showlog'
     if logId?
-      console.log 'log id'
       log = LogService.logs[logId]
       if invert? and invert
-        console.log 'invert'
-        console.log 'history change'
         if not switchLogs
-          console.log 'not switchlogs -> otherlog'
           $scope.otherLog = log
         else
-          console.log 'switchlogs -> log'
           $scope.log = log
         $scope.$apply()
       else
-        console.log 'no invert'
         if switchLogs
-          console.log 'switchlogs -> otherlog'
           $scope.otherLog = log
         else
-          console.log 'not switchlogs -> log'
           $scope.log = log
       if log.profileId?
-        console.log 'profileid'
         if renderBadgeInMain? and renderBadgeInMain
-          console.log "rendering badge in main"
           renderBadge(log.profileId, '.main')
         else
-          console.log "rendering badge in launch"
           renderBadge(log.profileId, '.launch')
       else
-        console.log 'no profileid'
         if renderBadgeInMain? and renderBadgeInMain
           $(".main .log-author").html(log.profileName)
         else
           $(".launch .log-author").html(log.profileName)
       if not dontPushState? or not dontPushState
-        console.log 'pushstate'
         history.pushState(log.id, log.title, "/log/"+log.id)
       if manualSwitch? and manualSwitch
-        console.log 'manual switch'
         switchLogs = not switchLogs
       LogService.current = log.key
       if not notChangeMarker? or not notChangeMarker
-        console.log log.id
         MapService.changeLocation(logId)
-      console.log 'finish showing log'
     else
       console.log 'no logid'
 
@@ -143,25 +106,18 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
     if LogService.loadingLogs == 0
       LogService.move(direction)
       log = LogService.getCurrentLog()
-      console.log log
-      console.log 'showing log'
       showLog(log.id, null, null, null, true)
-      console.log 'moving'
       move(direction)
       $timeout(()->
-        console.log log.id
         MapService.changeLocation(log.id)
       , 500
       )
 
   $rootScope.$on('switch-marker', (event, logId) ->
-    console.log "switching marker"
     $(".main" + " .log-author").css({"opacity": 0})
     if LogService.logs[logId].body?
-      console.log "body exists"
       showLog(logId, false, true, false, false, true)
     else
-      console.log "fetching body"
       LogService.getLog(logId)
       LogService.getClosestLogs(LogService.logs[logId].key)
       watch = $rootScope.$on('getting-logs', (event, isLoading) ->
@@ -209,7 +165,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
 
   MapService.init()
 
-  LogService.init().then((logs) ->
+  LogService.init($rootScope.urlEntered).then((logs) ->
     $rootScope.logs = logs
   ,null
   ,(progress) ->
@@ -219,35 +175,16 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
         if flow.isLogServiceReady
           unblockBegin()
       when 1
-        console.log 'first log ready'
         flow.isFirstLogReady = true
         if flow.arePinsDropped
-          console.log 'pins are dropped from first log ready'
           $(".main.fade").removeClass("fadeout")
           $(".main.fade").addClass("fadein")
           loadingWatch()
           switchLoading("small corner")
-          if $rootScope.urlEntered?
-            console.log 'entered url'
-            if not LogService.logs[$rootScope.urlEntered].body?
-              LogService.getLog($rootScope.urlEntered)
-              LogService.getClosestLogs(LogService.logs[$rootScope.urlEntered].key)
-              watch = $rootScope.$on('getting-logs', (event, isLoading) ->
-                console.log 'url watch'
-                if not isLoading
-                  console.log 'stop url watch'
-                  showLog($rootScope.urlEntered, true, null, null, null, true)
-                  watch()
-              )
-            else
-              showLog($rootScope.urlEntered, true)
-          else
-            console.log "no url entered"
-            showLog(LogService.getCurrentLog().id, true, null, null, null, true)
+          showLog(LogService.getCurrentLog().id, true, null, null, null, true)
         else
-          console.log 'pins not dropped yet'
       when 2
-        console.log 'other logs ready'
+        break
   )
 
 ])

@@ -496,8 +496,6 @@
         },
         changeLocation: function(markerId) {
           var newMarker;
-          console.log(this.idMarkerMap);
-          console.log(this.idMarkerMap[markerId]);
           newMarker = this.idMarkerMap[markerId];
           if (this.currentMiniMarker) {
             this.currentMiniMarker.setAnimation(null);

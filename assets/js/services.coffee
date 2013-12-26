@@ -382,8 +382,6 @@ srv.factory('MapService', [() ->
 
     # click handler for a minimap item
     changeLocation: (markerId) ->
-      console.log @idMarkerMap
-      console.log @idMarkerMap[markerId]
       newMarker = @idMarkerMap[markerId]
 
       # deselct the old one if it exists
