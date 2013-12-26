@@ -2,7 +2,6 @@
 ctrl = angular.module("mainModule.controllers", [])
 
 ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map', ($http, $scope, $rootScope, $timeout, Map) ->
-  console.log 'mainctrl'
   $rootScope.overlayIsActive = false
   switchLogs = false
   flow =
@@ -16,9 +15,6 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
   $scope.log = null
   $scope.otherLog = null
 
-  console.log 'var init'
-
-
   dropPins = () ->
     console.log 'drop pins'
     dropPin = (log) ->
@@ -26,7 +22,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         placeMarkerMiniMap(log)
 
     i = 0
-    for logId, log of Map.data.logs
+    for logId, log of Map.logs
       $timeout(dropPin(log),200*i)
       i++
     $timeout(
@@ -41,12 +37,12 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
             switchLoading("small corner")
             if $rootScope.urlEntered?
               console.log 'entered url'
-              if not Map.data.logs[$rootScope.urlEntered].body?
+              if not Map.logs[$rootScope.urlEntered].body?
                 Map.getLog($rootScope.urlEntered)
-                Map.getClosestLogs(Map.data.logs[$rootScope.urlEntered].key)
-                watch = $rootScope.$on('is-loading-log', (event, isLoading) ->
+                Map.getClosestLogs(Map.logs[$rootScope.urlEntered].key)
+                watch = $rootScope.$on('getting-logs', (event, totalLogs) ->
                   console.log 'url watch'
-                  if not isLoading
+                  if totalLogs is 0
                     console.log 'stop watch'
                     showLog($rootScope.urlEntered, true, null, null, null, true)
                     watch()
@@ -56,10 +52,8 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
             else
               showLog(Map.getCurrentLog().id, true, null, null, null, true)
         ,
-        200*Object.keys(Map.data.logs).length
+        200*Object.keys(Map.logs).length
       )
-
-  console.log 'drop pins defined'
 
   $rootScope.$on('map-ready', () ->
     flow.isMapReady = true
@@ -67,54 +61,10 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       unblockBegin()
   )
 
-  console.log 'map ready defined'
-
-  $rootScope.$on('logs-ready', () ->
-    flow.areLogsReady = true
-    if flow.isMapReady
-      unblockBegin()
-  )
-
-  console.log 'logs ready defined'
-
-  $rootScope.$on('first-log-ready', () ->
-    console.log 'first log ready'
-    flow.isFirstLogReady = true
-    if flow.arePinsDropped
-      console.log 'pins are dropped from first log ready'
-      $(".main.fade").removeClass("fadeout")
-      $(".main.fade").addClass("fadein")
-      loadingWatch()
-      switchLoading("small corner")
-      if $rootScope.urlEntered?
-        console.log 'entered url'
-        if not Map.data.logs[$rootScope.urlEntered].body?
-          Map.getLog($rootScope.urlEntered)
-          Map.getClosestLogs(Map.data.logs[$rootScope.urlEntered].key)
-          watch = $rootScope.$on('is-loading-log', (event, isLoading) ->
-            console.log 'url watch'
-            if not isLoading
-              console.log 'stop url watch'
-              showLog($rootScope.urlEntered, true, null, null, null, true)
-              watch()
-          )
-        else
-          showLog($rootScope.urlEntered, true)
-      else
-        console.log "no url entered"
-        showLog(Map.getCurrentLog().id, true, null, null, null, true)
-    else
-      console.log 'pins not dropped yet'
-  )
-
-  console.log 'first log ready defined'
-
   unblockBegin = ()->
     $("#loading").addClass("fadeout")
     $("#start-here").addClass("fadein")
     flow.canBegin = true
-
-  console.log 'unlock begin defined'
 
   $scope.begin = () ->
     if flow.canBegin
@@ -127,15 +77,10 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         dropPins()
       , 500)
 
-  console.log 'begin defined'
-
   window.switchLoading = (classString) ->
     loading = $("#loading")
     loading.removeClass("small big center corner")
     loading.addClass(classString)
-
-  console.log 'switchloading defined'
-
 
   $rootScope.$on('sliding-animation-done', () ->
     console.log 'animation done'
@@ -143,13 +88,11 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
     switchLogs = not switchLogs
   )
 
-  console.log 'sliding animation defined'
-
   showLog = (logId, manualSwitch, invert, dontPushState, notChangeMarker, renderBadgeInMain) ->
     console.log 'showlog'
     if logId?
       console.log 'log id'
-      log = Map.data.logs[logId]
+      log = Map.logs[logId]
       if invert? and invert
         console.log 'invert'
         console.log 'history change'
@@ -188,17 +131,15 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       if manualSwitch? and manualSwitch
         console.log 'manual switch'
         switchLogs = not switchLogs
-      Map.data.current = log.key
+      Map.current = log.key
       if not notChangeMarker? or not notChangeMarker
         changeLocation(logId)
       console.log 'finish showing log'
     else
       console.log 'no logid'
 
-  console.log 'show log defined'
-
   $scope.move = (direction) ->
-    if Map.data.loadingLogs == 0
+    if Map.loadingLogs == 0
       log = Map.move(direction)
       console.log log
       console.log 'showing log'
@@ -210,40 +151,34 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       , 500
       )
 
-  console.log 'move defined'
-
   $rootScope.$on('switch-marker', (event, logId) ->
     console.log "switching marker"
     $(".main" + " .log-author").css({"opacity": 0})
-    if Map.data.logs[logId].body?
+    if Map.logs[logId].body?
       console.log "body exists"
       showLog(logId, false, true, false, false, true)
     else
       console.log "fetching body"
       Map.getLog(logId)
-      Map.getClosestLogs(Map.data.logs[logId].key)
-      watch = $rootScope.$on('is-loading-log', (event, isLoading) ->
+      Map.getClosestLogs(Map.logs[logId].key)
+      watch = $rootScope.$on('getting-logs', (event, isLoading) ->
         if not isLoading
           showLog(logId, false, true, false, false, true)
           watch()
       )
   )
 
-  console.log 'switch marker defined'
-
   loadingWatch = () ->
-    if Map.data.loadingLogs == 0
+    if Map.loadingLogs == 0
       fadeLoading(true)
     else
       fadeLoading(false)
-    $rootScope.$on('is-loading-log', (event, isLoading) ->
+    $rootScope.$on('getting-logs', (event, isLoading) ->
       if isLoading
         fadeLoading(false)
       else
         fadeLoading(true)
     )
-
-  console.log 'loading watch defined'
 
   window.fadeLoading = (fadeOut) ->
     if fadeOut
@@ -253,19 +188,12 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
       $("#loading").removeClass("fadeout")
       $("#loading").addClass("fadein")
 
-
-  console.log 'fadeLoading defined'
-
   window.onpopstate = (event) ->
     if event.state?
       showLog(event.state, false, true, true)
 
-  console.log 'onpopstate defined'
-
   $scope.deactivateOverlay = (view) ->
     $rootScope.overlayIsActive = false
-
-  console.log 'deactivate overlay defined'
 
   $scope.changeShowing = (view) ->
     if !$("#loading").hasClass("fadein")
@@ -276,12 +204,46 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'Map',
         $rootScope.pullFiles()
       $rootScope.setShowing()
 
-  console.log 'changeshowing defined'
-
-  Map.initMap()
-
-  console.log 'map inited'
-
+  Map.initMap().then((logs) ->
+    $rootScope.logs = logs
+  ,null
+  ,(progress) ->
+    switch progress
+      when 0
+        flow.areLogsReady = true
+        if flow.isMapReady
+          unblockBegin()
+      when 1
+        console.log 'first log ready'
+        flow.isFirstLogReady = true
+        if flow.arePinsDropped
+          console.log 'pins are dropped from first log ready'
+          $(".main.fade").removeClass("fadeout")
+          $(".main.fade").addClass("fadein")
+          loadingWatch()
+          switchLoading("small corner")
+          if $rootScope.urlEntered?
+            console.log 'entered url'
+            if not Map.logs[$rootScope.urlEntered].body?
+              Map.getLog($rootScope.urlEntered)
+              Map.getClosestLogs(Map.logs[$rootScope.urlEntered].key)
+              watch = $rootScope.$on('getting-logs', (event, isLoading) ->
+                console.log 'url watch'
+                if not isLoading
+                  console.log 'stop url watch'
+                  showLog($rootScope.urlEntered, true, null, null, null, true)
+                  watch()
+              )
+            else
+              showLog($rootScope.urlEntered, true)
+          else
+            console.log "no url entered"
+            showLog(Map.getCurrentLog().id, true, null, null, null, true)
+        else
+          console.log 'pins not dropped yet'
+      when 2
+        console.log 'other logs ready'
+  )
 
 ])
 

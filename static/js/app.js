@@ -9,15 +9,8 @@
     var logId;
     logId = window.location.pathname.slice(5);
     if (logId !== "") {
-      $rootScope.urlEntered = logId;
+      return $rootScope.urlEntered = logId;
     }
-    return $rootScope.$watch(function() {
-      return angular.element('body').scope();
-    }, function(oldScope, newScope) {
-      console.log(oldScope);
-      console.log(newScope);
-      return console.log;
-    });
   });
 
 }).call(this);

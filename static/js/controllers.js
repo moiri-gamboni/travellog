@@ -8,7 +8,6 @@
   ctrl.controller("mainCtrl", [
     '$http', '$scope', '$rootScope', '$timeout', 'Map', function($http, $scope, $rootScope, $timeout, Map) {
       var dropPins, flow, loadingWatch, showLog, switchLogs, unblockBegin;
-      console.log('mainctrl');
       $rootScope.overlayIsActive = false;
       switchLogs = false;
       flow = {
@@ -22,7 +21,6 @@
       };
       $scope.log = null;
       $scope.otherLog = null;
-      console.log('var init');
       dropPins = function() {
         var dropPin, i, log, logId, _ref;
         console.log('drop pins');
@@ -32,7 +30,7 @@
           };
         };
         i = 0;
-        _ref = Map.data.logs;
+        _ref = Map.logs;
         for (logId in _ref) {
           log = _ref[logId];
           $timeout(dropPin(log), 200 * i);
@@ -50,12 +48,12 @@
             switchLoading("small corner");
             if ($rootScope.urlEntered != null) {
               console.log('entered url');
-              if (Map.data.logs[$rootScope.urlEntered].body == null) {
+              if (Map.logs[$rootScope.urlEntered].body == null) {
                 Map.getLog($rootScope.urlEntered);
-                Map.getClosestLogs(Map.data.logs[$rootScope.urlEntered].key);
-                return watch = $rootScope.$on('is-loading-log', function(event, isLoading) {
+                Map.getClosestLogs(Map.logs[$rootScope.urlEntered].key);
+                return watch = $rootScope.$on('getting-logs', function(event, totalLogs) {
                   console.log('url watch');
-                  if (!isLoading) {
+                  if (totalLogs === 0) {
                     console.log('stop watch');
                     showLog($rootScope.urlEntered, true, null, null, null, true);
                     return watch();
@@ -68,64 +66,19 @@
               return showLog(Map.getCurrentLog().id, true, null, null, null, true);
             }
           }
-        }, 200 * Object.keys(Map.data.logs).length);
+        }, 200 * Object.keys(Map.logs).length);
       };
-      console.log('drop pins defined');
       $rootScope.$on('map-ready', function() {
         flow.isMapReady = true;
         if (flow.areLogsReady) {
           return unblockBegin();
         }
       });
-      console.log('map ready defined');
-      $rootScope.$on('logs-ready', function() {
-        flow.areLogsReady = true;
-        if (flow.isMapReady) {
-          return unblockBegin();
-        }
-      });
-      console.log('logs ready defined');
-      $rootScope.$on('first-log-ready', function() {
-        var watch;
-        console.log('first log ready');
-        flow.isFirstLogReady = true;
-        if (flow.arePinsDropped) {
-          console.log('pins are dropped from first log ready');
-          $(".main.fade").removeClass("fadeout");
-          $(".main.fade").addClass("fadein");
-          loadingWatch();
-          switchLoading("small corner");
-          if ($rootScope.urlEntered != null) {
-            console.log('entered url');
-            if (Map.data.logs[$rootScope.urlEntered].body == null) {
-              Map.getLog($rootScope.urlEntered);
-              Map.getClosestLogs(Map.data.logs[$rootScope.urlEntered].key);
-              return watch = $rootScope.$on('is-loading-log', function(event, isLoading) {
-                console.log('url watch');
-                if (!isLoading) {
-                  console.log('stop url watch');
-                  showLog($rootScope.urlEntered, true, null, null, null, true);
-                  return watch();
-                }
-              });
-            } else {
-              return showLog($rootScope.urlEntered, true);
-            }
-          } else {
-            console.log("no url entered");
-            return showLog(Map.getCurrentLog().id, true, null, null, null, true);
-          }
-        } else {
-          return console.log('pins not dropped yet');
-        }
-      });
-      console.log('first log ready defined');
       unblockBegin = function() {
         $("#loading").addClass("fadeout");
         $("#start-here").addClass("fadein");
         return flow.canBegin = true;
       };
-      console.log('unlock begin defined');
       $scope.begin = function() {
         if (flow.canBegin) {
           $("#launch-screen").addClass("fadeout");
@@ -138,26 +91,23 @@
           }, 500);
         }
       };
-      console.log('begin defined');
       window.switchLoading = function(classString) {
         var loading;
         loading = $("#loading");
         loading.removeClass("small big center corner");
         return loading.addClass(classString);
       };
-      console.log('switchloading defined');
       $rootScope.$on('sliding-animation-done', function() {
         console.log('animation done');
         console.log('\n');
         return switchLogs = !switchLogs;
       });
-      console.log('sliding animation defined');
       showLog = function(logId, manualSwitch, invert, dontPushState, notChangeMarker, renderBadgeInMain) {
         var log;
         console.log('showlog');
         if (logId != null) {
           console.log('log id');
-          log = Map.data.logs[logId];
+          log = Map.logs[logId];
           if ((invert != null) && invert) {
             console.log('invert');
             console.log('history change');
@@ -204,7 +154,7 @@
             console.log('manual switch');
             switchLogs = !switchLogs;
           }
-          Map.data.current = log.key;
+          Map.current = log.key;
           if ((notChangeMarker == null) || !notChangeMarker) {
             changeLocation(logId);
           }
@@ -213,10 +163,9 @@
           return console.log('no logid');
         }
       };
-      console.log('show log defined');
       $scope.move = function(direction) {
         var log;
-        if (Map.data.loadingLogs === 0) {
+        if (Map.loadingLogs === 0) {
           log = Map.move(direction);
           console.log(log);
           console.log('showing log');
@@ -228,21 +177,20 @@
           }, 500);
         }
       };
-      console.log('move defined');
       $rootScope.$on('switch-marker', function(event, logId) {
         var watch;
         console.log("switching marker");
         $(".main" + " .log-author").css({
           "opacity": 0
         });
-        if (Map.data.logs[logId].body != null) {
+        if (Map.logs[logId].body != null) {
           console.log("body exists");
           return showLog(logId, false, true, false, false, true);
         } else {
           console.log("fetching body");
           Map.getLog(logId);
-          Map.getClosestLogs(Map.data.logs[logId].key);
-          return watch = $rootScope.$on('is-loading-log', function(event, isLoading) {
+          Map.getClosestLogs(Map.logs[logId].key);
+          return watch = $rootScope.$on('getting-logs', function(event, isLoading) {
             if (!isLoading) {
               showLog(logId, false, true, false, false, true);
               return watch();
@@ -250,14 +198,13 @@
           });
         }
       });
-      console.log('switch marker defined');
       loadingWatch = function() {
-        if (Map.data.loadingLogs === 0) {
+        if (Map.loadingLogs === 0) {
           fadeLoading(true);
         } else {
           fadeLoading(false);
         }
-        return $rootScope.$on('is-loading-log', function(event, isLoading) {
+        return $rootScope.$on('getting-logs', function(event, isLoading) {
           if (isLoading) {
             return fadeLoading(false);
           } else {
@@ -265,7 +212,6 @@
           }
         });
       };
-      console.log('loading watch defined');
       window.fadeLoading = function(fadeOut) {
         if (fadeOut) {
           $("#loading").addClass("fadeout");
@@ -275,17 +221,14 @@
           return $("#loading").addClass("fadein");
         }
       };
-      console.log('fadeLoading defined');
       window.onpopstate = function(event) {
         if (event.state != null) {
           return showLog(event.state, false, true, true);
         }
       };
-      console.log('onpopstate defined');
       $scope.deactivateOverlay = function(view) {
         return $rootScope.overlayIsActive = false;
       };
-      console.log('deactivate overlay defined');
       $scope.changeShowing = function(view) {
         if (!$("#loading").hasClass("fadein")) {
           $rootScope.loadingposition = "big center";
@@ -297,9 +240,54 @@
           return $rootScope.setShowing();
         }
       };
-      console.log('changeshowing defined');
-      Map.initMap();
-      return console.log('map inited');
+      return Map.initMap().then(function(logs) {
+        return $rootScope.logs = logs;
+      }, null, function(progress) {
+        var watch;
+        switch (progress) {
+          case 0:
+            flow.areLogsReady = true;
+            if (flow.isMapReady) {
+              return unblockBegin();
+            }
+            break;
+          case 1:
+            console.log('first log ready');
+            flow.isFirstLogReady = true;
+            if (flow.arePinsDropped) {
+              console.log('pins are dropped from first log ready');
+              $(".main.fade").removeClass("fadeout");
+              $(".main.fade").addClass("fadein");
+              loadingWatch();
+              switchLoading("small corner");
+              if ($rootScope.urlEntered != null) {
+                console.log('entered url');
+                if (Map.logs[$rootScope.urlEntered].body == null) {
+                  Map.getLog($rootScope.urlEntered);
+                  Map.getClosestLogs(Map.logs[$rootScope.urlEntered].key);
+                  return watch = $rootScope.$on('getting-logs', function(event, isLoading) {
+                    console.log('url watch');
+                    if (!isLoading) {
+                      console.log('stop url watch');
+                      showLog($rootScope.urlEntered, true, null, null, null, true);
+                      return watch();
+                    }
+                  });
+                } else {
+                  return showLog($rootScope.urlEntered, true);
+                }
+              } else {
+                console.log("no url entered");
+                return showLog(Map.getCurrentLog().id, true, null, null, null, true);
+              }
+            } else {
+              return console.log('pins not dropped yet');
+            }
+            break;
+          case 2:
+            return console.log('other logs ready');
+        }
+      });
     }
   ]);
 

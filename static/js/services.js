@@ -5,114 +5,148 @@
 
   srv = angular.module("mainModule.services", []);
 
-  srv.factory('Map', [
+  srv.factory('Resources', [
     '$http', '$rootScope', function($http, $rootScope) {
       var factory;
       factory = {
-        data: {
-          logs: {},
-          countries: {},
-          latLogs: [],
-          lngLogs: [],
-          current: null,
-          loadingLogs: 0
+        getRequest: function(endpoint, params) {
+          var promise;
+          promise = null;
+          if (params != null) {
+            promise = $http.get(window.location.protocol + "//" + window.location.host + endpoint, {
+              params: params
+            });
+          } else {
+            promise = $http.get(window.location.protocol + "//" + window.location.host + endpoint);
+          }
+          promise.error(function(data, status, headers, config) {
+            console.log(data);
+            return alert("Unknown Error, please try again later.");
+          });
+          return promise;
         },
+        postRequest: function(endpoint, params) {
+          var promise;
+          promise = null;
+          if (params != null) {
+            promise = $http.post(window.location.protocol + "//" + window.location.host + endpoint, params);
+          } else {
+            promise = $http.post(window.location.protocol + "//" + window.location.host + endpoint);
+          }
+          promise.error(function(data, status, headers, config) {
+            console.log(data);
+            return alert("Unknown Error, please try again later.");
+          });
+          return promise;
+        },
+        deleteRequest: function(endpoint, params) {
+          var promise;
+          promise = null;
+          if (params != null) {
+            promise = $http["delete"](window.location.protocol + "//" + window.location.host + endpoint, {
+              params: params
+            });
+          } else {
+            promise = $http["delete"](window.location.protocol + "//" + window.location.host + endpoint);
+          }
+          promise.error(function(data, status, headers, config) {
+            console.log(data);
+            return alert("Unknown Error, please try again later.");
+          });
+          return promise;
+        },
+        getCountries: function() {
+          return this.getRequest('/countries');
+        },
+        getLogs: function() {
+          return this.getRequest('/logs');
+        },
+        getLog: function(logId) {
+          return this.getRequest('/logs', {
+            id: logId
+          });
+        },
+        createLog: function(googleDriveId, lat, lng, country) {
+          return $postRequest('/logs' + {
+            gdriveId: googleDriveId,
+            lat: lat,
+            lng: lng,
+            country: country
+          });
+        }
+      };
+      return factory;
+    }
+  ]);
+
+  srv.factory('Map', [
+    '$q', '$http', '$rootScope', 'Resources', function($q, $http, $rootScope, Resources) {
+      var factory, res;
+      res = Resources;
+      factory = {
+        logs: {},
+        countries: {},
+        sortedLogs: {},
+        current: null,
+        loadingLogs: 0,
         getCurrentLog: function() {
-          console.log('get current log');
-          if ((factory.data.current != null) && (factory.data.lngLogs != null) && (factory.data.lngLogs[factory.data.current[0]] != null)) {
-            return factory.data.logs[factory.data.lngLogs[factory.data.current[0]].id];
+          if ((this.current != null) && (this.sortedLogs.lng != null) && (this.sortedLogs.lng[this.current[0]] != null)) {
+            return this.logs[this.sortedLogs.lng[this.current[0]]];
           } else {
             return null;
           }
         },
-        getLogs: function(success) {
-          var get;
-          return get = $http.get(window.location.protocol + "//" + window.location.host + "/logs").success(success).error(function(data, status, headers, config) {
-            console.log('getLogs error');
-            return console.log(data);
-          });
-        },
         move: function(direction) {
           var change, newCurrentLog;
-          console.log('move');
           change = direction === 'N' || direction === 'E' ? +1 : -1;
           if (direction === 'N' || direction === 'S') {
-            newCurrentLog = factory.data.logs[factory.data.latLogs[mod(factory.data.current[1] + change, factory.data.latLogs.length)].id];
+            newCurrentLog = this.logs[this.sortedLogs.lat[mod(this.current[1] + change, this.sortedLogs.lat.length)]];
           } else {
-            newCurrentLog = factory.data.logs[factory.data.lngLogs[mod(factory.data.current[0] + change, factory.data.latLogs.length)].id];
+            newCurrentLog = this.logs[this.sortedLogs.lng[mod(this.current[0] + change, this.sortedLogs.lat.length)]];
           }
-          factory.getClosestLogs(newCurrentLog.key);
-          factory.data.current = newCurrentLog.key;
-          console.log('move done');
-          return newCurrentLog;
+          this.current = newCurrentLog.key;
+          return this.getClosestLogs(newCurrentLog.key);
         },
-        getLog: function(logId, callback) {
-          var get;
-          console.log('get log');
-          if (factory.data.logs[logId].body == null) {
-            console.log('has no body');
-            factory.data.loadingLogs++;
-            $rootScope.$broadcast('is-loading-log', true);
-            get = $http.get(window.location.protocol + "//" + window.location.host + "/logs", {
-              params: {
-                id: logId
-              }
+        getLog: function(logId) {
+          var deferred;
+          deferred = $q.defer();
+          if (this.logs[logId].body == null) {
+            this.loadingLogs++;
+            $rootScope.$broadcast('getting-logs', this.loadingLogs);
+            res.getLog(logId).success(function(data) {
+              factory.logs[data.log.id].title = data.log.title;
+              factory.logs[data.log.id].profileId = data.log.profileId;
+              factory.logs[data.log.id].profileName = data.log.profileName;
+              factory.logs[data.log.id].body = data.log.body;
+              return deferred.resolve(factory.logs[data.log.id]);
+            }).error(function(data) {
+              console.log('getlog error');
+              return deferred.reject({
+                msg: 'getLog error',
+                err: data
+              });
+            })["finally"](function() {
+              factory.loadingLogs--;
+              return $rootScope.$broadcast('getting-logs', factory.loadingLogs);
             });
-            if (callback != null) {
-              return get.success(function(data, status, headers, config) {
-                console.log('get log success');
-                factory.data.loadingLogs--;
-                callback(data, status, headers, config);
-                if (factory.data.loadingLogs === 0) {
-                  return $rootScope.$broadcast('is-loading-log', false);
-                }
-              }).error(function(data, status, headers, config) {
-                console.log('get log error');
-                console.log(data);
-                factory.data.loadingLogs--;
-                if (factory.data.loadingLogs === 0) {
-                  return $rootScope.$broadcast('is-loading-log', false);
-                }
-              });
-            } else {
-              return get.success(function(data, status, headers, config) {
-                console.log('get log success');
-                console.log(data.log);
-                factory.data.loadingLogs--;
-                factory.data.logs[data.log.id].title = data.log.title;
-                factory.data.logs[data.log.id].profileId = data.log.profileId;
-                factory.data.logs[data.log.id].profileName = data.log.profileName;
-                factory.data.logs[data.log.id].body = data.log.body;
-                if (factory.data.loadingLogs === 0) {
-                  return $rootScope.$broadcast('is-loading-log', false);
-                }
-              }).error(function(data, status, headers, config) {
-                console.log('get log error');
-                console.log(data);
-                factory.data.loadingLogs--;
-                if (factory.data.loadingLogs === 0) {
-                  return $rootScope.$broadcast('is-loading-log', false);
-                }
-              });
-            }
+            return deferred.promise;
           }
         },
         getClosestLogs: function(logKey) {
-          var change, direction, location, _i, _len, _ref, _results;
-          console.log('get get closests logs');
+          var change, direction, location, logPromises, _i, _len, _ref;
+          logPromises = [];
           _ref = ['N', 'E', 'S', 'W'];
-          _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             direction = _ref[_i];
             change = direction === 'N' || direction === 'E' ? +1 : -1;
             if (direction === 'N' || direction === 'S') {
-              location = factory.data.logs[factory.data.latLogs[mod(logKey[1] + change, factory.data.latLogs.length)].id];
+              location = this.logs[this.sortedLogs.lat[mod(logKey[1] + change, this.sortedLogs.lat.length)]];
             } else {
-              location = factory.data.logs[factory.data.lngLogs[mod(logKey[0] + change, factory.data.lngLogs.length)].id];
+              location = this.logs[this.sortedLogs.lng[mod(logKey[0] + change, this.sortedLogs.lng.length)]];
             }
-            _results.push(factory.getLog(location.id));
+            logPromises.push(this.getLog(location.id));
           }
-          return _results;
+          return $q.all(logPromises);
         },
         getClosestLocation: function(from, direction) {
           var breakLoop, change, i, tempKey, tempLog, wrapNumber, _i, _len, _ref;
@@ -126,30 +160,30 @@
               break;
             }
             if (direction === 'N' || direction === 'S') {
-              i = Math.abs(mod(from[1] + change, factory.data.latLogs.length));
+              i = Math.abs(mod(from[1] + change, this.sortedLogs.lat.length));
               while (i !== from[1]) {
                 tempKey[1] = i;
-                tempLog = factory.data.latLogs[tempKey[1]];
-                tempKey = factory.data.logs[tempLog.id].key;
+                tempLog = this.sortedLogs.lat[tempKey[1]];
+                tempKey = this.logs[tempLog.id].key;
                 return tempKey;
-                if (factory.inRange(from, tempKey, direction, wrapNumber)) {
+                if (this.inRange(from, tempKey, direction, wrapNumber)) {
                   breakLoop = true;
                   break;
                 }
-                i = Math.abs(mod(i + change, factory.data.latLogs.length));
+                i = Math.abs(mod(i + change, this.sortedLogs.lat.length));
               }
             } else {
-              i = Math.abs(mod(from[0] + change, factory.data.lngLogs.length));
+              i = Math.abs(mod(from[0] + change, this.sortedLogs.lng.length));
               while (i !== from[0]) {
                 tempKey[0] = i;
-                tempLog = factory.data.lngLogs[tempKey[0]];
-                tempKey = factory.data.logs[tempLog.id].key;
+                tempLog = this.sortedLogs.lng[tempKey[0]];
+                tempKey = this.logs[tempLog.id].key;
                 return tempKey;
-                if (factory.inRange(from, tempKey, direction, wrapNumber)) {
+                if (this.inRange(from, tempKey, direction, wrapNumber)) {
                   breakLoop = true;
                   break;
                 }
-                i = Math.abs(mod(i + change, factory.data.lngLogs.length));
+                i = Math.abs(mod(i + change, this.sortedLogs.lng.length));
               }
             }
           }
@@ -157,8 +191,8 @@
         },
         inRange: function(from, to, direction, wrapNumber) {
           var gradient, wrapDirection;
-          from = factory.data.lngLogs[from[0]];
-          to = factory.data.lngLogs[to[0]];
+          from = this.sortedLogs.lng[from[0]];
+          to = this.sortedLogs.lng[to[0]];
           wrapDirection = direction === 'N' || direction === 'E' ? 1 : -1;
           gradient = ((to.lat + wrapDirection * wrapNumber * 90) - from.lat) / ((to.lng + wrapDirection * wrapNumber * 180) - from.lng);
           if (direction === 'N' || direction === 'S') {
@@ -183,63 +217,55 @@
             }
           }
         },
-        updateAllLogs: function() {
-          return 1 + 1;
-        },
-        initMap: function() {
-          var getLogsCallback;
-          getLogsCallback = function(mapData) {
-            return function(data, status, headers, config) {
-              var i, id, keys, log, _i, _j, _len, _len1, _ref, _ref1;
-              console.log('get logs success');
-              $rootScope.$broadcast('logs-ready');
-              mapData.latLogs = data.logs.slice().sort(function(b, a) {
-                return b.lat - a.lat;
-              });
-              console.log('sort lats');
-              _ref = mapData.latLogs;
-              for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
-                log = _ref[i];
-                mapData.logs[log.id] = {
-                  id: log.id,
-                  body: null,
-                  title: null,
-                  profileId: null,
-                  profileName: null,
-                  lat: log.lat,
-                  lng: log.lng,
-                  key: [null, i]
-                };
-              }
-              console.log('build logs data');
-              mapData.lngLogs = data.logs.slice().sort(function(b, a) {
-                return b.lng - a.lng;
-              });
-              console.log('sort lngs');
-              _ref1 = mapData.lngLogs;
-              for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
-                log = _ref1[i];
-                mapData.logs[log.id].key = [i, mapData.logs[log.id].key[1]];
-              }
-              console.log('rebuild logs data');
-              keys = Object.keys(mapData.logs);
-              mapData.current = mapData.logs[keys[(Math.random() * keys.length) >> 0]].key;
-              id = mapData.lngLogs[factory.data.current[0]].id;
-              factory.getLog(id, function(data, status, headers, config) {
-                console.log('get first log success');
-                factory.data.logs[data.log.id].title = data.log.title;
-                factory.data.logs[data.log.id].profileId = data.log.profileId;
-                factory.data.logs[data.log.id].profileName = data.log.profileName;
-                factory.data.logs[data.log.id].body = data.log.body;
-                return $rootScope.$broadcast('first-log-ready');
-              });
-              console.log('map init before closest logs done');
-              factory.getClosestLogs(factory.data.current);
-              return console.log('map init after closest logs');
-            };
-          };
-          factory.getLogs(getLogsCallback(factory.data));
-          return console.log('map init done');
+        initMap: function(logId) {
+          var deferred;
+          deferred = $q.defer();
+          res.getLogs().success(function(data) {
+            var i, keys, log, _i, _j, _len, _len1, _ref, _ref1;
+            deferred.notify(0);
+            factory.sortedLogs.lat = data.logs.slice().sort(function(b, a) {
+              return b.lat - a.lat;
+            });
+            _ref = factory.sortedLogs.lat;
+            for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+              log = _ref[i];
+              factory.sortedLogs.lat[i] = log.id;
+              factory.logs[log.id] = {
+                id: log.id,
+                body: null,
+                title: null,
+                profileId: null,
+                profileName: null,
+                lat: log.lat,
+                lng: log.lng,
+                key: [null, i]
+              };
+            }
+            factory.sortedLogs.lng = data.logs.slice().sort(function(b, a) {
+              return b.lng - a.lng;
+            });
+            _ref1 = factory.sortedLogs.lng;
+            for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
+              log = _ref1[i];
+              factory.sortedLogs.lng[i] = log.id;
+              factory.logs[log.id].key = [i, factory.logs[log.id].key[1]];
+            }
+            if (logId == null) {
+              keys = Object.keys(factory.logs);
+              factory.current = factory.logs[keys[(Math.random() * keys.length) >> 0]].key;
+              logId = factory.sortedLogs.lng[factory.current[0]];
+            } else {
+              factory.current = factory.logs[logId].key;
+            }
+            return factory.getLog(logId).then(function(logdata) {
+              deferred.notify(1);
+              return factory.getClosestLogs(factory.current);
+            }).then(function(data) {
+              deferred.notify(2);
+              return deferred.resolve(factory.logs);
+            });
+          });
+          return deferred.promise;
         }
       };
       return factory;
