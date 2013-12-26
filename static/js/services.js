@@ -528,7 +528,7 @@
             icon: this.icons.unvisited
           });
           this.idMarkerMap[log_object.id] = marker;
-          return google.maps.event.addListener(marker, "click", switchMiniMarker);
+          return google.maps.event.addListener(marker, "click", this.switchMiniMarker);
         },
         reverseGeocode: function(latlng, callback) {
           return this.geocoder.geocode({

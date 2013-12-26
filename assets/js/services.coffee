@@ -415,7 +415,7 @@ srv.factory('MapService', [() ->
         icon: @icons.unvisited
       )
       @idMarkerMap[log_object.id] = marker
-      google.maps.event.addListener(marker, "click", switchMiniMarker)
+      google.maps.event.addListener(marker, "click", @switchMiniMarker)
 
     # reverse geocoder modified from code example
     reverseGeocode: (latlng, callback) ->
