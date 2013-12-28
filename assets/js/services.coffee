@@ -67,7 +67,7 @@ srv.factory('Resources', ['$http', '$rootScope', ($http, $rootScope) ->
   return factory
 ])
 
-srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', 'MapService', ($q, $http, $rootScope, Resources, MapService) ->
+srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', 'MapService', '$timeout', ($q, $http, $rootScope, Resources, MapService, $timeout) ->
   res = Resources
   factory =
     logs: {}
@@ -114,17 +114,32 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', 'MapService
 
     # geolocate all logs (for backwards compatibility)
     refreshAllLogsLocation: () ->
+      i = 0
       for k, log of @logs
-        if not log.country or log.country == "None"
-          location = new google.maps.LatLng(log.lat, log.lng)
-          MapService.reverseGeocode(location, (formatted_address, countryName) ->
-            console.log window.location.origin + "/" + log.id + "/edit"
-            $.post(window.location.origin + "/log/" + log.id + "/edit",
-              JSON.stringify({country: countryName}), (resp) ->
-                console.log(resp)
-                console.log("updated log")
+        do (log) =>
+          $timeout( () =>
+            location = new google.maps.LatLng(log.lat, log.lng)
+            MapService.reverseGeocode(location, (formatted_address, countryName) =>
+              if not @countries[countryName]?
+                MapService.geocode(countryName, (location) =>
+                  $.post(window.location.origin + "/log/" + log.id + "/edit",
+                  JSON.stringify({
+                    country: countryName
+                    countryLat: location.lat()
+                    countryLng: location.lng()
+                  }), (resp) ->
+                    console.log("updated log with new geocode")
+                  )
+                )
+              else
+                console.log("attempting geocode with existing country " + countryName)
+                $.post(window.location.origin + "/log/" + log.id + "/edit",
+                  JSON.stringify({country: countryName}), (resp) ->
+                    console.log("updated log")
+                )
             )
-          )
+          , 2000*i)
+        i++
 
     getClosestLogs: (logKey) ->
       logPromises = []
@@ -441,17 +456,20 @@ srv.factory('MapService', [() ->
         latLng: latlng
       , (results, status) ->
         if status is google.maps.GeocoderStatus.OK
-          if results[1]
-            console.log "Results are:"
-            formatted_address = results[1].formatted_address
-            countryName = results[1].address_components[results[1].address_components.length - 1].long_name
-            console.log formatted_address
-            console.log countryName
+          if results.length > 0
+            formatted_address = results[0].formatted_address
+            for component in results[0].address_components
+              if component.types == "country" or "country" in component.types
+                countryName = component.long_name
+                break
+            countryName ?= "Other"
             typeof callback is "function" and callback(formatted_address, countryName)
           else
             console.log "No results found"
         else
           console.log "Geocoder failed due to: " + status
+          console.log latlng
+          typeof callback is "function" and callback("Other", "Other")
 
     geocode: (countryName, callback) ->
       @geocoder.geocode
