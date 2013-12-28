@@ -226,7 +226,7 @@
   ]);
 
   ctrl.controller("MyFilesController", [
-    '$http', '$scope', '$rootScope', '$timeout', 'User', function($http, $scope, $rootScope, $timeout, User) {
+    '$http', '$scope', '$rootScope', '$timeout', 'User', 'MapService', function($http, $scope, $rootScope, $timeout, User, MapService) {
       $rootScope.showing = 'loading';
       $scope.display = 'loading';
       $rootScope.loggedIn = false;
@@ -265,11 +265,6 @@
           return $rootScope.setShowing();
         });
       });
-      $rootScope.$on('addLogServiceSelected', function() {
-        return $scope.$apply(function() {
-          return $scope.addLogServiceSelected = true;
-        });
-      });
       $scope.submitAgain = function() {
         $scope.complete = false;
         return $rootScope.setShowing();
@@ -293,7 +288,7 @@
           });
           return angular.element("html").scope().$broadcast('update-load');
         });
-        return startAddLogService();
+        return MapService.startAddMap();
       };
       $rootScope.setShowing = function() {
         var returnVal;
@@ -321,7 +316,7 @@
               fadeLoading(true);
             }
             setTimeout(function() {
-              return google.maps.event.trigger(addLogService, 'resize');
+              return google.maps.event.trigger(MapService.addMap, 'resize');
             }, 200);
             returnVal = 'loggedIn';
           } else {
@@ -335,7 +330,7 @@
         return $scope.display = returnVal;
       };
       $scope.canSubmit = function() {
-        return $scope.addLogServiceSelected && ($scope.selectedFile != null);
+        return MapService.addMapMarker && ($scope.selectedFile != null);
       };
       $scope.activateOverlay = function(view) {
         $rootScope.overlayIsActive = true;
@@ -347,13 +342,19 @@
       $scope.upload = function() {
         var payload;
         if (!$scope.canSubmit()) {
+          $(".white.small").css({
+            color: "red"
+          });
+          $timeout(function() {
+            return $(".white.small").css("");
+          }, 2000);
           return;
         }
         switchLoading("big center");
         payload = {
           gdriveId: $scope.selectedFile.id,
-          lat: addLogServiceMarker.position.lat(),
-          lng: addLogServiceMarker.position.lng()
+          lat: MapService.addMapMarker.position.lat(),
+          lng: MapService.addMapMarker.position.lng()
         };
         if (User.isPlusUser != null) {
           payload.profileId = User.id;
@@ -364,23 +365,33 @@
         $scope.loading = true;
         $rootScope.setShowing();
         return makePublic(payload.gdriveId, function(resp) {
-          return addToTravellog(payload.gdriveId, function(resp) {
-            return $http({
-              method: "POST",
-              url: "/logs",
-              data: payload
-            }).success(function(data, status, headers, config) {
-              $scope.loading = false;
-              $scope.complete = true;
-              $rootScope.setShowing();
-              if (data.status === 200) {
-                $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id;
-                return $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:";
-              } else {
-                $scope.completeUrl = "";
-                return $scope.successMessage = data.error;
-              }
-            }).error(function(data, status, headers, config) {});
+          var location;
+          location = new google.maps.LatLng(payload.lat, payload.lng);
+          return MapService.reverseGeocode(location, function(formatted_address, countryName) {
+            var _this = this;
+            payload.country = countryName;
+            return MapService.geocode(countryName, function(location) {
+              payload.countryLat = location.lat();
+              payload.countryLng = location.lng();
+              return addToTravellog(payload.gdriveId, function(resp) {
+                return $http({
+                  method: "POST",
+                  url: "/logs",
+                  data: payload
+                }).success(function(data, status, headers, config) {
+                  $scope.loading = false;
+                  $scope.complete = true;
+                  $rootScope.setShowing();
+                  if (data.status === 200) {
+                    $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id;
+                    return $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:";
+                  } else {
+                    $scope.completeUrl = "";
+                    return $scope.successMessage = data.error;
+                  }
+                }).error(function(data, status, headers, config) {});
+              });
+            });
           });
         });
       };

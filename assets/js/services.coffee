@@ -267,6 +267,7 @@ srv.factory('MapService', [() ->
     geocoder: null
     addMapMarker: null
     miniMap: null
+    addMap: null
     icons:
       current: "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png"
       visited: "http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png"
@@ -388,16 +389,15 @@ srv.factory('MapService', [() ->
           ]
         ]
 
-      addMap = new google.maps.Map(document.getElementById("add-map-canvas"), mapOptions)
-      google.maps.event.addListener(addMap, "click", (event) ->
-        angular.element("html").scope().$broadcast("addMapSelected")
+      @addMap = new google.maps.Map(document.getElementById("add-map-canvas"), mapOptions)
+      google.maps.event.addListener(@addMap, "click", (event) =>
         if @addMapMarker?
           @addMapMarker.setPosition(event.latLng)
         else
           @addMapMarker = new google.maps.Marker(
             position: event.latLng
             animation: google.maps.Animation.BOUNCE
-            map: addMap
+            map: @addMap
           )
       )
 

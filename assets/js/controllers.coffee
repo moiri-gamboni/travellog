@@ -189,7 +189,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
 
 ])
 
-ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout', 'User', ($http, $scope, $rootScope, $timeout, User) ->
+ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout', 'User', 'MapService', ($http, $scope, $rootScope, $timeout, User, MapService) ->
     #if user is signed_in
   #$scope.map = LogService
   $rootScope.showing = 'loading'
@@ -229,10 +229,6 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
       $rootScope.setShowing()
   )
 
-  $rootScope.$on('addLogServiceSelected', () ->
-    $scope.$apply ()->
-      $scope.addLogServiceSelected = true
-  )
   $scope.submitAgain = () ->
     $scope.complete = false
     $rootScope.setShowing()
@@ -255,9 +251,9 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
         , 500
         )
       )
-      angular.element("html").scope().$broadcast('update-load');
+      angular.element("html").scope().$broadcast('update-load')
     )
-    startAddLogService()
+    MapService.startAddMap()
 
   $rootScope.setShowing = () ->
     returnVal = ""
@@ -280,7 +276,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
         else if $rootScope.overlayIsActive and $scope.filesLoaded
           fadeLoading(true)
         setTimeout( ()->
-          google.maps.event.trigger(addLogService, 'resize')
+          google.maps.event.trigger(MapService.addMap, 'resize')
         , 200)
         returnVal = 'loggedIn'
       else
@@ -291,7 +287,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
     $scope.display = returnVal
 
   $scope.canSubmit = () ->
-    return $scope.addLogServiceSelected and $scope.selectedFile?
+    return MapService.addMapMarker and $scope.selectedFile?
 
   $scope.activateOverlay = (view) ->
     $rootScope.overlayIsActive = true
@@ -302,38 +298,51 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
 
   $scope.upload = () ->
     if not $scope.canSubmit()
+      $(".white.small").css({color: "red"})
+      $timeout(() ->
+        $(".white.small").css("")
+      , 2000)
       return
     switchLoading("big center")
     payload =
       gdriveId: $scope.selectedFile.id
-      lat: addLogServiceMarker.position.lat()
-      lng: addLogServiceMarker.position.lng()
+      lat: MapService.addMapMarker.position.lat()
+      lng: MapService.addMapMarker.position.lng()
 
     if User.isPlusUser?
       payload.profileId = User.id
     else
       payload.profileName = User.name
+
     $scope.loadingMessage = "Sharing your story!"
     $scope.loading = true
     $rootScope.setShowing()
     makePublic(payload.gdriveId, (resp) ->
-      addToTravellog(payload.gdriveId, (resp) ->
-        $http(
-          method: "POST"
-          url: "/logs"
-          data: payload
-        ).success((data, status, headers, config) ->
-         $scope.loading = false
-         $scope.complete = true
-         $rootScope.setShowing()
-         if data.status == 200
-            $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id
-            $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:"
-          else
-            $scope.completeUrl = ""
-            $scope.successMessage = data.error
-        ).error (data, status, headers, config) ->
-          return
+      location = new google.maps.LatLng(payload.lat, payload.lng)
+      MapService.reverseGeocode(location, (formatted_address, countryName) ->
+        payload.country = countryName
+        MapService.geocode(countryName, (location) =>
+          payload.countryLat = location.lat()
+          payload.countryLng = location.lng()
+          addToTravellog(payload.gdriveId, (resp) ->
+            $http(
+              method: "POST"
+              url: "/logs"
+              data: payload
+            ).success((data, status, headers, config) ->
+             $scope.loading = false
+             $scope.complete = true
+             $rootScope.setShowing()
+             if data.status == 200
+                $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id
+                $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:"
+              else
+                $scope.completeUrl = ""
+                $scope.successMessage = data.error
+            ).error (data, status, headers, config) ->
+              return
+          )
+        )
       )
     )
 

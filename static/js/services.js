@@ -333,6 +333,7 @@
         geocoder: null,
         addMapMarker: null,
         miniMap: null,
+        addMap: null,
         icons: {
           current: "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png",
           visited: "http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png",
@@ -429,7 +430,8 @@
           return angular.element("html").scope().$broadcast("map-ready");
         },
         startAddMap: function() {
-          var addMap, mapOptions;
+          var mapOptions,
+            _this = this;
           mapOptions = {
             center: new google.maps.LatLng(0, 0),
             zoom: 1,
@@ -513,16 +515,15 @@
               }
             ]
           };
-          addMap = new google.maps.Map(document.getElementById("add-map-canvas"), mapOptions);
-          return google.maps.event.addListener(addMap, "click", function(event) {
-            angular.element("html").scope().$broadcast("addMapSelected");
-            if (this.addMapMarker != null) {
-              return this.addMapMarker.setPosition(event.latLng);
+          this.addMap = new google.maps.Map(document.getElementById("add-map-canvas"), mapOptions);
+          return google.maps.event.addListener(this.addMap, "click", function(event) {
+            if (_this.addMapMarker != null) {
+              return _this.addMapMarker.setPosition(event.latLng);
             } else {
-              return this.addMapMarker = new google.maps.Marker({
+              return _this.addMapMarker = new google.maps.Marker({
                 position: event.latLng,
                 animation: google.maps.Animation.BOUNCE,
-                map: addMap
+                map: _this.addMap
               });
             }
           });
