@@ -80,7 +80,7 @@
   ]);
 
   srv.factory('LogService', [
-    '$q', '$http', '$rootScope', 'Resources', function($q, $http, $rootScope, Resources) {
+    '$q', '$http', '$rootScope', 'Resources', 'MapService', function($q, $http, $rootScope, Resources, MapService) {
       var factory, res;
       res = Resources;
       factory = {
@@ -131,6 +131,29 @@
             });
             return deferred.promise;
           }
+        },
+        refreshAllLogsLocation: function() {
+          var k, location, log, _ref, _results;
+          _ref = this.logs;
+          _results = [];
+          for (k in _ref) {
+            log = _ref[k];
+            if (!log.country || log.country === "None") {
+              location = new google.maps.LatLng(log.lat, log.lng);
+              _results.push(MapService.reverseGeocode(location, function(formatted_address, countryName) {
+                console.log(window.location.origin + "/" + log.id + "/edit");
+                return $.post(window.location.origin + "/log/" + log.id + "/edit", JSON.stringify({
+                  country: countryName
+                }), function(resp) {
+                  console.log(resp);
+                  return console.log("updated log");
+                });
+              }));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
         },
         getClosestLogs: function(logKey) {
           var change, direction, location, logPromises, _i, _len, _ref;
@@ -220,8 +243,19 @@
         init: function(logId) {
           var deferred;
           deferred = $q.defer();
-          res.getLogs().success(function(data) {
+          res.getCountries().then(function(data) {
+            var country, _i, _len, _ref;
+            console.log("got countries");
+            _ref = data.data.countries;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              country = _ref[_i];
+              factory.countries[country.id] = country;
+            }
+            return res.getLogs();
+          }).then(function(data) {
             var i, keys, log, _i, _j, _len, _len1, _ref, _ref1;
+            console.log("got logs");
+            data = data.data;
             deferred.notify(0);
             factory.sortedLogs.lat = data.logs.slice().sort(function(b, a) {
               return b.lat - a.lat;
@@ -553,15 +587,10 @@
           return this.geocoder.geocode({
             address: countryName
           }, function(results, status) {
-            var marker;
             if (status === google.maps.GeocoderStatus.OK) {
-              map.setCenter(results[0].geometry.location);
-              return marker = new google.maps.Marker({
-                map: map,
-                position: results[0].geometry.location
-              });
+              return typeof callback === "function" && callback(results[0].geometry.location);
             } else {
-              return alert("Geocode was not successful for the following reason: " + status);
+              return console.log("Geocode was not successful for the following reason: " + status);
             }
           });
         }

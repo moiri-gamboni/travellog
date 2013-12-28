@@ -67,7 +67,7 @@ srv.factory('Resources', ['$http', '$rootScope', ($http, $rootScope) ->
   return factory
 ])
 
-srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http, $rootScope, Resources) ->
+srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', 'MapService', ($q, $http, $rootScope, Resources, MapService) ->
   res = Resources
   factory =
     logs: {}
@@ -112,6 +112,19 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http,
         )
         return deferred.promise
 
+    # geolocate all logs (for backwards compatibility)
+    refreshAllLogsLocation: () ->
+      for k, log of @logs
+        if not log.country or log.country == "None"
+          location = new google.maps.LatLng(log.lat, log.lng)
+          MapService.reverseGeocode(location, (formatted_address, countryName) ->
+            console.log window.location.origin + "/" + log.id + "/edit"
+            $.post(window.location.origin + "/log/" + log.id + "/edit",
+              JSON.stringify({country: countryName}), (resp) ->
+                console.log(resp)
+                console.log("updated log")
+            )
+          )
 
     getClosestLogs: (logKey) ->
       logPromises = []
@@ -181,7 +194,14 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http,
 
     init: (logId) ->
       deferred = $q.defer()
-      res.getLogs().success((data) ->
+      res.getCountries().then (data) ->
+        console.log("got countries")
+        for country in data.data.countries
+          factory.countries[country.id] = country
+        return res.getLogs()
+      .then( (data) ->
+        console.log "got logs"
+        data = data.data
         deferred.notify(0)
         factory.sortedLogs.lat = data.logs.slice().sort((b, a) ->
           return b.lat-a.lat
@@ -438,13 +458,10 @@ srv.factory('MapService', [() ->
         address: countryName
       , (results, status) ->
         if status is google.maps.GeocoderStatus.OK
-          map.setCenter results[0].geometry.location
-          marker = new google.maps.Marker(
-            map: map
-            position: results[0].geometry.location
-          )
+          #map.setCenter results[0].geometry.location
+          typeof callback is "function" and callback(results[0].geometry.location)
         else
-          alert "Geocode was not successful for the following reason: " + status
+          console.log "Geocode was not successful for the following reason: " + status
 
   return factory
 ])
