@@ -62,12 +62,15 @@ srv.factory('Resources', ['$http', '$rootScope', ($http, $rootScope) ->
     getLog: (logId) ->
       return @getRequest('/logs',{id:logId})
     createLog: (googleDriveId, lat, lng, country) ->
-      return $postRequest('/logs' + {gdriveId: googleDriveId, lat: lat, lng:lng, country:country})
+      return $postRequest('/logs' + {gdriveId: googleDriveId, lat: lat,\
+        lng:lng, country:country})
 
   return factory
 ])
 
-srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', 'MapService', '$timeout', ($q, $http, $rootScope, Resources, MapService, $timeout) ->
+srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
+'MapService', '$timeout',\
+($q, $http, $rootScope, Resources, MapService, $timeout) ->
   res = Resources
   factory =
     logs: {}
@@ -138,7 +141,7 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', 'MapService
                     console.log("updated log")
                 )
             )
-          , 2000*i)
+          , 3000*i)
         i++
 
     getClosestLogs: (logKey) ->
@@ -212,7 +215,9 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', 'MapService
       res.getCountries().then (data) ->
         console.log("got countries")
         for country in data.data.countries
+          country.logs = []
           factory.countries[country.id] = country
+          MapService.placeMarkerMiniMap(country, true)
         return res.getLogs()
       .then( (data) ->
         console.log "got logs"
@@ -232,6 +237,10 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', 'MapService
             lat: log.lat
             lng: log.lng
             key: [null, i]
+          factory.countries[log.country].logs.push(log.id)
+          # add to the marker
+          MapService.placeMarkerMiniMap(log)
+        MapService.initMarkers()
         factory.sortedLogs.lng = data.logs.slice().sort((b, a) ->
           return b.lng-a.lng
         )
@@ -264,9 +273,11 @@ srv.factory('User', [() ->
 srv.factory('MapService', [() ->
   factory =
     idMarkerMap: {}
+    countryMarkers: []
     geocoder: null
     addMapMarker: null
     miniMap: null
+    miniMapMgr: null
     addMap: null
     icons:
       current: "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png"
@@ -332,7 +343,9 @@ srv.factory('MapService', [() ->
         ]
 
       @miniMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
+      @miniMapMgr = new MarkerManager(@miniMap)
       angular.element("html").scope().$broadcast("map-ready")
+
     startAddMap: () ->
       mapOptions =
         center: new google.maps.LatLng(0, 0)
@@ -401,18 +414,6 @@ srv.factory('MapService', [() ->
           )
       )
 
-    seedMap: () ->
-      dropCallback = (resp, i) ->
-       return () ->
-        placeMarkerMiniMap(resp.logs[i])
-      $.get("/logs", (resp) ->
-        i = 0
-        while i < resp.logs.length
-          setTimeout(dropCallback(resp, i), i * 200)
-          i++
-      )
-
-
     # different icons
 
     # click handler for a minimap item
@@ -436,19 +437,34 @@ srv.factory('MapService', [() ->
 
       # focus the map to the new marker
       @miniMap.panTo(@currentMiniMarker.position)
-      @miniMap.setZoom(2) if @miniMap.getZoom() is 1
+      @miniMap.setZoom(3) if @miniMap.getZoom() is 1
+
     switchMiniMarker: () ->
       angular.element("html").scope().$broadcast("switch-marker", @title)
-    placeMarkerMiniMap: (log_object) ->
+
+    placeMarkerMiniMap: (log_object, isCountry) ->
       marker = new google.maps.Marker(
         position: new google.maps.LatLng(log_object.lat, log_object.lng)
-        animation: google.maps.Animation.DROP
-        map: @miniMap
         title: log_object.id
-        icon: @icons.unvisited
+        icon: if isCountry then @icons.unvisited else @icons.unvisited
       )
-      @idMarkerMap[log_object.id] = marker
-      google.maps.event.addListener(marker, "click", @switchMiniMarker)
+      if isCountry
+        @countryMarkers.push(marker)
+      else
+        @idMarkerMap[log_object.id] = marker
+        google.maps.event.addListener(marker, "click", @switchMiniMarker)
+
+    initMarkers: () ->
+      markers = []
+      for k, marker of @idMarkerMap
+        markers.push(marker)
+      console.log "Specific markers"
+      console.log markers
+      @miniMapMgr.addMarkers(markers, 3)
+      console.log "Country markers"
+      console.log @countryMarkers
+      @miniMapMgr.addMarkers(@countryMarkers, 0, 2)
+      @miniMapMgr.refresh()
 
     # reverse geocoder modified from code example
     reverseGeocode: (latlng, callback) ->

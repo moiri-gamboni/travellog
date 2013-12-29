@@ -16,13 +16,13 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
   $scope.otherLog = null
 
   dropPins = () ->
-    dropPin = (log) ->
-      return ()->
-        MapService.placeMarkerMiniMap(log)
+    #dropPin = (log) ->
+      #return ()->
+        #MapService.placeMarkerMiniMap(log)
 
     i = 0
     for logId, log of LogService.logs
-      $timeout(dropPin(log),200*i)
+      #$timeout(dropPin(log),200*i)
       i++
     $timeout(
         () ->

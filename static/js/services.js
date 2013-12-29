@@ -162,7 +162,7 @@
                   });
                 }
               });
-            }, 2000 * i);
+            }, 3000 * i);
           };
           _results = [];
           for (k in _ref) {
@@ -266,7 +266,9 @@
             _ref = data.data.countries;
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               country = _ref[_i];
+              country.logs = [];
               factory.countries[country.id] = country;
+              MapService.placeMarkerMiniMap(country, true);
             }
             return res.getLogs();
           }).then(function(data) {
@@ -291,7 +293,10 @@
                 lng: log.lng,
                 key: [null, i]
               };
+              factory.countries[log.country].logs.push(log.id);
+              MapService.placeMarkerMiniMap(log);
             }
+            MapService.initMarkers();
             factory.sortedLogs.lng = data.logs.slice().sort(function(b, a) {
               return b.lng - a.lng;
             });
@@ -330,9 +335,11 @@
       var factory;
       factory = {
         idMarkerMap: {},
+        countryMarkers: [],
         geocoder: null,
         addMapMarker: null,
         miniMap: null,
+        miniMapMgr: null,
         addMap: null,
         icons: {
           current: "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png",
@@ -427,6 +434,7 @@
             ]
           };
           this.miniMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+          this.miniMapMgr = new MarkerManager(this.miniMap);
           return angular.element("html").scope().$broadcast("map-ready");
         },
         startAddMap: function() {
@@ -528,24 +536,6 @@
             }
           });
         },
-        seedMap: function() {
-          var dropCallback;
-          dropCallback = function(resp, i) {
-            return function() {
-              return placeMarkerMiniMap(resp.logs[i]);
-            };
-          };
-          return $.get("/logs", function(resp) {
-            var i, _results;
-            i = 0;
-            _results = [];
-            while (i < resp.logs.length) {
-              setTimeout(dropCallback(resp, i), i * 200);
-              _results.push(i++);
-            }
-            return _results;
-          });
-        },
         changeLocation: function(markerId) {
           var newMarker;
           newMarker = this.idMarkerMap[markerId];
@@ -562,23 +552,41 @@
           }
           this.miniMap.panTo(this.currentMiniMarker.position);
           if (this.miniMap.getZoom() === 1) {
-            return this.miniMap.setZoom(2);
+            return this.miniMap.setZoom(3);
           }
         },
         switchMiniMarker: function() {
           return angular.element("html").scope().$broadcast("switch-marker", this.title);
         },
-        placeMarkerMiniMap: function(log_object) {
+        placeMarkerMiniMap: function(log_object, isCountry) {
           var marker;
           marker = new google.maps.Marker({
             position: new google.maps.LatLng(log_object.lat, log_object.lng),
-            animation: google.maps.Animation.DROP,
-            map: this.miniMap,
             title: log_object.id,
-            icon: this.icons.unvisited
+            icon: isCountry ? this.icons.unvisited : this.icons.unvisited
           });
-          this.idMarkerMap[log_object.id] = marker;
-          return google.maps.event.addListener(marker, "click", this.switchMiniMarker);
+          if (isCountry) {
+            return this.countryMarkers.push(marker);
+          } else {
+            this.idMarkerMap[log_object.id] = marker;
+            return google.maps.event.addListener(marker, "click", this.switchMiniMarker);
+          }
+        },
+        initMarkers: function() {
+          var k, marker, markers, _ref;
+          markers = [];
+          _ref = this.idMarkerMap;
+          for (k in _ref) {
+            marker = _ref[k];
+            markers.push(marker);
+          }
+          console.log("Specific markers");
+          console.log(markers);
+          this.miniMapMgr.addMarkers(markers, 3);
+          console.log("Country markers");
+          console.log(this.countryMarkers);
+          this.miniMapMgr.addMarkers(this.countryMarkers, 0, 2);
+          return this.miniMapMgr.refresh();
         },
         reverseGeocode: function(latlng, callback) {
           return this.geocoder.geocode({

@@ -22,17 +22,11 @@
       $scope.log = null;
       $scope.otherLog = null;
       dropPins = function() {
-        var dropPin, i, log, logId, _ref;
-        dropPin = function(log) {
-          return function() {
-            return MapService.placeMarkerMiniMap(log);
-          };
-        };
+        var i, log, logId, _ref;
         i = 0;
         _ref = LogService.logs;
         for (logId in _ref) {
           log = _ref[logId];
-          $timeout(dropPin(log), 200 * i);
           i++;
         }
         return $timeout(function() {
