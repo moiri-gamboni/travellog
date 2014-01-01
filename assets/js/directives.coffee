@@ -14,3 +14,10 @@ drct.directive("otherlog", () ->
     templateUrl: "/static/app/partials/otherLog.html"
   }
 )
+
+drct.directive("loading", () ->
+  return {
+    restrict: 'E'
+    templateUrl: "/static/app/partials/loading.html"
+  }
+)

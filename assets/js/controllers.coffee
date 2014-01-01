@@ -4,60 +4,47 @@ ctrl = angular.module("mainModule.controllers", [])
 ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogService', 'MapService', ($http, $scope, $rootScope, $timeout, LogService, MapService) ->
   $rootScope.overlayIsActive = false
   switchLogs = false
-  flow =
-    isLogServiceReady: false
-    isFirstLogReady: false
-    areLogsReady: false
-    hasBegun: false
-    arePinsDropped: false
-    canBegin: false
-    urlLogLoadWatch: null
+  isFirstLogReady: false
+  arePinsDropped: false
+  canBegin: false
   $scope.log = null
   $scope.otherLog = null
 
   dropPins = () ->
-    dropPin = (log) ->
-      return ()->
-        MapService.placeMarkerMiniMap(log)
-
+    deferredPins = []
     i = 0
     for logId, log of LogService.logs
-      $timeout(dropPin(log),200*i)
+      deferred = $q.defer()
+      deferredPins[i] = deferred.promise
+      $timeout(
+        ()->
+          MapService.placeMarkerMiniMap(log)
+          deferred.resolve()
+        ,200*i)
       i++
-    $timeout(
-        () ->
-          flow.arePinsDropped = true
-          if flow.isFirstLogReady
-            $(".main.fade").removeClass("fadeout")
-            $(".main.fade").addClass("fadein")
-            loadingWatch()
-            switchLoading("small corner")
-            showLog(LogService.getCurrentLog().id, true, null, null, null, true)
-        ,
-        200*Object.keys(LogService.logs).length
-      )
-
-  $rootScope.$on('map-ready', () ->
-    flow.isLogServiceReady = true
-    if flow.areLogsReady
-      unblockBegin()
-  )
-
-  unblockBegin = ()->
-    $("#loading").addClass("fadeout")
-    $("#start-here").addClass("fadein")
-    flow.canBegin = true
+    return $q.all(deferredPins)
 
   $scope.begin = () ->
-    if flow.canBegin
+    if canBegin
       $("#launch-screen").addClass("fadeout")
       $("#container").removeClass("hide")
       fadeLoading(false)
       switchLoading("big center")
-      flow.hasBegun = true
-      $timeout(()->
-        dropPins()
-      , 500)
+      $timeout(
+        ()->
+          dropPins().then(
+            ()->
+              arePinsDropped = true
+              if isFirstLogReady
+                $(".main.fade").removeClass("fadeout")
+                $(".main.fade").addClass("fadein")
+                loadingWatch()
+                switchLoading("small corner")
+                showLog(LogService.getCurrentLog().id, {manualSwitch:true, renderBadgeInMain:true})
+          )
+        ,500)
+
+
 
   window.switchLoading = (classString) ->
     loading = $("#loading")
@@ -68,10 +55,29 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
     switchLogs = not switchLogs
   )
 
-  showLog = (logId, manualSwitch, invert, dontPushState, notChangeMarker, renderBadgeInMain) ->
+  #Default options:
+  #manualSwitch = false
+  #invert = false
+  #pushState = true
+  #changeMarker = true
+  #renderBadgeInMain = false
+  showLog = (logId,options) ->
+    if not options?
+      options = {}
+    if not options.manualSwitch?
+      options.manualSwitch = false
+    if not options.invert?
+      options.invert = false
+    if not options.pushState?
+      options.pushState = true
+    if not options.notChangeMarker?
+      options.changeMarker = true
+    if not options.renderBadgeInMain?
+      options.renderBadgeInMain = false
+
     if logId?
       log = LogService.logs[logId]
-      if invert? and invert
+      if options.invert
         if not switchLogs
           $scope.otherLog = log
         else
@@ -83,21 +89,21 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
         else
           $scope.log = log
       if log.profileId?
-        if renderBadgeInMain? and renderBadgeInMain
+        if options.renderBadgeInMain
           renderBadge(log.profileId, '.main')
         else
           renderBadge(log.profileId, '.launch')
       else
-        if renderBadgeInMain? and renderBadgeInMain
+        if options.renderBadgeInMain
           $(".main .log-author").html(log.profileName)
         else
           $(".launch .log-author").html(log.profileName)
-      if not dontPushState? or not dontPushState
+      if options.pushState
         history.pushState(log.id, log.title, "/log/"+log.id)
-      if manualSwitch? and manualSwitch
+      if options.manualSwitch
         switchLogs = not switchLogs
       LogService.current = log.key
-      if not notChangeMarker? or not notChangeMarker
+      if options.changeMarker
         MapService.changeLocation(logId)
     else
       console.log 'no logid'
@@ -106,7 +112,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
     if LogService.loadingLogs == 0
       LogService.move(direction)
       log = LogService.getCurrentLog()
-      showLog(log.id, null, null, null, true)
+      showLog(log.id, {changeMarker:false})
       move(direction)
       $timeout(()->
         MapService.changeLocation(log.id)
@@ -116,27 +122,26 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
   $rootScope.$on('switch-marker', (event, logId) ->
     $(".main" + " .log-author").css({"opacity": 0})
     if LogService.logs[logId].body?
-      showLog(logId, false, true, false, false, true)
+      showLog(logId, {invert:true, changeMarker:true, renderBadgeInMain:true})
     else
       LogService.getLog(logId)
       LogService.getClosestLogs(LogService.logs[logId].key)
-      watch = $rootScope.$on('getting-logs', (event, isLoading) ->
-        if not isLoading
-          showLog(logId, false, true, false, false, true)
+      watch = $rootScope.$on('logs-loading', () ->
+        if LogService.loadingLogs == 0
+          showLog(logId, {manualSwitch:false, invert:true, pushState:true, changeMarker:true, renderBadgeInMain:true})
           watch()
       )
   )
 
   loadingWatch = () ->
-    if LogService.loadingLogs == 0
-      fadeLoading(true)
-    else
-      fadeLoading(false)
-    $rootScope.$on('getting-logs', (event, isLoading) ->
-      if isLoading
-        fadeLoading(false)
-      else
+    f = () ->
+      if LogService.loadingLogs == 0
         fadeLoading(true)
+      else
+        fadeLoading(false)
+    f()
+    $rootScope.$on('logs-loading', () ->
+      f()
     )
 
   window.fadeLoading = (fadeOut) ->
@@ -149,7 +154,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
 
   window.onpopstate = (event) ->
     if event.state?
-      showLog(event.state, false, true, true)
+      showLog(event.state, {manualSwitch:false, invert:true, pushState:false})
 
   $scope.deactivateOverlay = (view) ->
     $rootScope.overlayIsActive = false
@@ -164,28 +169,28 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
       $rootScope.setShowing()
 
   MapService.init()
-
-  LogService.init($rootScope.urlEntered).then((logs) ->
-    $rootScope.logs = logs
-  ,null
-  ,(progress) ->
-    switch progress
-      when 0
-        flow.areLogsReady = true
-        if flow.isLogServiceReady
-          unblockBegin()
-      when 1
-        flow.isFirstLogReady = true
-        if flow.arePinsDropped
-          $(".main.fade").removeClass("fadeout")
-          $(".main.fade").addClass("fadein")
-          loadingWatch()
-          switchLoading("small corner")
-          showLog(LogService.getCurrentLog().id, true, null, null, null, true)
-        else
-      when 2
-        break
+  LogService.initLogs.then(
+    (logs) ->
+      $rootScope.logs = logs
+      $("#loading").addClass("fadeout")
+      $("#start-here").addClass("fadein")
+      canBegin = true
+      return LogService.initLog($rootScope.urlEntered)
+  ).then(
+    (log) ->
+      isFirstLogReady = true
+      if arePinsDropped
+        $(".main.fade").removeClass("fadeout")
+        $(".main.fade").addClass("fadein")
+        loadingWatch()
+        switchLoading("small corner")
+        showLog(LogService.getCurrentLog().id, {manualSwitch:true, renderBadgeInMain:true})
+      return LogService.getClosestLogs(LogService.getCurrentLog().key)
+  ).then(
+    (data) ->
+      return
   )
+
 
 ])
 

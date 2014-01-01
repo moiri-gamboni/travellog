@@ -7,65 +7,54 @@
 
   ctrl.controller("mainCtrl", [
     '$http', '$scope', '$rootScope', '$timeout', 'LogService', 'MapService', function($http, $scope, $rootScope, $timeout, LogService, MapService) {
-      var dropPins, flow, loadingWatch, showLog, switchLogs, unblockBegin;
+      var dropPins, loadingWatch, showLog, switchLogs;
       $rootScope.overlayIsActive = false;
       switchLogs = false;
-      flow = {
-        isLogServiceReady: false,
+      ({
         isFirstLogReady: false,
-        areLogsReady: false,
-        hasBegun: false,
         arePinsDropped: false,
-        canBegin: false,
-        urlLogLoadWatch: null
-      };
+        canBegin: false
+      });
       $scope.log = null;
       $scope.otherLog = null;
       dropPins = function() {
-        var dropPin, i, log, logId, _ref;
-        dropPin = function(log) {
-          return function() {
-            return MapService.placeMarkerMiniMap(log);
-          };
-        };
+        var deferred, deferredPins, i, log, logId, _ref;
+        deferredPins = [];
         i = 0;
         _ref = LogService.logs;
         for (logId in _ref) {
           log = _ref[logId];
-          $timeout(dropPin(log), 200 * i);
+          deferred = $q.defer();
+          deferredPins[i] = deferred.promise;
+          $timeout(function() {
+            MapService.placeMarkerMiniMap(log);
+            return deferred.resolve();
+          }, 200 * i);
           i++;
         }
-        return $timeout(function() {
-          flow.arePinsDropped = true;
-          if (flow.isFirstLogReady) {
-            $(".main.fade").removeClass("fadeout");
-            $(".main.fade").addClass("fadein");
-            loadingWatch();
-            switchLoading("small corner");
-            return showLog(LogService.getCurrentLog().id, true, null, null, null, true);
-          }
-        }, 200 * Object.keys(LogService.logs).length);
-      };
-      $rootScope.$on('map-ready', function() {
-        flow.isLogServiceReady = true;
-        if (flow.areLogsReady) {
-          return unblockBegin();
-        }
-      });
-      unblockBegin = function() {
-        $("#loading").addClass("fadeout");
-        $("#start-here").addClass("fadein");
-        return flow.canBegin = true;
+        return $q.all(deferredPins);
       };
       $scope.begin = function() {
-        if (flow.canBegin) {
+        if (canBegin) {
           $("#launch-screen").addClass("fadeout");
           $("#container").removeClass("hide");
           fadeLoading(false);
           switchLoading("big center");
-          flow.hasBegun = true;
           return $timeout(function() {
-            return dropPins();
+            return dropPins().then(function() {
+              var arePinsDropped;
+              arePinsDropped = true;
+              if (isFirstLogReady) {
+                $(".main.fade").removeClass("fadeout");
+                $(".main.fade").addClass("fadein");
+                loadingWatch();
+                switchLoading("small corner");
+                return showLog(LogService.getCurrentLog().id, {
+                  manualSwitch: true,
+                  renderBadgeInMain: true
+                });
+              }
+            });
           }, 500);
         }
       };
@@ -78,11 +67,29 @@
       $rootScope.$on('sliding-animation-done', function() {
         return switchLogs = !switchLogs;
       });
-      showLog = function(logId, manualSwitch, invert, dontPushState, notChangeMarker, renderBadgeInMain) {
+      showLog = function(logId, options) {
         var log;
+        if (options == null) {
+          options = {};
+        }
+        if (options.manualSwitch == null) {
+          options.manualSwitch = false;
+        }
+        if (options.invert == null) {
+          options.invert = false;
+        }
+        if (options.pushState == null) {
+          options.pushState = true;
+        }
+        if (options.notChangeMarker == null) {
+          options.changeMarker = true;
+        }
+        if (options.renderBadgeInMain == null) {
+          options.renderBadgeInMain = false;
+        }
         if (logId != null) {
           log = LogService.logs[logId];
-          if ((invert != null) && invert) {
+          if (options.invert) {
             if (!switchLogs) {
               $scope.otherLog = log;
             } else {
@@ -97,26 +104,26 @@
             }
           }
           if (log.profileId != null) {
-            if ((renderBadgeInMain != null) && renderBadgeInMain) {
+            if (options.renderBadgeInMain) {
               renderBadge(log.profileId, '.main');
             } else {
               renderBadge(log.profileId, '.launch');
             }
           } else {
-            if ((renderBadgeInMain != null) && renderBadgeInMain) {
+            if (options.renderBadgeInMain) {
               $(".main .log-author").html(log.profileName);
             } else {
               $(".launch .log-author").html(log.profileName);
             }
           }
-          if ((dontPushState == null) || !dontPushState) {
+          if (options.pushState) {
             history.pushState(log.id, log.title, "/log/" + log.id);
           }
-          if ((manualSwitch != null) && manualSwitch) {
+          if (options.manualSwitch) {
             switchLogs = !switchLogs;
           }
           LogService.current = log.key;
-          if ((notChangeMarker == null) || !notChangeMarker) {
+          if (options.changeMarker) {
             return MapService.changeLocation(logId);
           }
         } else {
@@ -128,7 +135,9 @@
         if (LogService.loadingLogs === 0) {
           LogService.move(direction);
           log = LogService.getCurrentLog();
-          showLog(log.id, null, null, null, true);
+          showLog(log.id, {
+            changeMarker: false
+          });
           move(direction);
           return $timeout(function() {
             return MapService.changeLocation(log.id);
@@ -141,30 +150,40 @@
           "opacity": 0
         });
         if (LogService.logs[logId].body != null) {
-          return showLog(logId, false, true, false, false, true);
+          return showLog(logId, {
+            invert: true,
+            changeMarker: true,
+            renderBadgeInMain: true
+          });
         } else {
           LogService.getLog(logId);
           LogService.getClosestLogs(LogService.logs[logId].key);
-          return watch = $rootScope.$on('getting-logs', function(event, isLoading) {
-            if (!isLoading) {
-              showLog(logId, false, true, false, false, true);
+          return watch = $rootScope.$on('logs-loading', function() {
+            if (LogService.loadingLogs === 0) {
+              showLog(logId, {
+                manualSwitch: false,
+                invert: true,
+                pushState: true,
+                changeMarker: true,
+                renderBadgeInMain: true
+              });
               return watch();
             }
           });
         }
       });
       loadingWatch = function() {
-        if (LogService.loadingLogs === 0) {
-          fadeLoading(true);
-        } else {
-          fadeLoading(false);
-        }
-        return $rootScope.$on('getting-logs', function(event, isLoading) {
-          if (isLoading) {
-            return fadeLoading(false);
-          } else {
+        var f;
+        f = function() {
+          if (LogService.loadingLogs === 0) {
             return fadeLoading(true);
+          } else {
+            return fadeLoading(false);
           }
+        };
+        f();
+        return $rootScope.$on('logs-loading', function() {
+          return f();
         });
       };
       window.fadeLoading = function(fadeOut) {
@@ -178,7 +197,11 @@
       };
       window.onpopstate = function(event) {
         if (event.state != null) {
-          return showLog(event.state, false, true, true);
+          return showLog(event.state, {
+            manualSwitch: false,
+            invert: true,
+            pushState: false
+          });
         }
       };
       $scope.deactivateOverlay = function(view) {
@@ -196,32 +219,28 @@
         }
       };
       MapService.init();
-      return LogService.init($rootScope.urlEntered).then(function(logs) {
-        return $rootScope.logs = logs;
-      }, null, function(progress) {
-        switch (progress) {
-          case 0:
-            flow.areLogsReady = true;
-            if (flow.isLogServiceReady) {
-              return unblockBegin();
-            }
-            break;
-          case 1:
-            flow.isFirstLogReady = true;
-            if (flow.arePinsDropped) {
-              $(".main.fade").removeClass("fadeout");
-              $(".main.fade").addClass("fadein");
-              loadingWatch();
-              switchLoading("small corner");
-              return showLog(LogService.getCurrentLog().id, true, null, null, null, true);
-            } else {
-
-            }
-            break;
-          case 2:
-            break;
+      return LogService.initLogs.then(function(logs) {
+        var canBegin;
+        $rootScope.logs = logs;
+        $("#loading").addClass("fadeout");
+        $("#start-here").addClass("fadein");
+        canBegin = true;
+        return LogService.initLog($rootScope.urlEntered);
+      }).then(function(log) {
+        var isFirstLogReady;
+        isFirstLogReady = true;
+        if (arePinsDropped) {
+          $(".main.fade").removeClass("fadeout");
+          $(".main.fade").addClass("fadein");
+          loadingWatch();
+          switchLoading("small corner");
+          showLog(LogService.getCurrentLog().id, {
+            manualSwitch: true,
+            renderBadgeInMain: true
+          });
         }
-      });
+        return LogService.getClosestLogs(LogService.getCurrentLog().key);
+      }).then(function(data) {});
     }
   ]);
 

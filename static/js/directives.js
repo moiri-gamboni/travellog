@@ -19,4 +19,11 @@
     };
   });
 
+  drct.directive("loading", function() {
+    return {
+      restrict: 'E',
+      templateUrl: "/static/app/partials/loading.html"
+    };
+  });
+
 }).call(this);

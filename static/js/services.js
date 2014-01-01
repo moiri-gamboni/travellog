@@ -88,7 +88,7 @@
         countries: {},
         sortedLogs: {},
         current: null,
-        loadingLogs: 0,
+        logsLoading: 0,
         getCurrentLog: function() {
           if ((this.current != null) && (this.sortedLogs.lng != null) && (this.sortedLogs.lng[this.current[0]] != null)) {
             return this.logs[this.sortedLogs.lng[this.current[0]]];
@@ -111,8 +111,7 @@
           var deferred;
           deferred = $q.defer();
           if (this.logs[logId].body == null) {
-            this.loadingLogs++;
-            $rootScope.$broadcast('getting-logs', this.loadingLogs);
+            factory.logsLoading++;
             res.getLog(logId).success(function(data) {
               factory.logs[data.log.id].title = data.log.title;
               factory.logs[data.log.id].profileId = data.log.profileId;
@@ -121,16 +120,19 @@
               return deferred.resolve(factory.logs[data.log.id]);
             }).error(function(data) {
               console.log('getlog error');
+              console.log(data);
               return deferred.reject({
                 msg: 'getLog error',
                 err: data
               });
             })["finally"](function() {
-              factory.loadingLogs--;
-              return $rootScope.$broadcast('getting-logs', factory.loadingLogs);
+              factory.logsLoading--;
+              return $rootScope.broadcast('logs-loading', factory.logsLoading);
             });
-            return deferred.promise;
+          } else {
+            deferred.reject('Log is already loaded');
           }
+          return deferred.promise;
         },
         getClosestLogs: function(logKey) {
           var change, direction, location, logPromises, _i, _len, _ref;
@@ -217,12 +219,11 @@
             }
           }
         },
-        init: function(logId) {
+        initLogs: function() {
           var deferred;
           deferred = $q.defer();
           res.getLogs().success(function(data) {
-            var i, keys, log, _i, _j, _len, _len1, _ref, _ref1;
-            deferred.notify(0);
+            var i, log, _i, _j, _len, _len1, _ref, _ref1;
             factory.sortedLogs.lat = data.logs.slice().sort(function(b, a) {
               return b.lat - a.lat;
             });
@@ -250,22 +251,20 @@
               factory.sortedLogs.lng[i] = log.id;
               factory.logs[log.id].key = [i, factory.logs[log.id].key[1]];
             }
-            if (logId == null) {
-              keys = Object.keys(factory.logs);
-              factory.current = factory.logs[keys[(Math.random() * keys.length) >> 0]].key;
-              logId = factory.sortedLogs.lng[factory.current[0]];
-            } else {
-              factory.current = factory.logs[logId].key;
-            }
-            return factory.getLog(logId).then(function(logdata) {
-              deferred.notify(1);
-              return factory.getClosestLogs(factory.current);
-            }).then(function(data) {
-              deferred.notify(2);
-              return deferred.resolve(factory.logs);
-            });
+            return deferred.resolve(factory.logs);
           });
           return deferred.promise;
+        },
+        initLog: function(logId) {
+          var keys;
+          if (logId == null) {
+            keys = Object.keys(factory.logs);
+            factory.current = factory.logs[keys[(Math.random() * keys.length) >> 0]].key;
+            logId = factory.sortedLogs.lng[factory.current[0]];
+          } else {
+            factory.current = factory.logs[logId].key;
+          }
+          return factory.getLog(logId);
         }
       };
       return factory;
@@ -275,7 +274,7 @@
   srv.factory('User', [function() {}]);
 
   srv.factory('MapService', [
-    function() {
+    '$rootScope', function($rootScope) {
       var factory;
       factory = {
         idMarkerMap: {},
@@ -374,8 +373,7 @@
               }
             ]
           };
-          this.miniMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-          return angular.element("html").scope().$broadcast("map-ready");
+          return this.miniMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
         },
         startAddMap: function() {
           var addMap, mapOptions;
@@ -464,7 +462,7 @@
           };
           addMap = new google.maps.Map(document.getElementById("add-map-canvas"), mapOptions);
           return google.maps.event.addListener(addMap, "click", function(event) {
-            angular.element("html").scope().$broadcast("addMapSelected");
+            $rootScope.$broadcast("addMapSelected");
             if (this.addMapMarker != null) {
               return this.addMapMarker.setPosition(event.latLng);
             } else {
@@ -514,7 +512,7 @@
           }
         },
         switchMiniMarker: function() {
-          return angular.element("html").scope().$broadcast("switch-marker", this.title);
+          return $rootScope.$broadcast("switch-marker", this.title);
         },
         placeMarkerMiniMap: function(log_object) {
           var marker;

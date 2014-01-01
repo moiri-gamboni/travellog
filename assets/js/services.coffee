@@ -74,7 +74,7 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http,
     countries: {}
     sortedLogs: {}
     current: null
-    loadingLogs: 0
+    logsLoading: 0
 
     getCurrentLog: () ->
       if @current? and @sortedLogs.lng? and @sortedLogs.lng[@current[0]]?
@@ -95,8 +95,7 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http,
     getLog: (logId) ->
       deferred = $q.defer()
       if not @logs[logId].body?
-        @loadingLogs++
-        $rootScope.$broadcast('getting-logs', @loadingLogs)
+        factory.logsLoading++
         res.getLog(logId).success((data) ->
           factory.logs[data.log.id].title = data.log.title
           factory.logs[data.log.id].profileId = data.log.profileId
@@ -105,12 +104,15 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http,
           deferred.resolve(factory.logs[data.log.id])
         ).error((data) ->
           console.log 'getlog error'
+          console.log data
           deferred.reject({msg:'getLog error', err:data})
-        ).finally(() ->
-          factory.loadingLogs--
-          $rootScope.$broadcast('getting-logs', factory.loadingLogs)
+        ).finally(()->
+          factory.logsLoading--
+          $rootScope.broadcast('logs-loading', factory.logsLoading)
         )
-        return deferred.promise
+      else
+        deferred.reject('Log is already loaded')
+      return deferred.promise
 
 
     getClosestLogs: (logKey) ->
@@ -179,10 +181,9 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http,
         else
           return false
 
-    init: (logId) ->
+    initLogs: () ->
       deferred = $q.defer()
       res.getLogs().success((data) ->
-        deferred.notify(0)
         factory.sortedLogs.lat = data.logs.slice().sort((b, a) ->
           return b.lat-a.lat
         )
@@ -203,21 +204,18 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http,
         for log, i in factory.sortedLogs.lng
           factory.sortedLogs.lng[i] = log.id
           factory.logs[log.id].key = [i, factory.logs[log.id].key[1]]
-        if not logId?
-          keys = Object.keys(factory.logs)
-          factory.current = factory.logs[keys[(Math.random()*keys.length)>>0]].key
-          logId = factory.sortedLogs.lng[factory.current[0]]
-        else
-          factory.current = factory.logs[logId].key
-        factory.getLog(logId).then((logdata) ->
-          deferred.notify(1)
-          factory.getClosestLogs(factory.current)
-        ).then((data) ->
-          deferred.notify(2)
-          deferred.resolve(factory.logs)
-        )
+        deferred.resolve(factory.logs)
       )
       return deferred.promise
+
+    initLog: (logId) ->
+      if not logId?
+        keys = Object.keys(factory.logs)
+        factory.current = factory.logs[keys[(Math.random()*keys.length)>>0]].key
+        logId = factory.sortedLogs.lng[factory.current[0]]
+      else
+        factory.current = factory.logs[logId].key
+      return factory.getLog(logId)
 
   return factory
 ])
@@ -226,7 +224,7 @@ srv.factory('User', [() ->
   return
 ])
 
-srv.factory('MapService', [() ->
+srv.factory('MapService', ['$rootScope', ($rootScope) ->
   factory =
     idMarkerMap: {}
     geocoder: null
@@ -296,7 +294,6 @@ srv.factory('MapService', [() ->
         ]
 
       @miniMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
-      angular.element("html").scope().$broadcast("map-ready")
     startAddMap: () ->
       mapOptions =
         center: new google.maps.LatLng(0, 0)
@@ -355,7 +352,7 @@ srv.factory('MapService', [() ->
 
       addMap = new google.maps.Map(document.getElementById("add-map-canvas"), mapOptions)
       google.maps.event.addListener(addMap, "click", (event) ->
-        angular.element("html").scope().$broadcast("addMapSelected")
+        $rootScope.$broadcast("addMapSelected")
         if @addMapMarker?
           @addMapMarker.setPosition(event.latLng)
         else
@@ -403,7 +400,7 @@ srv.factory('MapService', [() ->
       @miniMap.panTo(@currentMiniMarker.position)
       @miniMap.setZoom(2) if @miniMap.getZoom() is 1
     switchMiniMarker: () ->
-      angular.element("html").scope().$broadcast("switch-marker", @title)
+      $rootScope.$broadcast("switch-marker", @title)
     placeMarkerMiniMap: (log_object) ->
       marker = new google.maps.Marker(
         position: new google.maps.LatLng(log_object.lat, log_object.lng)
