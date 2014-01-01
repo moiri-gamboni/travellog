@@ -47,7 +47,7 @@ class LogHandler(webapp2.RequestHandler):
         models.create_country(self.params["country"], self.params["countryLat"], self.params["countryLng"])
 
     # construct the child
-    log = models.create_log(self.params["gdriveId"], self.params["lat"], self.params["lng"])
+    log = models.create_log(self.params["gdriveId"], self.params["lat"], self.params["lng"], self.params["country"])
 
     # grab either a profileId or profileName depending on what was passed in
     if "profileId" in self.params.keys():
@@ -80,7 +80,7 @@ class CountryHandler(webapp2.RequestHandler):
     # return all countries
     if "id" not in self.request.arguments():
       self.response.headers['Content-Type'] = "application/json"
-      self.response.write(json.dumps({"status": 200, "logs":\
+      self.response.write(json.dumps({"status": 200, "countries":\
         models.get_all_countries()}))
 
 class DriveHandler(webapp2.RequestHandler):

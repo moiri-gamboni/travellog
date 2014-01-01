@@ -6,3 +6,7 @@ module.run(($rootScope)->
   if logId != ""
     $rootScope.urlEntered = logId
 )
+
+window.getSrv = (name, element) ->
+  element = element || '*[ng-app]'
+  return angular.element(element).injector().get(name)

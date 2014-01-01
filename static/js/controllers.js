@@ -6,33 +6,38 @@
   ctrl = angular.module("mainModule.controllers", []);
 
   ctrl.controller("mainCtrl", [
-    '$http', '$scope', '$rootScope', '$timeout', 'LogService', 'MapService', function($http, $scope, $rootScope, $timeout, LogService, MapService) {
-      var dropPins, loadingWatch, showLog, switchLogs;
+    '$q', '$http', '$scope', '$rootScope', '$timeout', 'LogService', 'MapService', function($q, $http, $scope, $rootScope, $timeout, LogService, MapService) {
+      var arePinsDropped, canBegin, dropPins, isFirstLogReady, loadingWatch, showLog, switchLogs;
       $rootScope.overlayIsActive = false;
       switchLogs = false;
-      ({
-        isFirstLogReady: false,
-        arePinsDropped: false,
-        canBegin: false
-      });
+      isFirstLogReady = false;
+      arePinsDropped = false;
+      canBegin = false;
       $scope.log = null;
       $scope.otherLog = null;
       dropPins = function() {
-        var deferred, deferredPins, i, log, logId, _ref;
+        var deferred, deferredPins, dropPin, i, log, logId, promisedPins, _i, _len, _ref;
         deferredPins = [];
+        promisedPins = [];
         i = 0;
+        dropPin = function(i) {
+          return function() {
+            MapService.placeMarkerMiniMap(log);
+            return deferredPins[i].resolve();
+          };
+        };
         _ref = LogService.logs;
         for (logId in _ref) {
           log = _ref[logId];
-          deferred = $q.defer();
-          deferredPins[i] = deferred.promise;
-          $timeout(function() {
-            MapService.placeMarkerMiniMap(log);
-            return deferred.resolve();
-          }, 200 * i);
+          deferredPins[i] = $q.defer();
+          $timeout(dropPin(i), 200 * i);
           i++;
         }
-        return $q.all(deferredPins);
+        for (_i = 0, _len = deferredPins.length; _i < _len; _i++) {
+          deferred = deferredPins[_i];
+          promisedPins.push(deferred.promise);
+        }
+        return $q.all(promisedPins);
       };
       $scope.begin = function() {
         if (canBegin) {
@@ -42,7 +47,6 @@
           switchLoading("big center");
           return $timeout(function() {
             return dropPins().then(function() {
-              var arePinsDropped;
               arePinsDropped = true;
               if (isFirstLogReady) {
                 $(".main.fade").removeClass("fadeout");
@@ -132,7 +136,7 @@
       };
       $scope.move = function(direction) {
         var log;
-        if (LogService.loadingLogs === 0) {
+        if (LogService.logsLoading === 0) {
           LogService.move(direction);
           log = LogService.getCurrentLog();
           showLog(log.id, {
@@ -152,7 +156,6 @@
         if (LogService.logs[logId].body != null) {
           return showLog(logId, {
             invert: true,
-            changeMarker: true,
             renderBadgeInMain: true
           });
         } else {
@@ -161,10 +164,7 @@
           return watch = $rootScope.$on('logs-loading', function() {
             if (LogService.loadingLogs === 0) {
               showLog(logId, {
-                manualSwitch: false,
                 invert: true,
-                pushState: true,
-                changeMarker: true,
                 renderBadgeInMain: true
               });
               return watch();
@@ -198,7 +198,6 @@
       window.onpopstate = function(event) {
         if (event.state != null) {
           return showLog(event.state, {
-            manualSwitch: false,
             invert: true,
             pushState: false
           });
@@ -219,15 +218,12 @@
         }
       };
       MapService.init();
-      return LogService.initLogs.then(function(logs) {
-        var canBegin;
-        $rootScope.logs = logs;
+      return LogService.initLogs().then(function(logs) {
         $("#loading").addClass("fadeout");
         $("#start-here").addClass("fadein");
         canBegin = true;
         return LogService.initLog($rootScope.urlEntered);
       }).then(function(log) {
-        var isFirstLogReady;
         isFirstLogReady = true;
         if (arePinsDropped) {
           $(".main.fade").removeClass("fadeout");
@@ -245,7 +241,7 @@
   ]);
 
   ctrl.controller("MyFilesController", [
-    '$http', '$scope', '$rootScope', '$timeout', 'User', function($http, $scope, $rootScope, $timeout, User) {
+    '$http', '$scope', '$rootScope', '$timeout', 'User', 'MapService', function($http, $scope, $rootScope, $timeout, User, MapService) {
       $rootScope.showing = 'loading';
       $scope.display = 'loading';
       $rootScope.loggedIn = false;
@@ -284,11 +280,6 @@
           return $rootScope.setShowing();
         });
       });
-      $rootScope.$on('addLogServiceSelected', function() {
-        return $scope.$apply(function() {
-          return $scope.addLogServiceSelected = true;
-        });
-      });
       $scope.submitAgain = function() {
         $scope.complete = false;
         return $rootScope.setShowing();
@@ -312,7 +303,7 @@
           });
           return angular.element("html").scope().$broadcast('update-load');
         });
-        return startAddLogService();
+        return MapService.startAddMap();
       };
       $rootScope.setShowing = function() {
         var returnVal;
@@ -340,7 +331,7 @@
               fadeLoading(true);
             }
             setTimeout(function() {
-              return google.maps.event.trigger(addLogService, 'resize');
+              return google.maps.event.trigger(MapService.addMap, 'resize');
             }, 200);
             returnVal = 'loggedIn';
           } else {
@@ -354,7 +345,7 @@
         return $scope.display = returnVal;
       };
       $scope.canSubmit = function() {
-        return $scope.addLogServiceSelected && ($scope.selectedFile != null);
+        return MapService.addMapMarker && ($scope.selectedFile != null);
       };
       $scope.activateOverlay = function(view) {
         $rootScope.overlayIsActive = true;
@@ -366,13 +357,19 @@
       $scope.upload = function() {
         var payload;
         if (!$scope.canSubmit()) {
+          $(".white.small").css({
+            color: "red"
+          });
+          $timeout(function() {
+            return $(".white.small").css("");
+          }, 2000);
           return;
         }
         switchLoading("big center");
         payload = {
           gdriveId: $scope.selectedFile.id,
-          lat: addLogServiceMarker.position.lat(),
-          lng: addLogServiceMarker.position.lng()
+          lat: MapService.addMapMarker.position.lat(),
+          lng: MapService.addMapMarker.position.lng()
         };
         if (User.isPlusUser != null) {
           payload.profileId = User.id;
@@ -383,23 +380,33 @@
         $scope.loading = true;
         $rootScope.setShowing();
         return makePublic(payload.gdriveId, function(resp) {
-          return addToTravellog(payload.gdriveId, function(resp) {
-            return $http({
-              method: "POST",
-              url: "/logs",
-              data: payload
-            }).success(function(data, status, headers, config) {
-              $scope.loading = false;
-              $scope.complete = true;
-              $rootScope.setShowing();
-              if (data.status === 200) {
-                $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id;
-                return $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:";
-              } else {
-                $scope.completeUrl = "";
-                return $scope.successMessage = data.error;
-              }
-            }).error(function(data, status, headers, config) {});
+          var location;
+          location = new google.maps.LatLng(payload.lat, payload.lng);
+          return MapService.reverseGeocode(location, function(formatted_address, countryName) {
+            var _this = this;
+            payload.country = countryName;
+            return MapService.geocode(countryName, function(location) {
+              payload.countryLat = location.lat();
+              payload.countryLng = location.lng();
+              return addToTravellog(payload.gdriveId, function(resp) {
+                return $http({
+                  method: "POST",
+                  url: "/logs",
+                  data: payload
+                }).success(function(data, status, headers, config) {
+                  $scope.loading = false;
+                  $scope.complete = true;
+                  $rootScope.setShowing();
+                  if (data.status === 200) {
+                    $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id;
+                    return $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:";
+                  } else {
+                    $scope.completeUrl = "";
+                    return $scope.successMessage = data.error;
+                  }
+                }).error(function(data, status, headers, config) {});
+              });
+            });
           });
         });
       };

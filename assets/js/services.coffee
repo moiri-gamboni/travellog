@@ -62,12 +62,15 @@ srv.factory('Resources', ['$http', '$rootScope', ($http, $rootScope) ->
     getLog: (logId) ->
       return @getRequest('/logs',{id:logId})
     createLog: (googleDriveId, lat, lng, country) ->
-      return $postRequest('/logs' + {gdriveId: googleDriveId, lat: lat, lng:lng, country:country})
+      return $postRequest('/logs' + {gdriveId: googleDriveId, lat: lat,\
+        lng:lng, country:country})
 
   return factory
 ])
 
-srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http, $rootScope, Resources) ->
+srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
+'MapService', '$timeout',\
+($q, $http, $rootScope, Resources, MapService, $timeout) ->
   res = Resources
   factory =
     logs: {}
@@ -114,6 +117,34 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http,
         deferred.reject('Log is already loaded')
       return deferred.promise
 
+    # geolocate all logs (for backwards compatibility)
+    refreshAllLogsLocation: () ->
+      i = 0
+      for k, log of @logs
+        do (log) =>
+          $timeout( () =>
+            location = new google.maps.LatLng(log.lat, log.lng)
+            MapService.reverseGeocode(location, (formatted_address, countryName) =>
+              if not @countries[countryName]?
+                MapService.geocode(countryName, (location) =>
+                  $.post(window.location.origin + "/log/" + log.id + "/edit",
+                  JSON.stringify({
+                    country: countryName
+                    countryLat: location.lat()
+                    countryLng: location.lng()
+                  }), (resp) ->
+                    console.log("updated log with new geocode")
+                  )
+                )
+              else
+                console.log("attempting geocode with existing country " + countryName)
+                $.post(window.location.origin + "/log/" + log.id + "/edit",
+                  JSON.stringify({country: countryName}), (resp) ->
+                    console.log("updated log")
+                )
+            )
+          , 3000*i)
+        i++
 
     getClosestLogs: (logKey) ->
       logPromises = []
@@ -183,7 +214,15 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http,
 
     initLogs: () ->
       deferred = $q.defer()
-      res.getLogs().success((data) ->
+      res.getCountries().then((data) ->
+        for country in data.data.countries
+          country.logs = []
+          factory.countries[country.id] = country
+          MapService.placeMarkerMiniMap(country, true)
+        return res.getLogs()
+      ).then((data) ->
+        data = data.data
+        deferred.notify(0)
         factory.sortedLogs.lat = data.logs.slice().sort((b, a) ->
           return b.lat-a.lat
         )
@@ -198,6 +237,10 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources', ($q, $http,
             lat: log.lat
             lng: log.lng
             key: [null, i]
+          factory.countries[log.country].logs.push(log.id)
+          # add to the marker
+          MapService.placeMarkerMiniMap(log)
+        MapService.initMarkers()
         factory.sortedLogs.lng = data.logs.slice().sort((b, a) ->
           return b.lng-a.lng
         )
@@ -227,9 +270,12 @@ srv.factory('User', [() ->
 srv.factory('MapService', ['$rootScope', ($rootScope) ->
   factory =
     idMarkerMap: {}
+    countryMarkers: []
     geocoder: null
     addMapMarker: null
     miniMap: null
+    miniMapMgr: null
+    addMap: null
     icons:
       current: "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png"
       visited: "http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png"
@@ -294,6 +340,9 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
         ]
 
       @miniMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
+      @miniMapMgr = new MarkerManager(@miniMap)
+      angular.element("html").scope().$broadcast("map-ready")
+
     startAddMap: () ->
       mapOptions =
         center: new google.maps.LatLng(0, 0)
@@ -350,30 +399,17 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
           ]
         ]
 
-      addMap = new google.maps.Map(document.getElementById("add-map-canvas"), mapOptions)
-      google.maps.event.addListener(addMap, "click", (event) ->
-        $rootScope.$broadcast("addMapSelected")
+      @addMap = new google.maps.Map(document.getElementById("add-map-canvas"), mapOptions)
+      google.maps.event.addListener(@addMap, "click", (event) =>
         if @addMapMarker?
           @addMapMarker.setPosition(event.latLng)
         else
           @addMapMarker = new google.maps.Marker(
             position: event.latLng
             animation: google.maps.Animation.BOUNCE
-            map: addMap
+            map: @addMap
           )
       )
-
-    seedMap: () ->
-      dropCallback = (resp, i) ->
-       return () ->
-        placeMarkerMiniMap(resp.logs[i])
-      $.get("/logs", (resp) ->
-        i = 0
-        while i < resp.logs.length
-          setTimeout(dropCallback(resp, i), i * 200)
-          i++
-      )
-
 
     # different icons
 
@@ -398,19 +434,32 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
 
       # focus the map to the new marker
       @miniMap.panTo(@currentMiniMarker.position)
-      @miniMap.setZoom(2) if @miniMap.getZoom() is 1
+      @miniMap.setZoom(3) if @miniMap.getZoom() is 1
+
     switchMiniMarker: () ->
       $rootScope.$broadcast("switch-marker", @title)
-    placeMarkerMiniMap: (log_object) ->
+
+    placeMarkerMiniMap: (log_object, isCountry) ->
       marker = new google.maps.Marker(
         position: new google.maps.LatLng(log_object.lat, log_object.lng)
-        animation: google.maps.Animation.DROP
-        map: @miniMap
         title: log_object.id
-        icon: @icons.unvisited
+        icon: if isCountry then @icons.unvisited else @icons.unvisited
       )
-      @idMarkerMap[log_object.id] = marker
-      google.maps.event.addListener(marker, "click", @switchMiniMarker)
+      if isCountry
+        @countryMarkers.push(marker)
+      else
+        @idMarkerMap[log_object.id] = marker
+        google.maps.event.addListener(marker, "click", @switchMiniMarker)
+
+    initMarkers: () ->
+      markers = []
+      for k, marker of @idMarkerMap
+        markers.push(marker)
+      console.log "Specific markers"
+      @miniMapMgr.addMarkers(markers, 3)
+      console.log "Country markers"
+      @miniMapMgr.addMarkers(@countryMarkers, 0, 2)
+      @miniMapMgr.refresh()
 
     # reverse geocoder modified from code example
     reverseGeocode: (latlng, callback) ->
@@ -418,30 +467,30 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
         latLng: latlng
       , (results, status) ->
         if status is google.maps.GeocoderStatus.OK
-          if results[1]
-            console.log "Results are:"
-            formatted_address = results[1].formatted_address
-            countryName = results[1].address_components[results[1].address_components.length - 1].long_name
-            console.log formatted_address
-            console.log countryName
+          if results.length > 0
+            formatted_address = results[0].formatted_address
+            for component in results[0].address_components
+              if component.types == "country" or "country" in component.types
+                countryName = component.long_name
+                break
+            countryName ?= "Other"
             typeof callback is "function" and callback(formatted_address, countryName)
           else
             console.log "No results found"
         else
           console.log "Geocoder failed due to: " + status
+          console.log latlng
+          typeof callback is "function" and callback("Other", "Other")
 
     geocode: (countryName, callback) ->
       @geocoder.geocode
         address: countryName
       , (results, status) ->
         if status is google.maps.GeocoderStatus.OK
-          map.setCenter results[0].geometry.location
-          marker = new google.maps.Marker(
-            map: map
-            position: results[0].geometry.location
-          )
+          #map.setCenter results[0].geometry.location
+          typeof callback is "function" and callback(results[0].geometry.location)
         else
-          alert "Geocode was not successful for the following reason: " + status
+          console.log "Geocode was not successful for the following reason: " + status
 
   return factory
 ])

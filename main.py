@@ -16,7 +16,7 @@ from data_api import LogHandler, LogIdHandler, DriveHandler, DriveSyncHandler,\
 import gdrive
 
 application = webapp2.WSGIApplication([
-  ('/logs', LogHandler), (r"/log/(\w+)/edit", LogIdHandler),
+  ('/logs', LogHandler), (r"/log/([\w-]+)/edit", LogIdHandler),
   ("/drive", DriveHandler), ("/drive/sync", DriveSyncHandler),
   ('/countries', CountryHandler)
 ], debug=True)

@@ -50,8 +50,8 @@ def get_all_logs_objects():
     resp[log.key.id()] = log
   return resp
 
-def create_log(gdriveId, lat, lng):
-  log = Log(id=gdriveId, lat=lat, lng=lng)
+def create_log(gdriveId, lat, lng, country):
+  log = Log(id=gdriveId, lat=lat, lng=lng, country=country)
   return log
 
 def get_country_object_by_key(country_name):

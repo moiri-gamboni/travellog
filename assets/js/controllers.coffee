@@ -1,28 +1,31 @@
 "use strict"
 ctrl = angular.module("mainModule.controllers", [])
 
-ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogService', 'MapService', ($http, $scope, $rootScope, $timeout, LogService, MapService) ->
+ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 'LogService', 'MapService', ($q, $http, $scope, $rootScope, $timeout, LogService, MapService) ->
   $rootScope.overlayIsActive = false
   switchLogs = false
-  isFirstLogReady: false
-  arePinsDropped: false
-  canBegin: false
+  isFirstLogReady = false
+  arePinsDropped = false
+  canBegin = false
   $scope.log = null
   $scope.otherLog = null
 
   dropPins = () ->
     deferredPins = []
+    promisedPins = []
     i = 0
+    dropPin = (i) ->
+      return () ->
+        MapService.placeMarkerMiniMap(log)
+        deferredPins[i].resolve()
+
     for logId, log of LogService.logs
-      deferred = $q.defer()
-      deferredPins[i] = deferred.promise
-      $timeout(
-        ()->
-          MapService.placeMarkerMiniMap(log)
-          deferred.resolve()
-        ,200*i)
+      deferredPins[i] = $q.defer()
+      $timeout(dropPin(i),200*i)
       i++
-    return $q.all(deferredPins)
+    for deferred in deferredPins
+      promisedPins.push(deferred.promise)
+    return $q.all(promisedPins)
 
   $scope.begin = () ->
     if canBegin
@@ -109,7 +112,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
       console.log 'no logid'
 
   $scope.move = (direction) ->
-    if LogService.loadingLogs == 0
+    if LogService.logsLoading == 0
       LogService.move(direction)
       log = LogService.getCurrentLog()
       showLog(log.id, {changeMarker:false})
@@ -122,13 +125,13 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
   $rootScope.$on('switch-marker', (event, logId) ->
     $(".main" + " .log-author").css({"opacity": 0})
     if LogService.logs[logId].body?
-      showLog(logId, {invert:true, changeMarker:true, renderBadgeInMain:true})
+      showLog(logId, {invert:true, renderBadgeInMain:true})
     else
       LogService.getLog(logId)
       LogService.getClosestLogs(LogService.logs[logId].key)
       watch = $rootScope.$on('logs-loading', () ->
         if LogService.loadingLogs == 0
-          showLog(logId, {manualSwitch:false, invert:true, pushState:true, changeMarker:true, renderBadgeInMain:true})
+          showLog(logId, {invert:true, renderBadgeInMain:true})
           watch()
       )
   )
@@ -154,7 +157,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
 
   window.onpopstate = (event) ->
     if event.state?
-      showLog(event.state, {manualSwitch:false, invert:true, pushState:false})
+      showLog(event.state, {invert:true, pushState:false})
 
   $scope.deactivateOverlay = (view) ->
     $rootScope.overlayIsActive = false
@@ -169,9 +172,8 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
       $rootScope.setShowing()
 
   MapService.init()
-  LogService.initLogs.then(
+  LogService.initLogs().then(
     (logs) ->
-      $rootScope.logs = logs
       $("#loading").addClass("fadeout")
       $("#start-here").addClass("fadein")
       canBegin = true
@@ -194,7 +196,7 @@ ctrl.controller("mainCtrl", ['$http', '$scope', '$rootScope', '$timeout', 'LogSe
 
 ])
 
-ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout', 'User', ($http, $scope, $rootScope, $timeout, User) ->
+ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout', 'User', 'MapService', ($http, $scope, $rootScope, $timeout, User, MapService) ->
     #if user is signed_in
   #$scope.map = LogService
   $rootScope.showing = 'loading'
@@ -234,10 +236,6 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
       $rootScope.setShowing()
   )
 
-  $rootScope.$on('addLogServiceSelected', () ->
-    $scope.$apply ()->
-      $scope.addLogServiceSelected = true
-  )
   $scope.submitAgain = () ->
     $scope.complete = false
     $rootScope.setShowing()
@@ -260,9 +258,9 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
         , 500
         )
       )
-      angular.element("html").scope().$broadcast('update-load');
+      angular.element("html").scope().$broadcast('update-load')
     )
-    startAddLogService()
+    MapService.startAddMap()
 
   $rootScope.setShowing = () ->
     returnVal = ""
@@ -285,7 +283,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
         else if $rootScope.overlayIsActive and $scope.filesLoaded
           fadeLoading(true)
         setTimeout( ()->
-          google.maps.event.trigger(addLogService, 'resize')
+          google.maps.event.trigger(MapService.addMap, 'resize')
         , 200)
         returnVal = 'loggedIn'
       else
@@ -296,7 +294,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
     $scope.display = returnVal
 
   $scope.canSubmit = () ->
-    return $scope.addLogServiceSelected and $scope.selectedFile?
+    return MapService.addMapMarker and $scope.selectedFile?
 
   $scope.activateOverlay = (view) ->
     $rootScope.overlayIsActive = true
@@ -307,38 +305,51 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
 
   $scope.upload = () ->
     if not $scope.canSubmit()
+      $(".white.small").css({color: "red"})
+      $timeout(() ->
+        $(".white.small").css("")
+      , 2000)
       return
     switchLoading("big center")
     payload =
       gdriveId: $scope.selectedFile.id
-      lat: addLogServiceMarker.position.lat()
-      lng: addLogServiceMarker.position.lng()
+      lat: MapService.addMapMarker.position.lat()
+      lng: MapService.addMapMarker.position.lng()
 
     if User.isPlusUser?
       payload.profileId = User.id
     else
       payload.profileName = User.name
+
     $scope.loadingMessage = "Sharing your story!"
     $scope.loading = true
     $rootScope.setShowing()
     makePublic(payload.gdriveId, (resp) ->
-      addToTravellog(payload.gdriveId, (resp) ->
-        $http(
-          method: "POST"
-          url: "/logs"
-          data: payload
-        ).success((data, status, headers, config) ->
-         $scope.loading = false
-         $scope.complete = true
-         $rootScope.setShowing()
-         if data.status == 200
-            $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id
-            $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:"
-          else
-            $scope.completeUrl = ""
-            $scope.successMessage = data.error
-        ).error (data, status, headers, config) ->
-          return
+      location = new google.maps.LatLng(payload.lat, payload.lng)
+      MapService.reverseGeocode(location, (formatted_address, countryName) ->
+        payload.country = countryName
+        MapService.geocode(countryName, (location) =>
+          payload.countryLat = location.lat()
+          payload.countryLng = location.lng()
+          addToTravellog(payload.gdriveId, (resp) ->
+            $http(
+              method: "POST"
+              url: "/logs"
+              data: payload
+            ).success((data, status, headers, config) ->
+             $scope.loading = false
+             $scope.complete = true
+             $rootScope.setShowing()
+             if data.status == 200
+                $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id
+                $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:"
+              else
+                $scope.completeUrl = ""
+                $scope.successMessage = data.error
+            ).error (data, status, headers, config) ->
+              return
+          )
+        )
       )
     )
 
