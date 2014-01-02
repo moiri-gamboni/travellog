@@ -72,7 +72,7 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
   #pushState = true
   #changeMarker = true
   #renderBadgeInMain = false
-  showLog = (logId,options) ->
+  showLog = (logId, options) ->
     if not options?
       options = {}
     if not options.manualSwitch?
@@ -146,6 +146,7 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     if LogService.logs[logId].body?
       showLog(logId, {invert:true, renderBadgeInMain:true})
     else
+      # THIS IS BROKEN. LOGS-LOADING never fires...
       LogService.getLog(logId)
       LogService.getClosestLogs(LogService.logs[logId].key)
       watch = $rootScope.$on('logs-loading', () ->
