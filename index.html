@@ -11,6 +11,7 @@
 	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEaBU9ut05NvkD4_k72xRDGuVYr_ucPZc&sensor=false">
 	</script>
   <script type="text/javascript" src='/static/js/markermanager.js'></script>
+  <script type="text/javascript" src='/static/js/markerwithlabel.js'></script>
   <meta name="description" content="Travellog is a place to discover and share experiences of travel">
   <meta name="keywords" content="Travel, gcdc, nyuad, experience, discover, stories">
   <meta property="og:image" content="http://www.travellog.io/static/img/travellog-logo.png"/>
@@ -36,6 +37,7 @@
 
 	<div id="container" class="hide">
 		<div id="minimap">
+      <div id="loading-text"></div>
 			<div id="map-canvas"></div>
 		</div>
 		<div id="overlay">
@@ -85,7 +87,6 @@
 		</div>
 	</div>
 	<div id="blackshade" ></div>
-
 	<log></log>
 	<otherlog></otherlog>
 	<div class="sidenav sidenav-left" ng-click="move('W')">
@@ -101,6 +102,7 @@
 		<div class="arrow arrow-up-down arrow-down"></div>
 	</div>
 	<div id="nav">
+    <div class="g-plus" data-action="share" data-align="right" data-annotation="bubble"></div>
 		<img id="add" ng-click="changeShowing('addFile')" src="/static/img/addIcon.png"/>
 		<img id="question" ng-click="changeShowing('help')" src="/static/img/questionIcon.png"/>
 	</div>

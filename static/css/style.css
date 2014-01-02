@@ -526,6 +526,7 @@
   opacity: 0.6;
 }
 #container #nav {
+  text-align: right;
   padding-right: 70px;
   padding-bottom: 60px;
   position: absolute;
@@ -757,4 +758,14 @@
   #container .log-details .log-title {
     font-size: 1.7em;
   }
+}
+#loading-text {
+  color: #fff;
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  text-align: center;
+  top: 40%;
+  font-size: 2em;
+  display: none;
 }

@@ -16,25 +16,34 @@
       $scope.log = null;
       $scope.otherLog = null;
       dropPins = function() {
-        var deferred, deferredPins, dropPin, i, log, logId, promisedPins, _i, _len, _ref;
+        var country, deferred, deferredPins, dropPin, i, loader, promisedPins, _i, _j, _len, _len1, _ref;
         deferredPins = [];
         promisedPins = [];
         i = 0;
-        dropPin = function(i) {
+        loader = $("#loading-text");
+        loader.css({
+          display: "block"
+        });
+        dropPin = function(i, country) {
           return function() {
-            MapService.placeMarkerMiniMap(log);
+            loader.html(country.title);
+            MapService.miniMapMgr.addMarker(country, 0, 2);
             return deferredPins[i].resolve();
           };
         };
-        _ref = LogService.logs;
-        for (logId in _ref) {
-          log = _ref[logId];
-          deferredPins[i] = $q.defer();
-          $timeout(dropPin(i), 200 * i);
-          i++;
+        _ref = MapService.countryMarkers;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          country = _ref[_i];
+          if (country.title !== "Other") {
+            (function(country) {
+              deferredPins[i] = $q.defer();
+              return $timeout(dropPin(i, country), 250 * i);
+            })(country);
+            i++;
+          }
         }
-        for (_i = 0, _len = deferredPins.length; _i < _len; _i++) {
-          deferred = deferredPins[_i];
+        for (_j = 0, _len1 = deferredPins.length; _j < _len1; _j++) {
+          deferred = deferredPins[_j];
           promisedPins.push(deferred.promise);
         }
         return $q.all(promisedPins);
@@ -48,6 +57,10 @@
           return $timeout(function() {
             return dropPins().then(function() {
               arePinsDropped = true;
+              $("#loading-text").css({
+                display: "none"
+              });
+              console.log("cancelling");
               if (isFirstLogReady) {
                 $(".main.fade").removeClass("fadeout");
                 $(".main.fade").addClass("fadein");
@@ -93,6 +106,7 @@
         }
         if (logId != null) {
           log = LogService.logs[logId];
+          document.title = "Travellog - " + log.title;
           if (options.invert) {
             if (!switchLogs) {
               $scope.otherLog = log;
@@ -148,8 +162,11 @@
           }, 500);
         }
       };
-      $rootScope.$on('switch-marker', function(event, logId) {
+      $rootScope.$on('switch-marker', function(event, logId, isCountry) {
         var watch;
+        if (isCountry) {
+          logId = LogService.countries[logId].logs[0];
+        }
         $(".main" + " .log-author").css({
           "opacity": 0
         });
@@ -217,6 +234,7 @@
           return $rootScope.setShowing();
         }
       };
+      console.log("Maps init");
       MapService.init();
       return LogService.initLogs().then(function(logs) {
         $("#loading").addClass("fadeout");

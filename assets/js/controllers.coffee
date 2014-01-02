@@ -14,15 +14,20 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     deferredPins = []
     promisedPins = []
     i = 0
-    dropPin = (i) ->
+    loader = $("#loading-text")
+    loader.css({display: "block"})
+    dropPin = (i, country) ->
       return () ->
-        MapService.placeMarkerMiniMap(log)
+        loader.html(country.title)
+        MapService.miniMapMgr.addMarker(country, 0, 2)
         deferredPins[i].resolve()
 
-    for logId, log of LogService.logs
-      deferredPins[i] = $q.defer()
-      $timeout(dropPin(i),200*i)
-      i++
+    for country in MapService.countryMarkers
+      if country.title != "Other"
+        do (country) ->
+          deferredPins[i] = $q.defer()
+          $timeout(dropPin(i, country),250*i)
+        i++
     for deferred in deferredPins
       promisedPins.push(deferred.promise)
     return $q.all(promisedPins)
@@ -38,6 +43,8 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
           dropPins().then(
             ()->
               arePinsDropped = true
+              $("#loading-text").css({display: "none"})
+              console.log "cancelling"
               if isFirstLogReady
                 $(".main.fade").removeClass("fadeout")
                 $(".main.fade").addClass("fadein")
@@ -80,6 +87,7 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
 
     if logId?
       log = LogService.logs[logId]
+      document.title = "Travellog - " + log.title
       if options.invert
         if not switchLogs
           $scope.otherLog = log
@@ -122,7 +130,9 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
       , 500
       )
 
-  $rootScope.$on('switch-marker', (event, logId) ->
+  $rootScope.$on('switch-marker', (event, logId, isCountry) ->
+    if isCountry
+      logId = LogService.countries[logId].logs[0]
     $(".main" + " .log-author").css({"opacity": 0})
     if LogService.logs[logId].body?
       showLog(logId, {invert:true, renderBadgeInMain:true})
@@ -171,6 +181,7 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
         $rootScope.pullFiles()
       $rootScope.setShowing()
 
+  console.log "Maps init"
   MapService.init()
   LogService.initLogs().then(
     (logs) ->

@@ -220,7 +220,7 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
           factory.countries[country.id] = country
           MapService.placeMarkerMiniMap(country, true)
         return res.getLogs()
-      ).then((data) ->
+      ).then((data) =>
         data = data.data
         deferred.notify(0)
         factory.sortedLogs.lat = data.logs.slice().sort((b, a) ->
@@ -240,7 +240,14 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
           factory.countries[log.country].logs.push(log.id)
           # add to the marker
           MapService.placeMarkerMiniMap(log)
-        MapService.initMarkers()
+        try
+          # if the manager is already loaded
+          MapService.initMarkers()
+        catch
+          # otherwise work when loaded
+          google.maps.event.addListener(MapService.miniMapMgr, 'loaded', () ->
+            MapService.initMarkers()
+          )
         factory.sortedLogs.lng = data.logs.slice().sort((b, a) ->
           return b.lng-a.lng
         )
@@ -277,9 +284,10 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
     miniMapMgr: null
     addMap: null
     icons:
-      current: "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png"
-      visited: "http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png"
-      unvisited: "http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png"
+      current: "/static/img/pins/storyActive.png"
+      visited: "/static/img/pins/storyVisited.png"
+      unvisited: "/static/img/pins/storyUnvisited.png"
+      country: "/static/img/pins/countryZoomedActive.png"
     currentMiniMarker: null
 
     init: () ->
@@ -434,19 +442,23 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
 
       # focus the map to the new marker
       @miniMap.panTo(@currentMiniMarker.position)
-      @miniMap.setZoom(3) if @miniMap.getZoom() is 1
+      @miniMap.setZoom(3)
 
-    switchMiniMarker: () ->
-      $rootScope.$broadcast("switch-marker", @title)
+    switchMiniMarker: (isCountry) ->
+      $rootScope.$broadcast("switch-marker", @title, false)
+
+    switchMiniMarkerCountry: (isCountry) ->
+      $rootScope.$broadcast("switch-marker", @title, true)
 
     placeMarkerMiniMap: (log_object, isCountry) ->
       marker = new google.maps.Marker(
         position: new google.maps.LatLng(log_object.lat, log_object.lng)
         title: log_object.id
-        icon: if isCountry then @icons.unvisited else @icons.unvisited
+        icon: if isCountry then @icons.country else @icons.unvisited
       )
       if isCountry
         @countryMarkers.push(marker)
+        google.maps.event.addListener(marker, "click", @switchMiniMarkerCountry)
       else
         @idMarkerMap[log_object.id] = marker
         google.maps.event.addListener(marker, "click", @switchMiniMarker)
@@ -455,10 +467,8 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
       markers = []
       for k, marker of @idMarkerMap
         markers.push(marker)
-      console.log "Specific markers"
       @miniMapMgr.addMarkers(markers, 3)
-      console.log "Country markers"
-      @miniMapMgr.addMarkers(@countryMarkers, 0, 2)
+      #@miniMapMgr.addMarkers(@countryMarkers, 0, 2)
       @miniMapMgr.refresh()
 
     # reverse geocoder modified from code example

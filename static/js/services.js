@@ -260,7 +260,8 @@
           }
         },
         initLogs: function() {
-          var deferred;
+          var deferred,
+            _this = this;
           deferred = $q.defer();
           res.getCountries().then(function(data) {
             var country, _i, _len, _ref;
@@ -296,7 +297,13 @@
               factory.countries[log.country].logs.push(log.id);
               MapService.placeMarkerMiniMap(log);
             }
-            MapService.initMarkers();
+            try {
+              MapService.initMarkers();
+            } catch (_error) {
+              google.maps.event.addListener(MapService.miniMapMgr, 'loaded', function() {
+                return MapService.initMarkers();
+              });
+            }
             factory.sortedLogs.lng = data.logs.slice().sort(function(b, a) {
               return b.lng - a.lng;
             });
@@ -340,9 +347,10 @@
         miniMapMgr: null,
         addMap: null,
         icons: {
-          current: "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png",
-          visited: "http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png",
-          unvisited: "http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png"
+          current: "/static/img/pins/storyActive.png",
+          visited: "/static/img/pins/storyVisited.png",
+          unvisited: "/static/img/pins/storyUnvisited.png",
+          country: "/static/img/pins/countryZoomedActive.png"
         },
         currentMiniMarker: null,
         init: function() {
@@ -549,22 +557,24 @@
             this.currentMiniMarker.setAnimation(google.maps.Animation.BOUNCE);
           }
           this.miniMap.panTo(this.currentMiniMarker.position);
-          if (this.miniMap.getZoom() === 1) {
-            return this.miniMap.setZoom(3);
-          }
+          return this.miniMap.setZoom(3);
         },
-        switchMiniMarker: function() {
-          return $rootScope.$broadcast("switch-marker", this.title);
+        switchMiniMarker: function(isCountry) {
+          return $rootScope.$broadcast("switch-marker", this.title, false);
+        },
+        switchMiniMarkerCountry: function(isCountry) {
+          return $rootScope.$broadcast("switch-marker", this.title, true);
         },
         placeMarkerMiniMap: function(log_object, isCountry) {
           var marker;
           marker = new google.maps.Marker({
             position: new google.maps.LatLng(log_object.lat, log_object.lng),
             title: log_object.id,
-            icon: isCountry ? this.icons.unvisited : this.icons.unvisited
+            icon: isCountry ? this.icons.country : this.icons.unvisited
           });
           if (isCountry) {
-            return this.countryMarkers.push(marker);
+            this.countryMarkers.push(marker);
+            return google.maps.event.addListener(marker, "click", this.switchMiniMarkerCountry);
           } else {
             this.idMarkerMap[log_object.id] = marker;
             return google.maps.event.addListener(marker, "click", this.switchMiniMarker);
@@ -578,10 +588,7 @@
             marker = _ref[k];
             markers.push(marker);
           }
-          console.log("Specific markers");
           this.miniMapMgr.addMarkers(markers, 3);
-          console.log("Country markers");
-          this.miniMapMgr.addMarkers(this.countryMarkers, 0, 2);
           return this.miniMapMgr.refresh();
         },
         reverseGeocode: function(latlng, callback) {
