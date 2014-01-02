@@ -8,7 +8,7 @@
 	<meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
 	<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
 	<script type="text/javascript"
-	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEaBU9ut05NvkD4_k72xRDGuVYr_ucPZc&sensor=false">
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEaBU9ut05NvkD4_k72xRDGuVYr_ucPZc&sensor=false&libraries=places">
 	</script>
   <script type="text/javascript" src='/static/js/markermanager.js'></script>
   <meta name="description" content="Travellog is a place to discover and share experiences of travel">
@@ -36,6 +36,7 @@
 
 	<div id="container" class="hide">
 		<div id="minimap">
+      <input id="place-search" class="controls" type="text" placeholder="Location Search">
       <div id="loading-text"></div>
 			<div id="map-canvas"></div>
 		</div>
@@ -101,7 +102,7 @@
 		<div class="arrow arrow-up-down arrow-down"></div>
 	</div>
 	<div id="nav">
-    <div class="g-plus" data-action="share" data-align="right" data-annotation="bubble"></div>
+    <div id="plus-button"></div>
 		<img id="add" ng-click="changeShowing('addFile')" src="/static/img/addIcon.png"/>
 		<img id="question" ng-click="changeShowing('help')" src="/static/img/questionIcon.png"/>
 	</div>

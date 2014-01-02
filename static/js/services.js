@@ -354,7 +354,8 @@
         },
         currentMiniMarker: null,
         init: function() {
-          var mapOptions;
+          var input, mapOptions, searchBox,
+            _this = this;
           this.geocoder = new google.maps.Geocoder();
           mapOptions = {
             center: new google.maps.LatLng(20, 0),
@@ -441,6 +442,15 @@
           };
           this.miniMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
           this.miniMapMgr = new MarkerManager(this.miniMap);
+          input = document.getElementById('place-search');
+          this.miniMap.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+          searchBox = new google.maps.places.SearchBox(input);
+          google.maps.event.addListener(searchBox, 'places_changed', function() {
+            var places;
+            places = searchBox.getPlaces();
+            _this.miniMap.panTo(places[0].geometry.location);
+            return _this.miniMap.setZoom(3);
+          });
           return angular.element("html").scope().$broadcast("map-ready");
         },
         startAddMap: function() {
@@ -448,7 +458,7 @@
             _this = this;
           mapOptions = {
             center: new google.maps.LatLng(0, 0),
-            zoom: 1,
+            zoom: 2,
             styles: [
               {
                 featureType: "administrative",

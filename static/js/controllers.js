@@ -34,7 +34,8 @@
         _ref = MapService.countryMarkers;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           country = _ref[_i];
-          if (country.title !== "Other") {
+          if (country.title !== "Other" && country.title !== "None") {
+            console.log(country.title);
             (function(country) {
               deferredPins[i] = $q.defer();
               return $timeout(dropPin(i, country), 250 * i);
@@ -129,13 +130,21 @@
             }
           } else {
             if (options.renderBadgeInMain) {
-              $(".main .log-author").html(log.profileName);
+              $(".main .log-author").html(log.profileName).scrollTop(0);
             } else {
-              $(".launch .log-author").html(log.profileName);
+              $(".launch .log-author").html(log.profileName).scrollTop(0);
             }
           }
           if (options.pushState) {
             history.pushState(log.id, log.title, "/log/" + log.id);
+            console.log("new link");
+            console.log(document.location.href);
+            gapi.plus.render("plus-button", {
+              action: "share",
+              align: "right",
+              annotation: "bubble",
+              href: document.location.href
+            });
           }
           if (options.manualSwitch) {
             switchLogs = !switchLogs;

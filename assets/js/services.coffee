@@ -349,12 +349,20 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
 
       @miniMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
       @miniMapMgr = new MarkerManager(@miniMap)
+      input = document.getElementById('place-search')
+      @miniMap.controls[google.maps.ControlPosition.TOP_LEFT].push(input)
+      searchBox = new google.maps.places.SearchBox(input)
+      google.maps.event.addListener(searchBox, 'places_changed', () =>
+        places = searchBox.getPlaces()
+        @miniMap.panTo places[0].geometry.location
+        @miniMap.setZoom(3)
+      )
       angular.element("html").scope().$broadcast("map-ready")
 
     startAddMap: () ->
       mapOptions =
         center: new google.maps.LatLng(0, 0)
-        zoom: 1
+        zoom: 2
         styles: [
           featureType: "administrative"
           stylers: [visibility: "off"]

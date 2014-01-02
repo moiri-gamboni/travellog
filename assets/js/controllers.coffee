@@ -23,7 +23,8 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
         deferredPins[i].resolve()
 
     for country in MapService.countryMarkers
-      if country.title != "Other"
+      if country.title != "Other" and country.title != "None"
+        console.log country.title
         do (country) ->
           deferredPins[i] = $q.defer()
           $timeout(dropPin(i, country),250*i)
@@ -106,11 +107,19 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
           renderBadge(log.profileId, '.launch')
       else
         if options.renderBadgeInMain
-          $(".main .log-author").html(log.profileName)
+          $(".main .log-author").html(log.profileName).scrollTop(0)
         else
-          $(".launch .log-author").html(log.profileName)
+          $(".launch .log-author").html(log.profileName).scrollTop(0)
       if options.pushState
         history.pushState(log.id, log.title, "/log/"+log.id)
+        console.log "new link"
+        console.log document.location.href
+        gapi.plus.render("plus-button",
+          action: "share"
+          align: "right"
+          annotation: "bubble"
+          href: document.location.href
+        )
       if options.manualSwitch
         switchLogs = not switchLogs
       LogService.current = log.key
