@@ -50,6 +50,7 @@
         return $q.all(promisedPins);
       };
       $scope.begin = function() {
+        console.log("This is calling scope.begin");
         if (canBegin) {
           $("#launch-screen").addClass("fadeout");
           $("#container").removeClass("hide");
@@ -61,13 +62,13 @@
               $("#loading-text").css({
                 display: "none"
               });
-              console.log("cancelling");
               if (isFirstLogReady) {
                 $(".main.fade").removeClass("fadeout");
                 $(".main.fade").addClass("fadein");
                 loadingWatch();
                 switchLoading("small corner");
                 return showLog(LogService.getCurrentLog().id, {
+                  firstLoad: true,
                   manualSwitch: true,
                   renderBadgeInMain: true
                 });
@@ -85,8 +86,22 @@
       $rootScope.$on('sliding-animation-done', function() {
         return switchLogs = !switchLogs;
       });
+      $scope.safeApply = function(fn) {
+        var phase;
+        phase = this.$root.$$phase;
+        if (phase === "$apply" || phase === "$digest") {
+          if (fn && (typeof fn === "function")) {
+            return fn();
+          }
+        } else {
+          return this.$apply(fn);
+        }
+      };
       showLog = function(logId, options) {
         var log;
+        console.log("Calling the showlog");
+        console.log(logId);
+        console.log(options);
         if (options == null) {
           options = {};
         }
@@ -105,22 +120,36 @@
         if (options.renderBadgeInMain == null) {
           options.renderBadgeInMain = false;
         }
+        if (options.firstLoad == null) {
+          options.firstLoad = false;
+        }
         if (logId != null) {
           log = LogService.logs[logId];
           document.title = "Travellog - " + log.title;
+          $("#disqus_thread").remove();
           if (options.invert) {
             if (!switchLogs) {
+              console.log("In 1");
               $scope.otherLog = log;
+              $scope.safeApply();
             } else {
+              console.log("In 2");
               $scope.log = log;
+              $scope.safeApply();
             }
-            $scope.$apply();
           } else {
             if (switchLogs) {
+              console.log("In 3");
               $scope.otherLog = log;
             } else {
+              console.log("In 4");
               $scope.log = log;
             }
+          }
+          if (options.firstLoad || options.invert) {
+            $(".main .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>");
+          } else {
+            $(".launch .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>");
           }
           if (log.profileId != null) {
             if (options.renderBadgeInMain) {
@@ -130,9 +159,9 @@
             }
           } else {
             if (options.renderBadgeInMain) {
-              $(".main .log-author").html(log.profileName).scrollTop(0);
+              $(".main .log-author").html(log.profileName);
             } else {
-              $(".launch .log-author").html(log.profileName).scrollTop(0);
+              $(".launch .log-author").html(log.profileName);
             }
           }
           if (options.pushState) {
@@ -151,8 +180,11 @@
           }
           LogService.current = log.key;
           if (options.changeMarker) {
-            return MapService.changeLocation(logId);
+            MapService.changeLocation(logId);
           }
+          return typeof DISQUS !== "undefined" && DISQUS !== null ? DISQUS.reset({
+            reload: true
+          }) : void 0;
         } else {
           return console.log('no logid');
         }
@@ -176,7 +208,7 @@
         if (isCountry) {
           logId = LogService.countries[logId].logs[0];
         }
-        $(".main" + " .log-author").css({
+        $(".main .log-author").css({
           "opacity": 0
         });
         if (LogService.logs[logId].body != null) {

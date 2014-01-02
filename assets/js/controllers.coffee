@@ -34,6 +34,7 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     return $q.all(promisedPins)
 
   $scope.begin = () ->
+    console.log "This is calling scope.begin"
     if canBegin
       $("#launch-screen").addClass("fadeout")
       $("#container").removeClass("hide")
@@ -45,13 +46,12 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
             ()->
               arePinsDropped = true
               $("#loading-text").css({display: "none"})
-              console.log "cancelling"
               if isFirstLogReady
                 $(".main.fade").removeClass("fadeout")
                 $(".main.fade").addClass("fadein")
                 loadingWatch()
                 switchLoading("small corner")
-                showLog(LogService.getCurrentLog().id, {manualSwitch:true, renderBadgeInMain:true})
+                showLog(LogService.getCurrentLog().id, {firstLoad: true, manualSwitch:true, renderBadgeInMain:true})
           )
         ,500)
 
@@ -66,13 +66,24 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     switchLogs = not switchLogs
   )
 
+  $scope.safeApply = (fn) ->
+    phase = @$root.$$phase
+    if phase is "$apply" or phase is "$digest"
+      fn()  if fn and (typeof (fn) is "function")
+    else
+      @$apply fn
+
   #Default options:
   #manualSwitch = false
   #invert = false
   #pushState = true
   #changeMarker = true
   #renderBadgeInMain = false
+  #firstLoad = false
   showLog = (logId, options) ->
+    console.log "Calling the showlog"
+    console.log logId
+    console.log options
     if not options?
       options = {}
     if not options.manualSwitch?
@@ -85,21 +96,35 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
       options.changeMarker = true
     if not options.renderBadgeInMain?
       options.renderBadgeInMain = false
+    if not options.firstLoad?
+      options.firstLoad = false
 
     if logId?
       log = LogService.logs[logId]
       document.title = "Travellog - " + log.title
+      # Change comments
+      $("#disqus_thread").remove()
       if options.invert
         if not switchLogs
+          console.log "In 1"
           $scope.otherLog = log
+          $scope.safeApply()
         else
+          console.log "In 2"
           $scope.log = log
-        $scope.$apply()
+          $scope.safeApply()
       else
         if switchLogs
+          console.log "In 3"
           $scope.otherLog = log
         else
+          console.log "In 4"
           $scope.log = log
+      if options.firstLoad or (options.invert)
+        $(".main .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>")
+      else
+        $(".launch .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>")
+
       if log.profileId?
         if options.renderBadgeInMain
           renderBadge(log.profileId, '.main')
@@ -107,9 +132,9 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
           renderBadge(log.profileId, '.launch')
       else
         if options.renderBadgeInMain
-          $(".main .log-author").html(log.profileName).scrollTop(0)
+          $(".main .log-author").html(log.profileName)
         else
-          $(".launch .log-author").html(log.profileName).scrollTop(0)
+          $(".launch .log-author").html(log.profileName)
       if options.pushState
         history.pushState(log.id, log.title, "/log/"+log.id)
         console.log "new link"
@@ -125,6 +150,9 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
       LogService.current = log.key
       if options.changeMarker
         MapService.changeLocation(logId)
+      DISQUS?.reset(
+        reload: true
+      )
     else
       console.log 'no logid'
 
@@ -142,7 +170,7 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
   $rootScope.$on('switch-marker', (event, logId, isCountry) ->
     if isCountry
       logId = LogService.countries[logId].logs[0]
-    $(".main" + " .log-author").css({"opacity": 0})
+    $(".main .log-author").css({"opacity": 0})
     if LogService.logs[logId].body?
       showLog(logId, {invert:true, renderBadgeInMain:true})
     else

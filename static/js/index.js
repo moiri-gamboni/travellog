@@ -73,7 +73,7 @@
     }
     $(".launch").attr({
       "style": ""
-    }).css(prepare).children(".log-wrapper").scrollTop(0);
+    }).css(prepare).children(".log-wrapper");
     return setTimeout(function() {
       $(".launch").transition(launchIn, 800);
       $(".main").transition(mainOut, 800);
