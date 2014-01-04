@@ -526,11 +526,15 @@
   opacity: 0.6;
 }
 #container #nav {
+  text-align: right;
   padding-right: 70px;
   padding-bottom: 60px;
   position: absolute;
   bottom: 0;
   right: 0;
+}
+#container #nav #add {
+  margin-left: 10px;
 }
 #container #nav img {
   height: 30px;
@@ -757,4 +761,30 @@
   #container .log-details .log-title {
     font-size: 1.7em;
   }
+}
+#loading-text {
+  color: #fff;
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  text-align: center;
+  top: 40%;
+  font-size: 2em;
+  display: none;
+}
+#place-search {
+  background-color: #fff;
+  padding: 0 11px 0 13px;
+  width: 50%;
+  font-size: 15px;
+  font-weight: 300;
+  text-overflow: ellipsis;
+}
+.controls {
+  margin-top: 5px;
+  border: 1px solid transparent;
+  border-radius: 2px 0 0 2px;
+  height: 20px;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }

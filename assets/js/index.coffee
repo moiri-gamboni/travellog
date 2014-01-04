@@ -28,7 +28,7 @@ window.move = (direction) ->
 		prepare = {"left":screenWidth, "top": topDistance}
 		launchIn = {"x": -screenWidth, y: 0}
 		mainOut = {"x": -screenWidth, y: 0}
-	$(".launch").attr({"style": ""}).css(prepare).children(".log-wrapper").scrollTop(0)
+	$(".launch").attr({"style": ""}).css(prepare).children(".log-wrapper")
 	setTimeout(() ->
 		$(".launch").transition(launchIn,800)
 		$(".main").transition(mainOut,800)

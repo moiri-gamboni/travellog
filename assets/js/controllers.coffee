@@ -14,20 +14,27 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     deferredPins = []
     promisedPins = []
     i = 0
-    dropPin = (i) ->
+    loader = $("#loading-text")
+    loader.css({display: "block"})
+    dropPin = (i, country) ->
       return () ->
-        MapService.placeMarkerMiniMap(log)
+        loader.html(country.title)
+        MapService.miniMapMgr.addMarker(country, 0, 2)
         deferredPins[i].resolve()
 
-    for logId, log of LogService.logs
-      deferredPins[i] = $q.defer()
-      $timeout(dropPin(i),200*i)
-      i++
+    for country in MapService.countryMarkers
+      if country.title != "Other" and country.title != "None"
+        console.log country.title
+        do (country) ->
+          deferredPins[i] = $q.defer()
+          $timeout(dropPin(i, country),250*i)
+        i++
     for deferred in deferredPins
       promisedPins.push(deferred.promise)
     return $q.all(promisedPins)
 
   $scope.begin = () ->
+    console.log "This is calling scope.begin"
     if canBegin
       $("#launch-screen").addClass("fadeout")
       $("#container").removeClass("hide")
@@ -38,12 +45,13 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
           dropPins().then(
             ()->
               arePinsDropped = true
+              $("#loading-text").css({display: "none"})
               if isFirstLogReady
                 $(".main.fade").removeClass("fadeout")
                 $(".main.fade").addClass("fadein")
                 loadingWatch()
                 switchLoading("small corner")
-                showLog(LogService.getCurrentLog().id, {manualSwitch:true, renderBadgeInMain:true})
+                showLog(LogService.getCurrentLog().id, {firstLoad: true, manualSwitch:true, renderBadgeInMain:true})
           )
         ,500)
 
@@ -58,13 +66,24 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     switchLogs = not switchLogs
   )
 
+  $scope.safeApply = (fn) ->
+    phase = @$root.$$phase
+    if phase is "$apply" or phase is "$digest"
+      fn()  if fn and (typeof (fn) is "function")
+    else
+      @$apply fn
+
   #Default options:
   #manualSwitch = false
   #invert = false
   #pushState = true
   #changeMarker = true
   #renderBadgeInMain = false
-  showLog = (logId,options) ->
+  #firstLoad = false
+  showLog = (logId, options) ->
+    console.log "Calling the showlog"
+    console.log logId
+    console.log options
     if not options?
       options = {}
     if not options.manualSwitch?
@@ -77,20 +96,35 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
       options.changeMarker = true
     if not options.renderBadgeInMain?
       options.renderBadgeInMain = false
+    if not options.firstLoad?
+      options.firstLoad = false
 
     if logId?
       log = LogService.logs[logId]
+      document.title = "Travellog - " + log.title
+      # Change comments
+      $("#disqus_thread").remove()
       if options.invert
         if not switchLogs
+          console.log "In 1"
           $scope.otherLog = log
+          $scope.safeApply()
         else
+          console.log "In 2"
           $scope.log = log
-        $scope.$apply()
+          $scope.safeApply()
       else
         if switchLogs
+          console.log "In 3"
           $scope.otherLog = log
         else
+          console.log "In 4"
           $scope.log = log
+      if options.firstLoad or (options.invert)
+        $(".main .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>")
+      else
+        $(".launch .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>")
+
       if log.profileId?
         if options.renderBadgeInMain
           renderBadge(log.profileId, '.main')
@@ -103,11 +137,22 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
           $(".launch .log-author").html(log.profileName)
       if options.pushState
         history.pushState(log.id, log.title, "/log/"+log.id)
+        console.log "new link"
+        console.log document.location.href
+        gapi.plus.render("plus-button",
+          action: "share"
+          align: "right"
+          annotation: "bubble"
+          href: document.location.href
+        )
       if options.manualSwitch
         switchLogs = not switchLogs
       LogService.current = log.key
       if options.changeMarker
         MapService.changeLocation(logId)
+      DISQUS?.reset(
+        reload: true
+      )
     else
       console.log 'no logid'
 
@@ -122,11 +167,14 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
       , 500
       )
 
-  $rootScope.$on('switch-marker', (event, logId) ->
-    $(".main" + " .log-author").css({"opacity": 0})
+  $rootScope.$on('switch-marker', (event, logId, isCountry) ->
+    if isCountry
+      logId = LogService.countries[logId].logs[0]
+    $(".main .log-author").css({"opacity": 0})
     if LogService.logs[logId].body?
       showLog(logId, {invert:true, renderBadgeInMain:true})
     else
+      # THIS IS BROKEN. LOGS-LOADING never fires...
       LogService.getLog(logId)
       LogService.getClosestLogs(LogService.logs[logId].key)
       watch = $rootScope.$on('logs-loading', () ->
@@ -171,6 +219,7 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
         $rootScope.pullFiles()
       $rootScope.setShowing()
 
+  console.log "Maps init"
   MapService.init()
   LogService.initLogs().then(
     (logs) ->
