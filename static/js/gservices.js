@@ -64,14 +64,11 @@ function getUserInfo() {
 
 // renders the google plus badge in the loader
 function renderBadge(id, div) {
-  console.log('render badge')
   div_id = $(div + " .log-author").html('<div class="g-person"' +
     'data-width="273" data-href="https://plus.google.com/' + id +
     '" data-layout="landscape" data-showcoverphoto="false"></div>').attr("id");
   gapi.person.go(div_id);
-  console.log($(div + " .log-author"));
   setTimeout(function() {
-    console.log("fading in");
     $(".main" + " .log-author").css({"opacity": 1});
   }, 1500);
 }
@@ -84,22 +81,27 @@ function renderBadge(id, div) {
 function retrieveAllFiles(callback) {
   var retrievePageOfFiles = function(request, result) {
     request.execute(function(resp) {
-      fileFilter = []
-      resp.items.map(function(x) {
-        if (x.mimeType == "application/vnd.google-apps.document") {
-          fileFilter.push(x);
+      fileFilter = [];
+      if (resp.items) {
+        resp.items.map(function(x) {
+          if (x.mimeType == "application/vnd.google-apps.document") {
+            fileFilter.push(x);
+          }
+        }); 
+        result = result.concat(fileFilter);
+        angular.element("html").scope().$broadcast('partialFilesLoaded', result);
+        var nextPageToken = resp.nextPageToken;
+        if (nextPageToken) {
+          request = gapi.client.drive.files.list({
+            'pageToken': nextPageToken
+          });
+          retrievePageOfFiles(request, result);
+        } else {
+          callback(result);
         }
-      }); 
-      result = result.concat(fileFilter);
-      angular.element("html").scope().$broadcast('partialFilesLoaded', result);
-      var nextPageToken = resp.nextPageToken;
-      if (nextPageToken) {
-        request = gapi.client.drive.files.list({
-          'pageToken': nextPageToken
-        });
-        retrievePageOfFiles(request, result);
       } else {
-        callback(result);
+        angular.element("html").scope().$broadcast('partialFilesLoaded', []);
+        callback([]);
       }
     });
   };

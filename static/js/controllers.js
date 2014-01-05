@@ -15,6 +15,7 @@
       canBegin = false;
       $scope.log = null;
       $scope.otherLog = null;
+      $rootScope.miniMapMgrLoaded = $q.defer();
       dropPins = function() {
         var country, deferred, deferredPins, dropPin, i, loader, promisedPins, _i, _j, _len, _len1, _ref;
         deferredPins = [];
@@ -35,7 +36,6 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           country = _ref[_i];
           if (country.title !== "Other" && country.title !== "None") {
-            console.log(country.title);
             (function(country) {
               deferredPins[i] = $q.defer();
               return $timeout(dropPin(i, country), 250 * i);
@@ -49,8 +49,14 @@
         }
         return $q.all(promisedPins);
       };
+      $scope.deactivateOverlay = function(view) {
+        $("#overlay, #overlay-content").removeClass("fadein");
+        $rootScope.overlayIsActive = false;
+        $scope.changeShowing("small corner");
+        fadeLoading(true);
+        return $rootScope.setShowing();
+      };
       $scope.begin = function() {
-        console.log("This is calling scope.begin");
         if (canBegin) {
           $("#launch-screen").addClass("fadeout");
           $("#container").removeClass("hide");
@@ -99,9 +105,6 @@
       };
       showLog = function(logId, options) {
         var log;
-        console.log("Calling the showlog");
-        console.log(logId);
-        console.log(options);
         if (options == null) {
           options = {};
         }
@@ -126,30 +129,26 @@
         if (logId != null) {
           log = LogService.logs[logId];
           document.title = "Travellog - " + log.title;
-          $("#disqus_thread").remove();
+          $("#g-comments").remove();
           if (options.invert) {
             if (!switchLogs) {
-              console.log("In 1");
               $scope.otherLog = log;
               $scope.safeApply();
             } else {
-              console.log("In 2");
               $scope.log = log;
               $scope.safeApply();
             }
           } else {
             if (switchLogs) {
-              console.log("In 3");
               $scope.otherLog = log;
             } else {
-              console.log("In 4");
               $scope.log = log;
             }
           }
           if (options.firstLoad || options.invert) {
-            $(".main .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>");
+            $(".main .log-wrapper").scrollTop(0).children(".log-content").append("<div id='g-comments'></div>");
           } else {
-            $(".launch .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>");
+            $(".launch .log-wrapper").scrollTop(0).children(".log-content").append("<div id='g-comments'></div>");
           }
           if (log.profileId != null) {
             if (options.renderBadgeInMain) {
@@ -166,14 +165,6 @@
           }
           if (options.pushState) {
             history.pushState(log.id, log.title, "/log/" + log.id);
-            console.log("new link");
-            console.log(document.location.href);
-            gapi.plus.render("plus-button", {
-              action: "share",
-              align: "right",
-              annotation: "bubble",
-              href: document.location.href
-            });
           }
           if (options.manualSwitch) {
             switchLogs = !switchLogs;
@@ -182,9 +173,18 @@
           if (options.changeMarker) {
             MapService.changeLocation(logId);
           }
-          return typeof DISQUS !== "undefined" && DISQUS !== null ? DISQUS.reset({
-            reload: true
-          }) : void 0;
+          gapi.plus.render("plus-button", {
+            action: "share",
+            align: "right",
+            annotation: "bubble",
+            href: document.location.href
+          });
+          return gapi.comments.render('g-comments', {
+            href: window.location,
+            width: 624,
+            first_party_property: 'BLOGGER',
+            view_type: 'FILTERED_POSTMOD'
+          });
         } else {
           return console.log('no logid');
         }
@@ -220,7 +220,6 @@
           LogService.getLog(logId);
           LogService.getClosestLogs(LogService.logs[logId].key);
           return watch = $rootScope.$on('logs-loading', function() {
-            console.log(LogService.logsLoading);
             if (LogService.logsLoading === 0) {
               showLog(logId, {
                 invert: true,
@@ -262,12 +261,8 @@
           });
         }
       };
-      $scope.deactivateOverlay = function(view) {
-        return $rootScope.overlayIsActive = false;
-      };
       $scope.changeShowing = function(view) {
         if (!$("#loading").hasClass("fadein")) {
-          $rootScope.loadingposition = "big center";
           $rootScope.showing = view;
           $rootScope.overlayIsActive = true;
           if ($rootScope.loggedIn && !$rootScope.filesLoaded) {
@@ -276,7 +271,6 @@
           return $rootScope.setShowing();
         }
       };
-      console.log("Maps init");
       MapService.init();
       return LogService.initCountries().then(function(data) {
         return LogService.initLogs();
@@ -285,6 +279,8 @@
         $("#start-here").addClass("fadein");
         canBegin = true;
         return LogService.initLog($rootScope.urlEntered);
+      }).then(function() {
+        return $rootScope.miniMapMgrLoaded.promise;
       }).then(function(log) {
         isFirstLogReady = true;
         if (arePinsDropped) {
@@ -357,7 +353,14 @@
         retrieveAllFiles(function(resp) {
           $scope.$apply(function() {
             $scope.filesLoaded = true;
-            $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded";
+            if (resp.length > 0) {
+              $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded";
+            } else {
+              $scope.numFilesMessage = "You have no google documents in your drive";
+              $("#file-loading-message").css({
+                color: "red"
+              });
+            }
             fadeLoading(true);
             return $timeout(function() {
               return switchLoading("center big");

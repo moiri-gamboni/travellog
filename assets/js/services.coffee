@@ -16,8 +16,7 @@ srv.factory('Resources', ['$http', '$rootScope', ($http, $rootScope) ->
           window.location.protocol + "//" + window.location.host + endpoint,
         )
       promise.error((data, status, headers, config) ->
-        console.log data
-        alert("Unknown Error, please try again later.")
+        console.log("Unknown Error, please try again later.")
       )
       return promise
 
@@ -33,8 +32,7 @@ srv.factory('Resources', ['$http', '$rootScope', ($http, $rootScope) ->
           window.location.protocol + "//" + window.location.host + endpoint,
         )
       promise.error((data, status, headers, config) ->
-        console.log data
-        alert("Unknown Error, please try again later.")
+        console.log("Unknown Error, please try again later.")
       )
       return promise
 
@@ -50,8 +48,7 @@ srv.factory('Resources', ['$http', '$rootScope', ($http, $rootScope) ->
           window.location.protocol + "//" + window.location.host + endpoint,
         )
       promise.error((data, status, headers, config) ->
-        console.log data
-        alert("Unknown Error, please try again later.")
+        console.log("Unknown Error, please try again later.")
       )
       return promise
 
@@ -106,11 +103,8 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
           factory.logs[data.log.id].body = data.log.body
           deferred.resolve(factory.logs[data.log.id])
         ).error((data) ->
-          console.log 'getlog error'
-          console.log data
           deferred.reject({msg:'getLog error', err:data})
         ).finally(()->
-          console.log 'finally'
           factory.logsLoading--
           $rootScope.$broadcast('logs-loading', factory.logsLoading)
         )
@@ -133,15 +127,11 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
                     country: countryName
                     countryLat: location.lat()
                     countryLng: location.lng()
-                  }), (resp) ->
-                    console.log("updated log with new geocode")
-                  )
+                  }))
                 )
               else
-                console.log("attempting geocode with existing country " + countryName)
                 $.post(window.location.origin + "/log/" + log.id + "/edit",
-                  JSON.stringify({country: countryName}), (resp) ->
-                    console.log("updated log")
+                  JSON.stringify({country: countryName})
                 )
             )
           , 3000*i)
@@ -222,7 +212,6 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
       )
     initLogs: () ->
       return res.getLogs().then((data) ->
-        console.log data
         data = data.data
         factory.sortedLogs.lat = data.logs.slice().sort((b, a) ->
           return b.lat-a.lat
@@ -241,12 +230,10 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
           factory.countries[log.country].logs.push(log.id)
           # add to the marker
           MapService.placeMarkerMiniMap(log)
-        console.log factory.logs
 
         factory.sortedLogs.lng = data.logs.slice().sort((b, a) ->
           return b.lng-a.lng
         )
-        console.log factory.sortedLogs
 
         try
           # if the manager is already loaded
@@ -260,7 +247,6 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
         for log, i in factory.sortedLogs.lng
           factory.sortedLogs.lng[i] = log.id
           factory.logs[log.id].key = [i, factory.logs[log.id].key[1]]
-        console.log factory.logs
       )
 
     initLog: (logId) ->
@@ -300,6 +286,7 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
       mapOptions =
         center: new google.maps.LatLng(20, 0)
         zoom: 1
+        disableDefaultUI: true
         styles: [
           featureType: "administrative"
           stylers: [visibility: "off"]
@@ -354,6 +341,10 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
 
       @miniMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
       @miniMapMgr = new MarkerManager(@miniMap)
+      # wait for miniMapMgr to be loaded
+      google.maps.event.addListener(@miniMapMgr, 'loaded', () ->
+        $rootScope.miniMapMgrLoaded.resolve()
+      )
       input = document.getElementById('place-search')
       @miniMap.controls[google.maps.ControlPosition.TOP_LEFT].push(input)
       searchBox = new google.maps.places.SearchBox(input)
@@ -367,6 +358,7 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
     startAddMap: () ->
       mapOptions =
         center: new google.maps.LatLng(0, 0)
+        disableDefaultUI: true
         zoom: 2
         styles: [
           featureType: "administrative"
@@ -502,7 +494,6 @@ srv.factory('MapService', ['$rootScope', ($rootScope) ->
             console.log "No results found"
         else
           console.log "Geocoder failed due to: " + status
-          console.log latlng
           typeof callback is "function" and callback("Other", "Other")
 
     geocode: (countryName, callback) ->

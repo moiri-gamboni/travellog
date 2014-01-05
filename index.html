@@ -42,7 +42,7 @@
 		</div>
 		<div id="overlay">
 			<div id="blackblur" ></div>
-			<h2 id="escape" ng-click="deactiveOverlay()" class="fade">&#10006;</h2>
+			<h2 id="escape" ng-click="deactivateOverlay()" class="fade">&#10006;</h2>
 			<div id="overlay-content" ng-controller="MyFilesController">
 			<!-- 	<div ng-hide="loggedIn">
 
@@ -67,7 +67,7 @@
 			<div id="search" ng-show="display == 'loggedIn'" class="message">
 				<span class="white small">1. Search for your story as a Google Document</span><br/>
 				<span class="white small">2. Place your story on the map</span>
-				<span id="file-loading-message" class="white">{{numFilesMessage}}</span>
+				<span id="file-loading-message" class="white" ng-bind-html="numFilesMessage"></span>
 				<button ng-click="upload()" ng-class="{active: canSubmit()}">Submit</button>
 				<input ng-model="query" placeholder="search">
 				<ul decorations:"none">
@@ -83,7 +83,6 @@
 				where we've strayed off-road, and the lessons we've learned. <br/>
 				This is a space welcome to all people and any submissions, no matter the length or style.
 			</div>
-
 		</div>
 	</div>
 	<div id="blackshade" ></div>
@@ -123,6 +122,5 @@ src="/static/js/jquery.transit.min.js">
 <script type="text/javascript" src="/static/js/index.js?v=3"></script>
 <script type="text/javascript" src="/static/js/gservices.js?v=3"></script>
 <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
-<script type="text/javascript" src="//gcdc2013-travellog.disqus.com/embed.js"></script>
 </body>
 </html>
