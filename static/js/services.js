@@ -127,8 +127,9 @@
                 err: data
               });
             })["finally"](function() {
+              console.log('finally');
               factory.logsLoading--;
-              return $rootScope.broadcast('logs-loading', factory.logsLoading);
+              return $rootScope.$broadcast('logs-loading', factory.logsLoading);
             });
           } else {
             deferred.reject('Log is already loaded');
@@ -259,24 +260,25 @@
             }
           }
         },
-        initLogs: function() {
-          var deferred,
-            _this = this;
-          deferred = $q.defer();
-          res.getCountries().then(function(data) {
-            var country, _i, _len, _ref;
+        initCountries: function() {
+          return res.getCountries().then(function(data) {
+            var country, _i, _len, _ref, _results;
             _ref = data.data.countries;
+            _results = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               country = _ref[_i];
               country.logs = [];
               factory.countries[country.id] = country;
-              MapService.placeMarkerMiniMap(country, true);
+              _results.push(MapService.placeMarkerMiniMap(country, true));
             }
-            return res.getLogs();
-          }).then(function(data) {
+            return _results;
+          });
+        },
+        initLogs: function() {
+          return res.getLogs().then(function(data) {
             var i, log, _i, _j, _len, _len1, _ref, _ref1;
+            console.log(data);
             data = data.data;
-            deferred.notify(0);
             factory.sortedLogs.lat = data.logs.slice().sort(function(b, a) {
               return b.lat - a.lat;
             });
@@ -297,6 +299,11 @@
               factory.countries[log.country].logs.push(log.id);
               MapService.placeMarkerMiniMap(log);
             }
+            console.log(factory.logs);
+            factory.sortedLogs.lng = data.logs.slice().sort(function(b, a) {
+              return b.lng - a.lng;
+            });
+            console.log(factory.sortedLogs);
             try {
               MapService.initMarkers();
             } catch (_error) {
@@ -304,18 +311,14 @@
                 return MapService.initMarkers();
               });
             }
-            factory.sortedLogs.lng = data.logs.slice().sort(function(b, a) {
-              return b.lng - a.lng;
-            });
             _ref1 = factory.sortedLogs.lng;
             for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
               log = _ref1[i];
               factory.sortedLogs.lng[i] = log.id;
               factory.logs[log.id].key = [i, factory.logs[log.id].key[1]];
             }
-            return deferred.resolve(factory.logs);
+            return console.log(factory.logs);
           });
-          return deferred.promise;
         },
         initLog: function(logId) {
           var keys;

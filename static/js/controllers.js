@@ -220,7 +220,8 @@
           LogService.getLog(logId);
           LogService.getClosestLogs(LogService.logs[logId].key);
           return watch = $rootScope.$on('logs-loading', function() {
-            if (LogService.loadingLogs === 0) {
+            console.log(LogService.logsLoading);
+            if (LogService.logsLoading === 0) {
               showLog(logId, {
                 invert: true,
                 renderBadgeInMain: true
@@ -233,7 +234,7 @@
       loadingWatch = function() {
         var f;
         f = function() {
-          if (LogService.loadingLogs === 0) {
+          if (LogService.logsLoading === 0) {
             return fadeLoading(true);
           } else {
             return fadeLoading(false);
@@ -277,7 +278,9 @@
       };
       console.log("Maps init");
       MapService.init();
-      return LogService.initLogs().then(function(logs) {
+      return LogService.initCountries().then(function(data) {
+        return LogService.initLogs();
+      }).then(function(logs) {
         $("#loading").addClass("fadeout");
         $("#start-here").addClass("fadein");
         canBegin = true;

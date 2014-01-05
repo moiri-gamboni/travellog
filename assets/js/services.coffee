@@ -110,8 +110,9 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
           console.log data
           deferred.reject({msg:'getLog error', err:data})
         ).finally(()->
+          console.log 'finally'
           factory.logsLoading--
-          $rootScope.broadcast('logs-loading', factory.logsLoading)
+          $rootScope.$broadcast('logs-loading', factory.logsLoading)
         )
       else
         deferred.reject('Log is already loaded')
@@ -212,17 +213,17 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
         else
           return false
 
-    initLogs: () ->
-      deferred = $q.defer()
-      res.getCountries().then((data) ->
+    initCountries: () ->
+      return res.getCountries().then((data) ->
         for country in data.data.countries
           country.logs = []
           factory.countries[country.id] = country
           MapService.placeMarkerMiniMap(country, true)
-        return res.getLogs()
-      ).then((data) =>
+      )
+    initLogs: () ->
+      return res.getLogs().then((data) ->
+        console.log data
         data = data.data
-        deferred.notify(0)
         factory.sortedLogs.lat = data.logs.slice().sort((b, a) ->
           return b.lat-a.lat
         )
@@ -240,6 +241,13 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
           factory.countries[log.country].logs.push(log.id)
           # add to the marker
           MapService.placeMarkerMiniMap(log)
+        console.log factory.logs
+
+        factory.sortedLogs.lng = data.logs.slice().sort((b, a) ->
+          return b.lng-a.lng
+        )
+        console.log factory.sortedLogs
+
         try
           # if the manager is already loaded
           MapService.initMarkers()
@@ -248,15 +256,12 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
           google.maps.event.addListener(MapService.miniMapMgr, 'loaded', () ->
             MapService.initMarkers()
           )
-        factory.sortedLogs.lng = data.logs.slice().sort((b, a) ->
-          return b.lng-a.lng
-        )
+
         for log, i in factory.sortedLogs.lng
           factory.sortedLogs.lng[i] = log.id
           factory.logs[log.id].key = [i, factory.logs[log.id].key[1]]
-        deferred.resolve(factory.logs)
+        console.log factory.logs
       )
-      return deferred.promise
 
     initLog: (logId) ->
       if not logId?

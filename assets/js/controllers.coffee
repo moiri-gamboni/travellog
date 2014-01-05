@@ -178,7 +178,8 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
       LogService.getLog(logId)
       LogService.getClosestLogs(LogService.logs[logId].key)
       watch = $rootScope.$on('logs-loading', () ->
-        if LogService.loadingLogs == 0
+        console.log LogService.logsLoading
+        if LogService.logsLoading == 0
           showLog(logId, {invert:true, renderBadgeInMain:true})
           watch()
       )
@@ -186,7 +187,7 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
 
   loadingWatch = () ->
     f = () ->
-      if LogService.loadingLogs == 0
+      if LogService.logsLoading == 0
         fadeLoading(true)
       else
         fadeLoading(false)
@@ -221,7 +222,10 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
 
   console.log "Maps init"
   MapService.init()
-  LogService.initLogs().then(
+  LogService.initCountries().then(
+    (data) ->
+      return LogService.initLogs()
+  ).then(
     (logs) ->
       $("#loading").addClass("fadeout")
       $("#start-here").addClass("fadein")
