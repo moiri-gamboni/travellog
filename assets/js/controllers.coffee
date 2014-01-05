@@ -102,22 +102,13 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     time1 = 100
     time2 = 800
     time3 = 100
-    console.log 'index: window.move timeout 1 start'
-    console.log 'time: ' + time1
     $timeout(() ->
-      console.log 'index: window.move timeout 1 end'
-      console.log 'index: window.move timeout 2 start'
-      console.log 'time: ' + time2
       $(".launch").transition(launchIn,800)
       $(".main").transition(mainOut,800)
       setTimeout(() ->
-        console.log 'index: window.move timeout 2 end'
-        console.log 'index: window.move timeout 3 start'
-        console.log 'time: ' + time3
         $(".log-details").removeClass("animate").toggleClass("main launch").attr({"style": ""})
         angular.element("html").scope().$broadcast("sliding-animation-done")
         setTimeout(() ->
-          console.log 'index: window.move timeout 3 end'
           $(".launch .log-author").css({"opacity": 0})
           deferred.resolve()
         , time3)
@@ -196,7 +187,6 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
             href: document.location.href
           )
         if options.changeMarker
-          console.log 'changemarker'
           MapService.changeLocation(log.id)
 
         DISQUS?.reset(
@@ -226,7 +216,6 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     if LogService.logs[logId].body?
       showLog(logId, {invert:true, renderBadgeInMain:true})
     else
-      # THIS IS BROKEN. LOGS-LOADING never fires...
       LogService.getLog(logId)
       LogService.getClosestLogs(LogService.logs[logId].key)
       watch = $rootScope.$on('logs-loading', () ->

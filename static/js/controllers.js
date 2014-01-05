@@ -164,24 +164,15 @@
         time1 = 100;
         time2 = 800;
         time3 = 100;
-        console.log('index: window.move timeout 1 start');
-        console.log('time: ' + time1);
         $timeout(function() {
-          console.log('index: window.move timeout 1 end');
-          console.log('index: window.move timeout 2 start');
-          console.log('time: ' + time2);
           $(".launch").transition(launchIn, 800);
           $(".main").transition(mainOut, 800);
           return setTimeout(function() {
-            console.log('index: window.move timeout 2 end');
-            console.log('index: window.move timeout 3 start');
-            console.log('time: ' + time3);
             $(".log-details").removeClass("animate").toggleClass("main launch").attr({
               "style": ""
             });
             angular.element("html").scope().$broadcast("sliding-animation-done");
             return setTimeout(function() {
-              console.log('index: window.move timeout 3 end');
               $(".launch .log-author").css({
                 "opacity": 0
               });
@@ -269,7 +260,6 @@
               });
             }
             if (options.changeMarker) {
-              console.log('changemarker');
               MapService.changeLocation(log.id);
             }
             return typeof DISQUS !== "undefined" && DISQUS !== null ? DISQUS.reset({

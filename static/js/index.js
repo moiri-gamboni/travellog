@@ -15,10 +15,7 @@
     var time;
     $("#country").addClass("fadeout");
     time = 500;
-    console.log('index: window.changeCountry timeout start');
-    console.log('time: ' + time);
     return setTimeout(function() {
-      console.log('index: window.changeCountry timeout end');
       return $("#country").removeClass("fadeout").html(newCountry);
     }, time);
   };

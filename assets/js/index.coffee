@@ -9,10 +9,7 @@ $(() ->
 window.changeCountry = (newCountry) ->
 	$("#country").addClass("fadeout")
 	time = 500
-	console.log 'index: window.changeCountry timeout start'
-	console.log 'time: ' + time
 	setTimeout(() ->
-		console.log 'index: window.changeCountry timeout end'
 		$("#country").removeClass("fadeout").html(newCountry);
 	, time)
 

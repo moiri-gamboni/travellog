@@ -45,10 +45,7 @@ function getUserInfo() {
           var request = gapi.client.oauth2.userinfo.get();
           request.execute(function(resp) {;
             time = 1000;
-            // console.log('gservices: getUserInfo timeout start');
-            // console.log('time: ' + time);
             setTimeout(function() {
-              // console.log('gservices: getUserInfo timeout end');
               angular.element("html").scope().$broadcast('loggedIn', resp);
             }, time);
           });
@@ -56,10 +53,7 @@ function getUserInfo() {
       } else {
         // else retrieve their information from the g+ info
         time = 1000;
-        // console.log('gservices: getUserInfo timeout start');
-        // console.log('time: ' + time);
         setTimeout(function() {
-              // console.log('gservices: getUserInfo timeout end');
               angular.element("html").scope().$broadcast('loggedIn', resp);
             }, time);
       }
