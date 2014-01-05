@@ -24,7 +24,6 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
 
     for country in MapService.countryMarkers
       if country.title != "Other" and country.title != "None"
-        console.log country.title
         do (country) ->
           deferredPins[i] = $q.defer()
           $timeout(dropPin(i, country),250*i)
@@ -34,7 +33,6 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     return $q.all(promisedPins)
 
   $scope.begin = () ->
-    console.log "This is calling scope.begin"
     if canBegin
       $("#launch-screen").addClass("fadeout")
       $("#container").removeClass("hide")
@@ -44,14 +42,18 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
         ()->
           dropPins().then(
             ()->
-              arePinsDropped = true
-              $("#loading-text").css({display: "none"})
-              if isFirstLogReady
-                $(".main.fade").removeClass("fadeout")
-                $(".main.fade").addClass("fadein")
-                loadingWatch()
-                switchLoading("small corner")
-                showLog(LogService.getCurrentLog().id, {firstLoad: true, manualSwitch:true, renderBadgeInMain:true})
+              $timeout(
+                () ->
+                  arePinsDropped = true
+                  $("#loading-text").css({display: "none"})
+                  if isFirstLogReady
+                    $(".main.fade").removeClass("fadeout")
+                    $(".main.fade").addClass("fadein")
+                    loadingWatch()
+                    switchLoading("small corner")
+                    showLog(LogService.getCurrentLog().id, {firstLoad: true, manualSwitch:true, renderBadgeInMain:true})
+                ,1000
+              )
           )
         ,500)
 
@@ -73,6 +75,56 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     else
       @$apply fn
 
+  slide = (direction) ->
+    deferred = $q.defer()
+    windowHeight = $(".main").height();
+    windowWidth = $(".main").width();
+    screenHeight = $(window).height();
+    screenWidth = $(window).width();
+    topDistance = parseInt($(".main").css("top"), 10)
+    if direction == "N"
+      prepare = {"left":"0", "top":-windowHeight}
+      launchIn = {"y": windowHeight + topDistance, x: 0}
+      mainOut = {"y": screenHeight, x: 0}
+    else if direction == "S"
+      prepare = {"left":"0", "top": screenHeight}
+      launchIn = {"y": -(screenHeight - topDistance), x: 0}
+      mainOut = {"y": -(screenHeight), x: 0}
+    else if direction == "W"
+      prepare = {"left":-screenWidth, "top": topDistance}
+      launchIn = {"x": screenWidth, y: 0}
+      mainOut = {"x": screenWidth, y: 0}
+    else if direction == "E"
+      prepare = {"left":screenWidth, "top": topDistance}
+      launchIn = {"x": -screenWidth, y: 0}
+      mainOut = {"x": -screenWidth, y: 0}
+    $(".launch").attr({"style": ""}).css(prepare).children(".log-wrapper")
+    time1 = 100
+    time2 = 800
+    time3 = 100
+    console.log 'index: window.move timeout 1 start'
+    console.log 'time: ' + time1
+    $timeout(() ->
+      console.log 'index: window.move timeout 1 end'
+      console.log 'index: window.move timeout 2 start'
+      console.log 'time: ' + time2
+      $(".launch").transition(launchIn,800)
+      $(".main").transition(mainOut,800)
+      setTimeout(() ->
+        console.log 'index: window.move timeout 2 end'
+        console.log 'index: window.move timeout 3 start'
+        console.log 'time: ' + time3
+        $(".log-details").removeClass("animate").toggleClass("main launch").attr({"style": ""})
+        angular.element("html").scope().$broadcast("sliding-animation-done")
+        setTimeout(() ->
+          console.log 'index: window.move timeout 3 end'
+          $(".launch .log-author").css({"opacity": 0})
+          deferred.resolve()
+        , time3)
+      , time2)
+    , time1)
+    return deferred.promise
+
   #Default options:
   #manualSwitch = false
   #invert = false
@@ -80,10 +132,8 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
   #changeMarker = true
   #renderBadgeInMain = false
   #firstLoad = false
+  #removeRendering = false
   showLog = (logId, options) ->
-    console.log "Calling the showlog"
-    console.log logId
-    console.log options
     if not options?
       options = {}
     if not options.manualSwitch?
@@ -98,6 +148,8 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
       options.renderBadgeInMain = false
     if not options.firstLoad?
       options.firstLoad = false
+    if not options.removeRendering?
+      options.removeRendering = false
 
     if logId?
       log = LogService.logs[logId]
@@ -106,65 +158,65 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
       $("#disqus_thread").remove()
       if options.invert
         if not switchLogs
-          console.log "In 1"
           $scope.otherLog = log
           $scope.safeApply()
         else
-          console.log "In 2"
           $scope.log = log
           $scope.safeApply()
       else
         if switchLogs
-          console.log "In 3"
           $scope.otherLog = log
         else
-          console.log "In 4"
           $scope.log = log
       if options.firstLoad or (options.invert)
         $(".main .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>")
       else
         $(".launch .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>")
-
-      if log.profileId?
-        if options.renderBadgeInMain
-          renderBadge(log.profileId, '.main')
-        else
-          renderBadge(log.profileId, '.launch')
-      else
-        if options.renderBadgeInMain
-          $(".main .log-author").html(log.profileName)
-        else
-          $(".launch .log-author").html(log.profileName)
-      if options.pushState
-        history.pushState(log.id, log.title, "/log/"+log.id)
-        console.log "new link"
-        console.log document.location.href
-        gapi.plus.render("plus-button",
-          action: "share"
-          align: "right"
-          annotation: "bubble"
-          href: document.location.href
-        )
       if options.manualSwitch
         switchLogs = not switchLogs
       LogService.current = log.key
-      if options.changeMarker
-        MapService.changeLocation(logId)
-      DISQUS?.reset(
-        reload: true
-      )
+
+      fn = () ->
+        if log.profileId?
+          if (options.renderBadgeInMain != options.removeRendering)
+            renderBadge(log.profileId, '.main')
+          else
+            renderBadge(log.profileId, '.launch')
+        else
+          if options.renderBadgeInMain
+            $(".main .log-author").html(log.profileName)
+          else
+            $(".launch .log-author").html(log.profileName)
+        if options.pushState
+          history.pushState(log.id, log.title, "/log/"+log.id)
+          gapi.plus.render("plus-button",
+            action: "share"
+            align: "right"
+            annotation: "bubble"
+            href: document.location.href
+          )
+        if options.changeMarker
+          console.log 'changemarker'
+          MapService.changeLocation(log.id)
+
+        DISQUS?.reset(
+          reload: true
+        )
+      if not options.removeRendering
+        fn()
+      else
+        return fn
     else
       console.log 'no logid'
+
 
   $scope.move = (direction) ->
     if LogService.logsLoading == 0
       LogService.move(direction)
       log = LogService.getCurrentLog()
-      showLog(log.id, {changeMarker:false})
-      move(direction)
-      $timeout(()->
-        MapService.changeLocation(log.id)
-      , 500
+      fn = showLog(log.id, {removeRendering:true})
+      slide(direction).then( ()->
+        fn()
       )
 
   $rootScope.$on('switch-marker', (event, logId, isCountry) ->
@@ -178,7 +230,6 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
       LogService.getLog(logId)
       LogService.getClosestLogs(LogService.logs[logId].key)
       watch = $rootScope.$on('logs-loading', () ->
-        console.log LogService.logsLoading
         if LogService.logsLoading == 0
           showLog(logId, {invert:true, renderBadgeInMain:true})
           watch()
@@ -220,7 +271,6 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
         $rootScope.pullFiles()
       $rootScope.setShowing()
 
-  console.log "Maps init"
   MapService.init()
   LogService.initCountries().then(
     (data) ->
@@ -394,7 +444,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
              $scope.complete = true
              $rootScope.setShowing()
              if data.status == 200
-                $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id
+                $scope.completeUrl = window.location.protocol + "//" + window.location.host + $scope.selectedFile.id
                 $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:"
               else
                 $scope.completeUrl = ""

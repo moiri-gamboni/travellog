@@ -127,7 +127,6 @@
                 err: data
               });
             })["finally"](function() {
-              console.log('finally');
               factory.logsLoading--;
               return $rootScope.$broadcast('logs-loading', factory.logsLoading);
             });
@@ -139,6 +138,7 @@
         refreshAllLogsLocation: function() {
           var i, k, log, _fn, _ref, _results,
             _this = this;
+          console.log('refreshAllLogsLocation');
           i = 0;
           _ref = this.logs;
           _fn = function(log) {
@@ -276,8 +276,7 @@
         },
         initLogs: function() {
           return res.getLogs().then(function(data) {
-            var i, log, _i, _j, _len, _len1, _ref, _ref1;
-            console.log(data);
+            var i, log, _i, _j, _len, _len1, _ref, _ref1, _results;
             data = data.data;
             factory.sortedLogs.lat = data.logs.slice().sort(function(b, a) {
               return b.lat - a.lat;
@@ -299,11 +298,9 @@
               factory.countries[log.country].logs.push(log.id);
               MapService.placeMarkerMiniMap(log);
             }
-            console.log(factory.logs);
             factory.sortedLogs.lng = data.logs.slice().sort(function(b, a) {
               return b.lng - a.lng;
             });
-            console.log(factory.sortedLogs);
             try {
               MapService.initMarkers();
             } catch (_error) {
@@ -312,12 +309,13 @@
               });
             }
             _ref1 = factory.sortedLogs.lng;
+            _results = [];
             for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
               log = _ref1[i];
               factory.sortedLogs.lng[i] = log.id;
-              factory.logs[log.id].key = [i, factory.logs[log.id].key[1]];
+              _results.push(factory.logs[log.id].key = [i, factory.logs[log.id].key[1]]);
             }
-            return console.log(factory.logs);
+            return _results;
           });
         },
         initLog: function(logId) {

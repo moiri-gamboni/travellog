@@ -110,7 +110,6 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
           console.log data
           deferred.reject({msg:'getLog error', err:data})
         ).finally(()->
-          console.log 'finally'
           factory.logsLoading--
           $rootScope.$broadcast('logs-loading', factory.logsLoading)
         )
@@ -120,6 +119,7 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
 
     # geolocate all logs (for backwards compatibility)
     refreshAllLogsLocation: () ->
+      console.log 'refreshAllLogsLocation'
       i = 0
       for k, log of @logs
         do (log) =>
@@ -222,7 +222,6 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
       )
     initLogs: () ->
       return res.getLogs().then((data) ->
-        console.log data
         data = data.data
         factory.sortedLogs.lat = data.logs.slice().sort((b, a) ->
           return b.lat-a.lat
@@ -241,13 +240,10 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
           factory.countries[log.country].logs.push(log.id)
           # add to the marker
           MapService.placeMarkerMiniMap(log)
-        console.log factory.logs
 
         factory.sortedLogs.lng = data.logs.slice().sort((b, a) ->
           return b.lng-a.lng
         )
-        console.log factory.sortedLogs
-
         try
           # if the manager is already loaded
           MapService.initMarkers()
@@ -260,7 +256,6 @@ srv.factory('LogService', ['$q', '$http', '$rootScope', 'Resources',\
         for log, i in factory.sortedLogs.lng
           factory.sortedLogs.lng[i] = log.id
           factory.logs[log.id].key = [i, factory.logs[log.id].key[1]]
-        console.log factory.logs
       )
 
     initLog: (logId) ->

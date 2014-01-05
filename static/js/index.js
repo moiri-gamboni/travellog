@@ -11,91 +11,16 @@
     }
   });
 
-  window.move = function(direction) {
-    var launchIn, mainOut, prepare, screenHeight, screenWidth, topDistance, windowHeight, windowWidth;
-    windowHeight = $(".main").height();
-    windowWidth = $(".main").width();
-    screenHeight = $(window).height();
-    screenWidth = $(window).width();
-    topDistance = parseInt($(".main").css("top"), 10);
-    if (direction === "N") {
-      prepare = {
-        "left": "0",
-        "top": -windowHeight
-      };
-      launchIn = {
-        "y": windowHeight + topDistance,
-        x: 0
-      };
-      mainOut = {
-        "y": screenHeight,
-        x: 0
-      };
-    } else if (direction === "S") {
-      prepare = {
-        "left": "0",
-        "top": screenHeight
-      };
-      launchIn = {
-        "y": -(screenHeight - topDistance),
-        x: 0
-      };
-      mainOut = {
-        "y": -screenHeight,
-        x: 0
-      };
-    } else if (direction === "W") {
-      prepare = {
-        "left": -screenWidth,
-        "top": topDistance
-      };
-      launchIn = {
-        "x": screenWidth,
-        y: 0
-      };
-      mainOut = {
-        "x": screenWidth,
-        y: 0
-      };
-    } else if (direction === "E") {
-      prepare = {
-        "left": screenWidth,
-        "top": topDistance
-      };
-      launchIn = {
-        "x": -screenWidth,
-        y: 0
-      };
-      mainOut = {
-        "x": -screenWidth,
-        y: 0
-      };
-    }
-    $(".launch").attr({
-      "style": ""
-    }).css(prepare).children(".log-wrapper");
-    return setTimeout(function() {
-      $(".launch").transition(launchIn, 800);
-      $(".main").transition(mainOut, 800);
-      return setTimeout(function() {
-        $(".log-details").removeClass("animate").toggleClass("main launch").attr({
-          "style": ""
-        });
-        angular.element("html").scope().$broadcast("sliding-animation-done");
-        return setTimeout(function() {
-          return $(".launch .log-author").css({
-            "opacity": 0
-          });
-        }, 100);
-      }, 1000);
-    }, 300);
-  };
-
   window.changeCountry = function(newCountry) {
+    var time;
     $("#country").addClass("fadeout");
+    time = 500;
+    console.log('index: window.changeCountry timeout start');
+    console.log('time: ' + time);
     return setTimeout(function() {
+      console.log('index: window.changeCountry timeout end');
       return $("#country").removeClass("fadeout").html(newCountry);
-    }, 500);
+    }, time);
   };
 
   $("#add, #question").click(function() {

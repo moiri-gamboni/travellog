@@ -44,16 +44,24 @@ function getUserInfo() {
         gapi.client.load('oauth2', 'v2', function() {
           var request = gapi.client.oauth2.userinfo.get();
           request.execute(function(resp) {;
+            time = 1000;
+            // console.log('gservices: getUserInfo timeout start');
+            // console.log('time: ' + time);
             setTimeout(function() {
+              // console.log('gservices: getUserInfo timeout end');
               angular.element("html").scope().$broadcast('loggedIn', resp);
-            }, 1000);
+            }, time);
           });
         });
       } else {
         // else retrieve their information from the g+ info
+        time = 1000;
+        // console.log('gservices: getUserInfo timeout start');
+        // console.log('time: ' + time);
         setTimeout(function() {
+              // console.log('gservices: getUserInfo timeout end');
               angular.element("html").scope().$broadcast('loggedIn', resp);
-            }, 1000);
+            }, time);
       }
 
     });
@@ -64,16 +72,11 @@ function getUserInfo() {
 
 // renders the google plus badge in the loader
 function renderBadge(id, div) {
-  console.log('render badge')
   div_id = $(div + " .log-author").html('<div class="g-person"' +
     'data-width="273" data-href="https://plus.google.com/' + id +
     '" data-layout="landscape" data-showcoverphoto="false"></div>').attr("id");
   gapi.person.go(div_id);
-  console.log($(div + " .log-author"));
-  setTimeout(function() {
-    console.log("fading in");
-    $(".main" + " .log-author").css({"opacity": 1});
-  }, 1500);
+  $(".main" + " .log-author").css({"opacity": 1});
 }
 
 /**
@@ -89,7 +92,7 @@ function retrieveAllFiles(callback) {
         if (x.mimeType == "application/vnd.google-apps.document") {
           fileFilter.push(x);
         }
-      }); 
+      });
       result = result.concat(fileFilter);
       angular.element("html").scope().$broadcast('partialFilesLoaded', result);
       var nextPageToken = resp.nextPageToken;

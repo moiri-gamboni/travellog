@@ -7,7 +7,7 @@
 
   ctrl.controller("mainCtrl", [
     '$q', '$http', '$scope', '$rootScope', '$timeout', 'LogService', 'MapService', function($q, $http, $scope, $rootScope, $timeout, LogService, MapService) {
-      var arePinsDropped, canBegin, dropPins, isFirstLogReady, loadingWatch, showLog, switchLogs;
+      var arePinsDropped, canBegin, dropPins, isFirstLogReady, loadingWatch, showLog, slide, switchLogs;
       $rootScope.overlayIsActive = false;
       switchLogs = false;
       isFirstLogReady = false;
@@ -35,7 +35,6 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           country = _ref[_i];
           if (country.title !== "Other" && country.title !== "None") {
-            console.log(country.title);
             (function(country) {
               deferredPins[i] = $q.defer();
               return $timeout(dropPin(i, country), 250 * i);
@@ -50,7 +49,6 @@
         return $q.all(promisedPins);
       };
       $scope.begin = function() {
-        console.log("This is calling scope.begin");
         if (canBegin) {
           $("#launch-screen").addClass("fadeout");
           $("#container").removeClass("hide");
@@ -58,21 +56,23 @@
           switchLoading("big center");
           return $timeout(function() {
             return dropPins().then(function() {
-              arePinsDropped = true;
-              $("#loading-text").css({
-                display: "none"
-              });
-              if (isFirstLogReady) {
-                $(".main.fade").removeClass("fadeout");
-                $(".main.fade").addClass("fadein");
-                loadingWatch();
-                switchLoading("small corner");
-                return showLog(LogService.getCurrentLog().id, {
-                  firstLoad: true,
-                  manualSwitch: true,
-                  renderBadgeInMain: true
+              return $timeout(function() {
+                arePinsDropped = true;
+                $("#loading-text").css({
+                  display: "none"
                 });
-              }
+                if (isFirstLogReady) {
+                  $(".main.fade").removeClass("fadeout");
+                  $(".main.fade").addClass("fadein");
+                  loadingWatch();
+                  switchLoading("small corner");
+                  return showLog(LogService.getCurrentLog().id, {
+                    firstLoad: true,
+                    manualSwitch: true,
+                    renderBadgeInMain: true
+                  });
+                }
+              }, 1000);
             });
           }, 500);
         }
@@ -97,11 +97,102 @@
           return this.$apply(fn);
         }
       };
+      slide = function(direction) {
+        var deferred, launchIn, mainOut, prepare, screenHeight, screenWidth, time1, time2, time3, topDistance, windowHeight, windowWidth;
+        deferred = $q.defer();
+        windowHeight = $(".main").height();
+        windowWidth = $(".main").width();
+        screenHeight = $(window).height();
+        screenWidth = $(window).width();
+        topDistance = parseInt($(".main").css("top"), 10);
+        if (direction === "N") {
+          prepare = {
+            "left": "0",
+            "top": -windowHeight
+          };
+          launchIn = {
+            "y": windowHeight + topDistance,
+            x: 0
+          };
+          mainOut = {
+            "y": screenHeight,
+            x: 0
+          };
+        } else if (direction === "S") {
+          prepare = {
+            "left": "0",
+            "top": screenHeight
+          };
+          launchIn = {
+            "y": -(screenHeight - topDistance),
+            x: 0
+          };
+          mainOut = {
+            "y": -screenHeight,
+            x: 0
+          };
+        } else if (direction === "W") {
+          prepare = {
+            "left": -screenWidth,
+            "top": topDistance
+          };
+          launchIn = {
+            "x": screenWidth,
+            y: 0
+          };
+          mainOut = {
+            "x": screenWidth,
+            y: 0
+          };
+        } else if (direction === "E") {
+          prepare = {
+            "left": screenWidth,
+            "top": topDistance
+          };
+          launchIn = {
+            "x": -screenWidth,
+            y: 0
+          };
+          mainOut = {
+            "x": -screenWidth,
+            y: 0
+          };
+        }
+        $(".launch").attr({
+          "style": ""
+        }).css(prepare).children(".log-wrapper");
+        time1 = 100;
+        time2 = 800;
+        time3 = 100;
+        console.log('index: window.move timeout 1 start');
+        console.log('time: ' + time1);
+        $timeout(function() {
+          console.log('index: window.move timeout 1 end');
+          console.log('index: window.move timeout 2 start');
+          console.log('time: ' + time2);
+          $(".launch").transition(launchIn, 800);
+          $(".main").transition(mainOut, 800);
+          return setTimeout(function() {
+            console.log('index: window.move timeout 2 end');
+            console.log('index: window.move timeout 3 start');
+            console.log('time: ' + time3);
+            $(".log-details").removeClass("animate").toggleClass("main launch").attr({
+              "style": ""
+            });
+            angular.element("html").scope().$broadcast("sliding-animation-done");
+            return setTimeout(function() {
+              console.log('index: window.move timeout 3 end');
+              $(".launch .log-author").css({
+                "opacity": 0
+              });
+              return deferred.resolve();
+            }, time3);
+          }, time2);
+        }, time1);
+        return deferred.promise;
+      };
       showLog = function(logId, options) {
-        var log;
-        console.log("Calling the showlog");
-        console.log(logId);
-        console.log(options);
+        var fn, log;
         if (options == null) {
           options = {};
         }
@@ -123,26 +214,25 @@
         if (options.firstLoad == null) {
           options.firstLoad = false;
         }
+        if (options.removeRendering == null) {
+          options.removeRendering = false;
+        }
         if (logId != null) {
           log = LogService.logs[logId];
           document.title = "Travellog - " + log.title;
           $("#disqus_thread").remove();
           if (options.invert) {
             if (!switchLogs) {
-              console.log("In 1");
               $scope.otherLog = log;
               $scope.safeApply();
             } else {
-              console.log("In 2");
               $scope.log = log;
               $scope.safeApply();
             }
           } else {
             if (switchLogs) {
-              console.log("In 3");
               $scope.otherLog = log;
             } else {
-              console.log("In 4");
               $scope.log = log;
             }
           }
@@ -151,56 +241,61 @@
           } else {
             $(".launch .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>");
           }
-          if (log.profileId != null) {
-            if (options.renderBadgeInMain) {
-              renderBadge(log.profileId, '.main');
-            } else {
-              renderBadge(log.profileId, '.launch');
-            }
-          } else {
-            if (options.renderBadgeInMain) {
-              $(".main .log-author").html(log.profileName);
-            } else {
-              $(".launch .log-author").html(log.profileName);
-            }
-          }
-          if (options.pushState) {
-            history.pushState(log.id, log.title, "/log/" + log.id);
-            console.log("new link");
-            console.log(document.location.href);
-            gapi.plus.render("plus-button", {
-              action: "share",
-              align: "right",
-              annotation: "bubble",
-              href: document.location.href
-            });
-          }
           if (options.manualSwitch) {
             switchLogs = !switchLogs;
           }
           LogService.current = log.key;
-          if (options.changeMarker) {
-            MapService.changeLocation(logId);
+          fn = function() {
+            if (log.profileId != null) {
+              if (options.renderBadgeInMain !== options.removeRendering) {
+                renderBadge(log.profileId, '.main');
+              } else {
+                renderBadge(log.profileId, '.launch');
+              }
+            } else {
+              if (options.renderBadgeInMain) {
+                $(".main .log-author").html(log.profileName);
+              } else {
+                $(".launch .log-author").html(log.profileName);
+              }
+            }
+            if (options.pushState) {
+              history.pushState(log.id, log.title, "/log/" + log.id);
+              gapi.plus.render("plus-button", {
+                action: "share",
+                align: "right",
+                annotation: "bubble",
+                href: document.location.href
+              });
+            }
+            if (options.changeMarker) {
+              console.log('changemarker');
+              MapService.changeLocation(log.id);
+            }
+            return typeof DISQUS !== "undefined" && DISQUS !== null ? DISQUS.reset({
+              reload: true
+            }) : void 0;
+          };
+          if (!options.removeRendering) {
+            return fn();
+          } else {
+            return fn;
           }
-          return typeof DISQUS !== "undefined" && DISQUS !== null ? DISQUS.reset({
-            reload: true
-          }) : void 0;
         } else {
           return console.log('no logid');
         }
       };
       $scope.move = function(direction) {
-        var log;
+        var fn, log;
         if (LogService.logsLoading === 0) {
           LogService.move(direction);
           log = LogService.getCurrentLog();
-          showLog(log.id, {
-            changeMarker: false
+          fn = showLog(log.id, {
+            removeRendering: true
           });
-          move(direction);
-          return $timeout(function() {
-            return MapService.changeLocation(log.id);
-          }, 500);
+          return slide(direction).then(function() {
+            return fn();
+          });
         }
       };
       $rootScope.$on('switch-marker', function(event, logId, isCountry) {
@@ -220,7 +315,6 @@
           LogService.getLog(logId);
           LogService.getClosestLogs(LogService.logs[logId].key);
           return watch = $rootScope.$on('logs-loading', function() {
-            console.log(LogService.logsLoading);
             if (LogService.logsLoading === 0) {
               showLog(logId, {
                 invert: true,
@@ -276,7 +370,6 @@
           return $rootScope.setShowing();
         }
       };
-      console.log("Maps init");
       MapService.init();
       return LogService.initCountries().then(function(data) {
         return LogService.initLogs();
@@ -460,7 +553,7 @@
                   $scope.complete = true;
                   $rootScope.setShowing();
                   if (data.status === 200) {
-                    $scope.completeUrl = "http://www.travellog.io/log/" + $scope.selectedFile.id;
+                    $scope.completeUrl = window.location.protocol + "//" + window.location.host + $scope.selectedFile.id;
                     return $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:";
                   } else {
                     $scope.completeUrl = "";
