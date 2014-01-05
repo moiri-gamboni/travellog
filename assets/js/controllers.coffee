@@ -9,6 +9,7 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
   canBegin = false
   $scope.log = null
   $scope.otherLog = null
+  $rootScope.miniMapMgrLoaded = $q.defer()
 
   dropPins = () ->
     deferredPins = []
@@ -31,6 +32,13 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     for deferred in deferredPins
       promisedPins.push(deferred.promise)
     return $q.all(promisedPins)
+
+  $scope.deactivateOverlay = (view) ->
+    $("#overlay, #overlay-content").removeClass("fadein")
+    $rootScope.overlayIsActive = false
+    $scope.changeShowing("small corner")
+    fadeLoading(true)
+    $rootScope.setShowing()
 
   $scope.begin = () ->
     if canBegin
@@ -146,7 +154,7 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
       log = LogService.logs[logId]
       document.title = "Travellog - " + log.title
       # Change comments
-      $("#disqus_thread").remove()
+      $("#g-comments").remove()
       if options.invert
         if not switchLogs
           $scope.otherLog = log
@@ -160,11 +168,13 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
         else
           $scope.log = log
       if options.firstLoad or (options.invert)
-        $(".main .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>")
+        $(".main .log-wrapper").scrollTop(0).children(".log-content").append("<div id='g-comments'></div>")
       else
-        $(".launch .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>")
+        $(".launch .log-wrapper").scrollTop(0).children(".log-content").append("<div id='g-comments'></div>")
       if options.manualSwitch
         switchLogs = not switchLogs
+      if options.pushState
+        history.pushState(log.id, log.title, "/log/"+log.id)
       LogService.current = log.key
 
       fn = () ->
@@ -178,19 +188,20 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
             $(".main .log-author").html(log.profileName)
           else
             $(".launch .log-author").html(log.profileName)
-        if options.pushState
-          history.pushState(log.id, log.title, "/log/"+log.id)
-          gapi.plus.render("plus-button",
-            action: "share"
-            align: "right"
-            annotation: "bubble"
-            href: document.location.href
-          )
-        if options.changeMarker
-          MapService.changeLocation(log.id)
 
-        DISQUS?.reset(
-          reload: true
+        if options.changeMarker
+          MapService.changeLocation(logId)
+        gapi.plus.render("plus-button",
+          action: "share"
+          align: "right"
+          annotation: "bubble"
+          href: document.location.href
+        )
+        gapi.comments.render('g-comments',
+          href: window.location
+          width: 624
+          first_party_property: 'BLOGGER'
+          view_type: 'FILTERED_POSTMOD'
         )
       if not options.removeRendering
         fn()
@@ -248,12 +259,8 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
     if event.state?
       showLog(event.state, {invert:true, pushState:false})
 
-  $scope.deactivateOverlay = (view) ->
-    $rootScope.overlayIsActive = false
-
   $scope.changeShowing = (view) ->
     if !$("#loading").hasClass("fadein")
-      $rootScope.loadingposition = "big center"
       $rootScope.showing = view
       $rootScope.overlayIsActive = true
       if $rootScope.loggedIn and not $rootScope.filesLoaded
@@ -270,6 +277,8 @@ ctrl.controller("mainCtrl", ['$q', '$http', '$scope', '$rootScope', '$timeout', 
       $("#start-here").addClass("fadein")
       canBegin = true
       return LogService.initLog($rootScope.urlEntered)
+  ).then(() ->
+    return $rootScope.miniMapMgrLoaded.promise
   ).then(
     (log) ->
       isFirstLogReady = true
@@ -343,7 +352,11 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
     retrieveAllFiles((resp) ->
       $scope.$apply(() ->
         $scope.filesLoaded = true
-        $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded"
+        if resp.length > 0
+          $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded"
+        else
+          $scope.numFilesMessage = "You have no google documents in your drive"
+          $("#file-loading-message").css({color: "red"})
         fadeLoading(true)
         $timeout(() ->
           switchLoading("center big")
@@ -382,7 +395,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
         returnVal = 'login'
         if $rootScope.overlayIsActive
           fadeLoading(true)
-    angular.element("html").scope().$broadcast('update-load');
+    angular.element("html").scope().$broadcast('update-load')
     $scope.display = returnVal
 
   $scope.canSubmit = () ->
@@ -391,6 +404,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
   $scope.activateOverlay = (view) ->
     $rootScope.overlayIsActive = true
     $scope.changeShowing(view)
+
 
   $scope.overlayActive = () ->
     return $scope.overlayIsActive

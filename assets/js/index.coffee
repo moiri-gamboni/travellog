@@ -18,10 +18,6 @@ $("#add, #question").click () ->
 		switchLoading('big center')
 		$("#overlay, #overlay-content").addClass("fadein")
 
-$("#escape").click () ->
-	switchLoading('small corner')
-	$("#overlay, #overlay-content").removeClass("fadein")
-
 window.incrementBackground = () ->
 	$(".background").toggleClass("active passive")
 	passive = $(".passive")

@@ -27,11 +27,6 @@
     }
   });
 
-  $("#escape").click(function() {
-    switchLoading('small corner');
-    return $("#overlay, #overlay-content").removeClass("fadein");
-  });
-
   window.incrementBackground = function() {
     var counter, newCounter, passive;
     $(".background").toggleClass("active passive");

@@ -15,6 +15,7 @@
       canBegin = false;
       $scope.log = null;
       $scope.otherLog = null;
+      $rootScope.miniMapMgrLoaded = $q.defer();
       dropPins = function() {
         var country, deferred, deferredPins, dropPin, i, loader, promisedPins, _i, _j, _len, _len1, _ref;
         deferredPins = [];
@@ -47,6 +48,13 @@
           promisedPins.push(deferred.promise);
         }
         return $q.all(promisedPins);
+      };
+      $scope.deactivateOverlay = function(view) {
+        $("#overlay, #overlay-content").removeClass("fadein");
+        $rootScope.overlayIsActive = false;
+        $scope.changeShowing("small corner");
+        fadeLoading(true);
+        return $rootScope.setShowing();
       };
       $scope.begin = function() {
         if (canBegin) {
@@ -211,7 +219,7 @@
         if (logId != null) {
           log = LogService.logs[logId];
           document.title = "Travellog - " + log.title;
-          $("#disqus_thread").remove();
+          $("#g-comments").remove();
           if (options.invert) {
             if (!switchLogs) {
               $scope.otherLog = log;
@@ -228,12 +236,15 @@
             }
           }
           if (options.firstLoad || options.invert) {
-            $(".main .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>");
+            $(".main .log-wrapper").scrollTop(0).children(".log-content").append("<div id='g-comments'></div>");
           } else {
-            $(".launch .log-wrapper").scrollTop(0).children(".log-content").append("<div id='disqus_thread'></div>");
+            $(".launch .log-wrapper").scrollTop(0).children(".log-content").append("<div id='g-comments'></div>");
           }
           if (options.manualSwitch) {
             switchLogs = !switchLogs;
+          }
+          if (options.pushState) {
+            history.pushState(log.id, log.title, "/log/" + log.id);
           }
           LogService.current = log.key;
           fn = function() {
@@ -250,21 +261,21 @@
                 $(".launch .log-author").html(log.profileName);
               }
             }
-            if (options.pushState) {
-              history.pushState(log.id, log.title, "/log/" + log.id);
-              gapi.plus.render("plus-button", {
-                action: "share",
-                align: "right",
-                annotation: "bubble",
-                href: document.location.href
-              });
-            }
             if (options.changeMarker) {
-              MapService.changeLocation(log.id);
+              MapService.changeLocation(logId);
             }
-            return typeof DISQUS !== "undefined" && DISQUS !== null ? DISQUS.reset({
-              reload: true
-            }) : void 0;
+            gapi.plus.render("plus-button", {
+              action: "share",
+              align: "right",
+              annotation: "bubble",
+              href: document.location.href
+            });
+            return gapi.comments.render('g-comments', {
+              href: window.location,
+              width: 624,
+              first_party_property: 'BLOGGER',
+              view_type: 'FILTERED_POSTMOD'
+            });
           };
           if (!options.removeRendering) {
             return fn();
@@ -346,12 +357,8 @@
           });
         }
       };
-      $scope.deactivateOverlay = function(view) {
-        return $rootScope.overlayIsActive = false;
-      };
       $scope.changeShowing = function(view) {
         if (!$("#loading").hasClass("fadein")) {
-          $rootScope.loadingposition = "big center";
           $rootScope.showing = view;
           $rootScope.overlayIsActive = true;
           if ($rootScope.loggedIn && !$rootScope.filesLoaded) {
@@ -368,6 +375,8 @@
         $("#start-here").addClass("fadein");
         canBegin = true;
         return LogService.initLog($rootScope.urlEntered);
+      }).then(function() {
+        return $rootScope.miniMapMgrLoaded.promise;
       }).then(function(log) {
         isFirstLogReady = true;
         if (arePinsDropped) {
@@ -440,7 +449,14 @@
         retrieveAllFiles(function(resp) {
           $scope.$apply(function() {
             $scope.filesLoaded = true;
-            $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded";
+            if (resp.length > 0) {
+              $scope.numFilesMessage = "All " + $scope.myfiles.length + " files loaded";
+            } else {
+              $scope.numFilesMessage = "You have no google documents in your drive";
+              $("#file-loading-message").css({
+                color: "red"
+              });
+            }
             fadeLoading(true);
             return $timeout(function() {
               return switchLoading("center big");

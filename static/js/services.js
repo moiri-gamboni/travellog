@@ -21,8 +21,7 @@
             promise = $http.get(window.location.protocol + "//" + window.location.host + endpoint);
           }
           promise.error(function(data, status, headers, config) {
-            console.log(data);
-            return alert("Unknown Error, please try again later.");
+            return console.log("Unknown Error, please try again later.");
           });
           return promise;
         },
@@ -35,8 +34,7 @@
             promise = $http.post(window.location.protocol + "//" + window.location.host + endpoint);
           }
           promise.error(function(data, status, headers, config) {
-            console.log(data);
-            return alert("Unknown Error, please try again later.");
+            return console.log("Unknown Error, please try again later.");
           });
           return promise;
         },
@@ -51,8 +49,7 @@
             promise = $http["delete"](window.location.protocol + "//" + window.location.host + endpoint);
           }
           promise.error(function(data, status, headers, config) {
-            console.log(data);
-            return alert("Unknown Error, please try again later.");
+            return console.log("Unknown Error, please try again later.");
           });
           return promise;
         },
@@ -120,8 +117,6 @@
               factory.logs[data.log.id].body = data.log.body;
               return deferred.resolve(factory.logs[data.log.id]);
             }).error(function(data) {
-              console.log('getlog error');
-              console.log(data);
               return deferred.reject({
                 msg: 'getLog error',
                 err: data
@@ -152,17 +147,12 @@
                       country: countryName,
                       countryLat: location.lat(),
                       countryLng: location.lng()
-                    }), function(resp) {
-                      return console.log("updated log with new geocode");
-                    });
+                    }));
                   });
                 } else {
-                  console.log("attempting geocode with existing country " + countryName);
                   return $.post(window.location.origin + "/log/" + log.id + "/edit", JSON.stringify({
                     country: countryName
-                  }), function(resp) {
-                    return console.log("updated log");
-                  });
+                  }));
                 }
               });
             }, 3000 * i);
@@ -361,6 +351,7 @@
           mapOptions = {
             center: new google.maps.LatLng(20, 0),
             zoom: 1,
+            disableDefaultUI: true,
             styles: [
               {
                 featureType: "administrative",
@@ -443,6 +434,9 @@
           };
           this.miniMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
           this.miniMapMgr = new MarkerManager(this.miniMap);
+          google.maps.event.addListener(this.miniMapMgr, 'loaded', function() {
+            return $rootScope.miniMapMgrLoaded.resolve();
+          });
           input = document.getElementById('place-search');
           this.miniMap.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
           searchBox = new google.maps.places.SearchBox(input);
@@ -459,6 +453,7 @@
             _this = this;
           mapOptions = {
             center: new google.maps.LatLng(0, 0),
+            disableDefaultUI: true,
             zoom: 2,
             styles: [
               {
@@ -627,7 +622,6 @@
               }
             } else {
               console.log("Geocoder failed due to: " + status);
-              console.log(latlng);
               return typeof callback === "function" && callback("Other", "Other");
             }
           });
