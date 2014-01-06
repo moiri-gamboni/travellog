@@ -447,7 +447,7 @@ ctrl.controller("MyFilesController", ['$http', '$scope', '$rootScope', '$timeout
              $scope.complete = true
              $rootScope.setShowing()
              if data.status == 200
-                $scope.completeUrl = window.location.protocol + "//" + window.location.host + $scope.selectedFile.id
+                $scope.completeUrl = window.location.protocol + "//" + window.location.host + "/log/" + $scope.selectedFile.id
                 $scope.successMessage = "Congratulations, your travel log has been uploaded and is available at:"
               else
                 $scope.completeUrl = ""
